@@ -365,8 +365,7 @@
                 </div>
                 <button onclick="staffLogin()" class="btn" style="width: 100%;">Login</button>
                 <p style="color: var(--text-dim); margin-top: 1rem; text-align: center; font-size: 0.85rem;">
-                    Default password: admin123
-                    <br><a href="index.html" style="color: var(--accent); text-decoration: none;">← Back to Visitor Check-In</a>
+                    <a href="index.html" style="color: var(--accent); text-decoration: none;">← Back to Visitor Check-In</a>
                 </p>
             </div>
         </div>
@@ -680,8 +679,65 @@
                 return;
             }
 
-            const names = stillIn.map(v => `- ${v.fullName} (${v.company})`).join('\n');
-            alert(`⚠️ ${stillIn.length} visitor(s) still checked in:\n\n${names}`);
+            // Create modal for manual check-out
+            const modalHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;" id="eodModal">
+                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                        <h2 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">⚠️ Visitors Still Checked In</h2>
+                        <p style="color: var(--text-dim); margin-bottom: 1.5rem;">${stillIn.length} visitor(s) have not checked out yet. You can manually check them out if they have left.</p>
+                        
+                        <div id="eodList">
+                            ${stillIn.map(v => `
+                                <div style="background: var(--secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                    <div style="flex: 1; min-width: 200px;">
+                                        <strong style="color: var(--text); font-size: 1.1rem;">${v.fullName}</strong><br>
+                                        <span style="color: var(--text-dim); font-size: 0.9rem;">${v.company} • Visiting: ${v.hostName}</span><br>
+                                        <span style="color: var(--text-dim); font-size: 0.85rem;">Checked in: ${new Date(v.checkInTime).toLocaleString()}</span>
+                                    </div>
+                                    <button onclick="manualCheckOut('${v.id}')" style="background: var(--danger); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap;">Check Out</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; text-align: center;">
+                            <button onclick="closeEODModal()" style="background: var(--secondary); color: var(--text); border: 1px solid var(--border); padding: 0.75rem 2rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Close</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function manualCheckOut(visitorId) {
+            if (!confirm('Confirm manual check-out for this visitor?')) {
+                return;
+            }
+            
+            visitors = JSON.parse(localStorage.getItem('visitors')) || [];
+            const visitor = visitors.find(v => v.id === visitorId);
+            
+            if (visitor) {
+                visitor.checkOutTime = new Date().toISOString();
+                visitor.status = 'OUT';
+                localStorage.setItem('visitors', JSON.stringify(visitors));
+                
+                alert(`✅ ${visitor.fullName} has been checked out manually.`);
+                closeEODModal();
+                updateDashboard();
+                
+                // If on current visitors tab, refresh it
+                if (document.getElementById('current').classList.contains('active')) {
+                    displayCurrentVisitors();
+                }
+            }
+        }
+
+        function closeEODModal() {
+            const modal = document.getElementById('eodModal');
+            if (modal) {
+                modal.remove();
+            }
         }
 
         function clearHistory() {
