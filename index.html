@@ -408,7 +408,7 @@
 
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('new')">New Visitor</button>
-            <button class="nav-tab" onclick="switchTab('returning')">Returning Visitor</button>
+            <button class="nav-tab" onclick="switchTab('returning')">Quick Check-In</button>
             <button class="nav-tab" onclick="switchTab('checkout')">Check Out</button>
         </div>
 
@@ -466,7 +466,7 @@
         <!-- Returning Visitor Tab -->
         <div id="returning" class="tab-content">
             <div class="card">
-                <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Quick Check-In (Returning Visitors)</h2>
+                <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Quick Check-In</h2>
                 <div id="returningAlert"></div>
                 <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Enter your name or phone number to retrieve your previous details</p>
                 
@@ -745,28 +745,106 @@
         function sendToMobile() {
             if (!currentBadgeData) return;
             
+            // Show loading
+            const originalBtn = event.target;
+            const originalText = originalBtn.textContent;
+            originalBtn.textContent = 'Generating...';
+            originalBtn.disabled = true;
+            
             const badge = document.getElementById('badgeToPrint');
             html2canvas(badge, {
                 scale: 3,
                 backgroundColor: '#ffffff'
             }).then(canvas => {
-                canvas.toBlob(blob => {
-                    const message = `Your visitor badge for ${currentBadgeData.fullName}. Show this upon entry and exit.`;
-                    const whatsappUrl = `https://wa.me/${currentBadgeData.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
-                    
-                    alert(`Badge image ready!\n\nOption 1: Send via WhatsApp (opening now)\nOption 2: Download and send manually\n\nPhone: ${currentBadgeData.phone}`);
-                    
-                    // Open WhatsApp
-                    window.open(whatsappUrl, '_blank');
-                    
-                    // Also trigger download
-                    const url = canvas.toDataURL('image/jpeg', 0.9);
-                    const link = document.createElement('a');
-                    link.download = `visitor-badge-${currentBadgeData.id}.jpg`;
-                    link.href = url;
-                    link.click();
-                });
+                // Download the badge
+                const url = canvas.toDataURL('image/jpeg', 0.95);
+                const link = document.createElement('a');
+                const fileName = `visitor-badge-${currentBadgeData.fullName.replace(/\s+/g, '-')}.jpg`;
+                link.download = fileName;
+                link.href = url;
+                link.click();
+                
+                // Clean phone number
+                const cleanPhone = currentBadgeData.phone.replace(/[^0-9+]/g, '');
+                const displayPhone = currentBadgeData.phone;
+                
+                // Create message
+                const message = `Hello! Your visitor badge has been generated. Visitor ID: ${currentBadgeData.id}. Please show your badge when arriving and leaving.`;
+                
+                // Create modal with options
+                const modalHTML = `
+                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10000;" id="sendModal">
+                        <div style="background: var(--card-bg); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; max-width: 500px; text-align: center;">
+                            <h3 style="color: var(--accent); margin-bottom: 1rem; font-size: 1.3rem;">✅ Badge Downloaded!</h3>
+                            <p style="color: var(--text); margin-bottom: 1.5rem;">Saved as: ${fileName}</p>
+                            
+                            <div style="background: var(--secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                                <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.5rem;">Visitor: ${currentBadgeData.fullName}</p>
+                                <p style="color: var(--accent); font-size: 1.1rem; font-weight: bold;">${displayPhone}</p>
+                            </div>
+                            
+                            <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1.5rem;">Choose how to send the badge:</p>
+                            
+                            <div style="display: grid; gap: 1rem;">
+                                <button onclick="openWhatsApp('${cleanPhone}', '${encodeURIComponent(message).replace(/'/g, "\\'")}', '${fileName}')" style="background: #25D366; color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem;">
+                                    📱 Open WhatsApp
+                                </button>
+                                <button onclick="openSMS('${cleanPhone}', '${encodeURIComponent(message).replace(/'/g, "\\'")}', '${fileName}')" style="background: var(--accent); color: var(--primary); border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem;">
+                                    💬 Send SMS
+                                </button>
+                                <button onclick="copyPhone('${displayPhone}')" style="background: var(--secondary); color: var(--text); border: 1px solid var(--border); padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                    📋 Copy Phone Number
+                                </button>
+                                <button onclick="closeSendModal()" style="background: var(--secondary); color: var(--text-dim); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; cursor: pointer;">
+                                    Close
+                                </button>
+                            </div>
+                            
+                            <p style="color: var(--warning); font-size: 0.85rem; margin-top: 1rem; background: rgba(255, 170, 0, 0.1); padding: 0.75rem; border-radius: 6px;">
+                                💡 Badge image is in your Downloads folder<br>Attach it to your message manually
+                            </p>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Reset button
+                originalBtn.textContent = originalText;
+                originalBtn.disabled = false;
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Error generating badge. Please try again.');
+                originalBtn.textContent = originalText;
+                originalBtn.disabled = false;
             });
+        }
+
+        function openWhatsApp(phone, message, fileName) {
+            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+            setTimeout(() => {
+                alert(`📱 WhatsApp opened for ${phone}\n\n📎 To send the badge:\n1. Click attachment (📎) button\n2. Select Gallery/Photos\n3. Choose: ${fileName}\n4. Send!`);
+            }, 1000);
+        }
+
+        function openSMS(phone, message, fileName) {
+            window.open(`sms:${phone}?body=${message}`, '_blank');
+            setTimeout(() => {
+                alert(`💬 SMS opened for ${phone}\n\n📎 To attach badge:\n1. Click attachment button\n2. Select the badge image: ${fileName}\n3. Send!`);
+            }, 1000);
+        }
+
+        function copyPhone(phone) {
+            navigator.clipboard.writeText(phone).then(() => {
+                alert(`✅ Phone number copied: ${phone}\n\nYou can now:\n1. Paste in any messaging app\n2. Attach the badge image from Downloads\n3. Send!`);
+            }).catch(() => {
+                prompt('Copy this phone number:', phone);
+            });
+        }
+
+        function closeSendModal() {
+            const modal = document.getElementById('sendModal');
+            if (modal) modal.remove();
         }
 
         function closeBadgeModal() {
