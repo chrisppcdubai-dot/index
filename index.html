@@ -376,57 +376,39 @@
             
             body {
                 background: white;
+            }
+            
+            body * {
+                visibility: hidden;
+            }
+            
+            .visitor-badge, .visitor-badge * {
+                visibility: visible;
+            }
+            
+            .visitor-badge {
+                position: absolute;
+                top: 0;
+                left: 0;
                 width: 10cm;
                 height: 6.5cm;
                 margin: 0;
-                padding: 0;
-            }
+		padding: 16px !important;
+                box-shadow: none;
+		transform: none !important;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+           	}
+             }
+ 	}
             
-            body::before {
-                display: none;
-            }
-            
-            .container,
-            header,
-            .nav-tabs,
-            .tab-content,
-            .staff-link,
+            .modal,
             .modal-content,
-            .modal-close,
-            .action-buttons {
+            .action-buttons,
+            button {
                 display: none !important;
-            }
-            
-            .modal {
-                display: block !important;
-                position: static !important;
-                background: white !important;
-            }
-            
-            .visitor-badge {
-                display: block !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 10cm !important;
-                height: 6.5cm !important;
-                margin: 0 !important;
-                padding: 16px !important;
-                box-shadow: none !important;
-                border: 2px solid #000 !important;
-                page-break-after: avoid !important;
-                page-break-inside: avoid !important;
-            }
-        }
+                visibility: hidden !important;
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .visitor-badge {
-                width: 340px;
-                height: 220px;
             }
         }
     </style>
