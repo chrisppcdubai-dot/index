@@ -489,8 +489,8 @@
                         <input type="hidden" id="returnCompany">
                         
                         <div class="form-group">
-                            <label for="returnHostName">Person/Department Visiting *</label>
-                            <input type="text" id="returnHostName" required>
+                            <label for="returnHostName">Person/Department Visiting</label>
+                            <input type="text" id="returnHostName">
                         </div>
                         
                         <div class="form-group">
@@ -499,12 +499,12 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="returnPurpose">Purpose of Visit *</label>
-                            <textarea id="returnPurpose" required></textarea>
+                            <label for="returnPurpose">Purpose of Visit</label>
+                            <textarea id="returnPurpose"></textarea>
                         </div>
                         
                         <div class="form-group">
-                            <label for="returnVehicle">Vehicle Details (Optional)</label>
+                            <label for="returnVehicle">Vehicle Details</label>
                             <input type="text" id="returnVehicle">
                         </div>
                         
@@ -542,6 +542,7 @@
             <div class="action-buttons">
                 <button onclick="printBadge()" class="btn">🖨️ Print</button>
                 <button onclick="saveBadgeAsPDF()" class="btn">💾 Save PDF</button>
+                <button onclick="sendViaEmail()" class="btn">📧 Email Badge</button>
                 <button onclick="sendToMobile()" class="btn">📱 Send to Mobile</button>
                 <button onclick="closeBadgeModal()" class="btn btn-secondary">Close</button>
             </div>
@@ -621,19 +622,27 @@
                 showAlert('returningAlert', 'error', 'Please enter a name or phone number');
                 return;
             }
-
+        
             const found = visitors.find(v => 
                 v.fullName.toLowerCase().includes(query) || 
                 v.phone.includes(query)
             );
-
+        
             if (found) {
+                // Fill all hidden fields
                 document.getElementById('returnFullName').value = found.fullName;
                 document.getElementById('returnPhone').value = found.phone;
                 document.getElementById('returnEmail').value = found.email;
                 document.getElementById('returnCompany').value = found.company;
+                
+                // Pre-fill editable fields with previous data
+                document.getElementById('returnHostName').value = found.hostName || '';
+                document.getElementById('returnHostCompany').value = found.hostCompany || 'Plastic Powder Coating Company LLC';
+                document.getElementById('returnPurpose').value = found.purpose || '';
+                document.getElementById('returnVehicle').value = found.vehicle || '';
+                
                 document.getElementById('returningForm').style.display = 'block';
-                showAlert('returningAlert', 'success', `Welcome back, ${found.fullName}!`);
+                showAlert('returningAlert', 'success', `Welcome back, ${found.fullName}! All your previous details have been loaded. Edit if needed or click Check In.`);
             } else {
                 showAlert('returningAlert', 'error', 'Visitor not found. Please use "New Visitor" tab.');
                 document.getElementById('returningForm').style.display = 'none';
@@ -844,6 +853,100 @@
 
         function closeSendModal() {
             const modal = document.getElementById('sendModal');
+            if (modal) modal.remove();
+        }
+
+        function sendViaEmail() {
+            if (!currentBadgeData) return;
+            
+            const originalBtn = event.target;
+            const originalText = originalBtn.textContent;
+            originalBtn.textContent = 'Preparing...';
+            originalBtn.disabled = true;
+            
+            const badge = document.getElementById('badgeToPrint');
+            html2canvas(badge, {
+                scale: 3,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const imageData = canvas.toDataURL('image/jpeg', 0.95);
+                
+                // Download the badge
+                const link = document.createElement('a');
+                const fileName = `visitor-badge-${currentBadgeData.fullName.replace(/\s+/g, '-')}.jpg`;
+                link.download = fileName;
+                link.href = imageData;
+                link.click();
+                
+                // Create email content
+                const subject = encodeURIComponent(`Your Visitor Badge - ${currentBadgeData.fullName}`);
+                const body = encodeURIComponent(
+                    `Dear ${currentBadgeData.fullName},\n\n` +
+                    `Your visitor badge has been generated for your visit to Plastic Powder Coating Company LLC.\n\n` +
+                    `Visitor Details:\n` +
+                    `• Name: ${currentBadgeData.fullName}\n` +
+                    `• Company: ${currentBadgeData.company}\n` +
+                    `• Visiting: ${currentBadgeData.hostName}\n` +
+                    `• Visitor ID: ${currentBadgeData.id}\n` +
+                    `• Date: ${new Date(currentBadgeData.checkInTime).toLocaleDateString()}\n\n` +
+                    `Please show this badge upon arrival and when leaving the facility.\n\n` +
+                    `The badge image has been downloaded to your device. Please attach it to this email.\n\n` +
+                    `Best regards,\n` +
+                    `Plastic Powder Coating Company LLC`
+                );
+                
+                if (currentBadgeData.email && currentBadgeData.email.includes('@')) {
+                    // Show success modal
+                    const modalHTML = `
+                        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10000;" id="emailModal">
+                            <div style="background: var(--card-bg); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; max-width: 500px; text-align: center;">
+                                <h3 style="color: var(--accent); margin-bottom: 1rem; font-size: 1.3rem;">📧 Email Ready!</h3>
+                                <p style="color: var(--text); margin-bottom: 1rem;">Badge downloaded: ${fileName}</p>
+                                
+                                <div style="background: var(--secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                                    <p style="color: var(--text-dim); font-size: 0.9rem;">Sending to:</p>
+                                    <p style="color: var(--accent); font-size: 1.1rem; font-weight: bold; margin-top: 0.5rem;">${currentBadgeData.email}</p>
+                                </div>
+                                
+                                <button onclick="openEmailClient('${currentBadgeData.email}', '${subject}', '${body}', '${fileName}')" style="background: var(--accent); color: var(--primary); border: none; padding: 1rem 2rem; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; margin-bottom: 1rem; font-size: 1.1rem;">
+                                    Open Email Client
+                                </button>
+                                
+                                <button onclick="closeEmailModal()" style="background: var(--secondary); color: var(--text); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; cursor: pointer; width: 100%;">
+                                    Close
+                                </button>
+                                
+                                <p style="color: var(--warning); font-size: 0.85rem; margin-top: 1rem; background: rgba(255, 170, 0, 0.1); padding: 0.75rem; border-radius: 6px;">
+                                    📎 Badge is in Downloads folder<br>Attach it before sending the email
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.insertAdjacentHTML('beforeend', modalHTML);
+                } else {
+                    alert('❌ No valid email address found for this visitor.\n\nEmail: ' + (currentBadgeData.email || 'Not provided') + '\n\nPlease use "Send to Mobile" instead.');
+                }
+                
+                originalBtn.textContent = originalText;
+                originalBtn.disabled = false;
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Error generating badge. Please try again.');
+                originalBtn.textContent = originalText;
+                originalBtn.disabled = false;
+            });
+        }
+
+        function openEmailClient(email, subject, body, fileName) {
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+            setTimeout(() => {
+                alert(`✅ Email client opened!\n\nTo: ${email}\n\n📎 Please attach the badge:\n"${fileName}"\n\nIt's in your Downloads folder.`);
+            }, 500);
+        }
+
+        function closeEmailModal() {
+            const modal = document.getElementById('emailModal');
             if (modal) modal.remove();
         }
 
