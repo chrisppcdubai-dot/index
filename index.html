@@ -367,51 +367,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
         }
-
-        @media print {
-		    @page {
-		        size: 10cm 6.5cm;
-		        margin: 0;
-		    }
-		    
-		    body {
-		        background: white !important;
-		        width: 10cm;
-		        height: 6.5cm;
-		        margin: 0;
-		        padding: 0;
-		    }
-		    
-		    body::before {
-		        display: none !important;
-		    }
-		    
-		    body * {
-		        visibility: hidden !important;
-		    }
-		    
-		    .visitor-badge,
-		    .visitor-badge * {
-		        visibility: visible !important;
-		    }
-		    
-		    .visitor-badge {
-		        position: absolute !important;
-		        top: 0 !important;
-		        left: 0 !important;
-		        width: 10cm !important;
-		        height: 6.5cm !important;
-		        margin: 0 !important;
-		        padding: 16px !important;
-		        box-shadow: none !important;
-		        transform: none !important;
-		        page-break-after: avoid !important;
-		        page-break-inside: avoid !important;
-		        border: 2px solid #000 !important;
-		        border-radius: 8px !important;
-		        background: white !important;
-		    }
-		}
+        
     </style>
 </head>
 <body>
@@ -555,12 +511,12 @@
             <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace; text-align: center;">Visitor Badge</h2>
             <div id="badgePreview"></div>
             <div class="action-buttons">
-                <button onclick="printBadge()" class="btn">🖨️ Print</button>
-                <button onclick="saveBadgeAsPDF()" class="btn">💾 Save PDF</button>
-                <button onclick="sendViaEmail()" class="btn">📧 Email Badge</button>
-                <button onclick="sendToMobile()" class="btn">📱 Send to Mobile</button>
-                <button onclick="closeBadgeModal()" class="btn btn-secondary">Close</button>
-            </div>
+			    <button onclick="saveBadgeAsPDF()" class="btn">💾 Save PDF</button>
+			    <button onclick="saveAndPrint()" class="btn">🖨️ Save & Print</button>
+			    <button onclick="sendViaEmail()" class="btn">📧 Email Badge</button>
+			    <button onclick="sendToMobile()" class="btn">📱 Send to Mobile</button>
+			    <button onclick="closeBadgeModal()" class="btn btn-secondary">Close</button>
+			</div>
         </div>
     </div>
 
@@ -735,8 +691,99 @@
         }
 
         function printBadge() {
-            window.print();
-        }
+		    // This function is deprecated - use saveAndPrint() instead
+		    saveAndPrint();
+		}
+		
+		function saveAndPrint() {
+		    const badge = document.getElementById('badgeToPrint');
+		    
+		    // Show loading state
+		    const modalHTML = `
+		        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10001;" id="printLoadingModal">
+		            <div style="background: var(--card-bg); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; text-align: center;">
+		                <h3 style="color: var(--accent); margin-bottom: 1rem;">Preparing Badge...</h3>
+		                <p style="color: var(--text-dim);">Generating PDF for printing</p>
+		            </div>
+		        </div>
+		    `;
+		    document.body.insertAdjacentHTML('beforeend', modalHTML);
+		    
+		    html2canvas(badge, {
+		        scale: 3,
+		        backgroundColor: '#ffffff'
+		    }).then(canvas => {
+		        const imgData = canvas.toDataURL('image/png');
+		        const { jsPDF } = window.jspdf;
+		        const pdf = new jsPDF({
+		            orientation: 'landscape',
+		            unit: 'mm',
+		            format: [100, 65]
+		        });
+		        
+		        pdf.addImage(imgData, 'PNG', 0, 0, 100, 65);
+		        
+		        // Save the PDF
+		        const filename = `visitor-badge-${currentBadgeData.fullName.replace(/\s+/g, '-')}.pdf`;
+		        pdf.save(filename);
+		        
+		        // Remove loading modal
+		        const loadingModal = document.getElementById('printLoadingModal');
+		        if (loadingModal) loadingModal.remove();
+		        
+		        // Show print options modal
+		        const printModalHTML = `
+		            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10001;" id="printOptionsModal">
+		                <div style="background: var(--card-bg); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; max-width: 500px; text-align: center;">
+		                    <h3 style="color: var(--accent); margin-bottom: 1rem; font-size: 1.3rem;">✅ PDF Saved!</h3>
+		                    <p style="color: var(--text); margin-bottom: 1.5rem;">Badge saved as: <strong>${filename}</strong></p>
+		                    
+		                    <div style="background: rgba(0, 255, 136, 0.1); border: 1px solid var(--accent); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: left;">
+		                        <p style="color: var(--text); font-size: 0.95rem; line-height: 1.8;">
+		                            <strong style="color: var(--accent);">📋 To Print:</strong><br>
+		                            1. Open the downloaded PDF file<br>
+		                            2. Click Print (Ctrl+P)<br>
+		                            3. Select your printer<br>
+		                            4. Page size: 10cm x 6.5cm (or Landscape)<br>
+		                            5. Print quality: Normal/High<br>
+		                            6. Click Print
+		                        </p>
+		                    </div>
+		                    
+		                    <div style="display: grid; gap: 1rem;">
+		                        <button onclick="openPDFForPrint('${filename}')" style="background: var(--accent); color: var(--primary); border: none; padding: 1rem 2rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 1rem;">
+		                            🖨️ Open PDF to Print
+		                        </button>
+		                        <button onclick="closePrintOptionsModal()" style="background: var(--secondary); color: var(--text); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; cursor: pointer;">
+		                            Close
+		                        </button>
+		                    </div>
+		                    
+		                    <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 1rem; font-style: italic;">
+		                        💡 PDF is in your Downloads folder
+		                    </p>
+		                </div>
+		            </div>
+		        `;
+		        
+		        document.body.insertAdjacentHTML('beforeend', printModalHTML);
+		    }).catch(error => {
+		        const loadingModal = document.getElementById('printLoadingModal');
+		        if (loadingModal) loadingModal.remove();
+		        console.error('Error:', error);
+		        alert('Error generating PDF. Please try again.');
+		    });
+		}
+		
+		function openPDFForPrint(filename) {
+		    alert(`📁 Please open this file from your Downloads folder:\n\n${filename}\n\nThen press Ctrl+P to print.`);
+		    closePrintOptionsModal();
+		}
+		
+		function closePrintOptionsModal() {
+		    const modal = document.getElementById('printOptionsModal');
+		    if (modal) modal.remove();
+		}
 
         function saveBadgeAsPDF() {
             const badge = document.getElementById('badgeToPrint');
