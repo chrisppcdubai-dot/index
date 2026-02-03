@@ -678,28 +678,53 @@
                 alert('✅ All visitors have checked out!');
                 return;
             }
-
+        
+            // Track selected visitors
+            let selectedVisitors = new Set();
+        
             // Create modal for manual check-out
             const modalHTML = `
                 <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;" id="eodModal">
-                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; max-width: 600px; max-height: 80vh; overflow-y: auto;">
-                        <h2 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">⚠️ Visitors Still Checked In</h2>
-                        <p style="color: var(--text-dim); margin-bottom: 1.5rem;">${stillIn.length} visitor(s) have not checked out yet. You can manually check them out if they have left.</p>
+                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; max-width: 650px; max-height: 85vh; overflow-y: auto;">
+                        <h2 style="color: var(--accent); margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;">⚠️ Visitors Still Checked In</h2>
+                        <p style="color: var(--text-dim); margin-bottom: 1.5rem;">${stillIn.length} visitor(s) have not checked out yet.</p>
                         
-                        <div id="eodList">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: rgba(0, 255, 136, 0.1); border-radius: 8px; cursor: pointer;">
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="color: var(--accent); font-weight: 600; font-family: 'JetBrains Mono', monospace;">Select All</span>
+                            </label>
+                        </div>
+                        
+                        <div id="eodList" style="margin-bottom: 1.5rem;">
                             ${stillIn.map(v => `
-                                <div style="background: var(--secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                                    <div style="flex: 1; min-width: 200px;">
-                                        <strong style="color: var(--text); font-size: 1.1rem;">${v.fullName}</strong><br>
-                                        <span style="color: var(--text-dim); font-size: 0.9rem;">${v.company} • Visiting: ${v.hostName}</span><br>
-                                        <span style="color: var(--text-dim); font-size: 0.85rem;">Checked in: ${new Date(v.checkInTime).toLocaleString()}</span>
-                                    </div>
-                                    <button onclick="manualCheckOut('${v.id}')" style="background: var(--danger); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap;">Check Out</button>
+                                <div style="background: var(--secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                                    <label style="display: flex; gap: 1rem; align-items: start; cursor: pointer;">
+                                        <input type="checkbox" class="visitor-checkbox" value="${v.id}" onchange="updateSelection()" style="width: 18px; height: 18px; margin-top: 0.25rem; cursor: pointer; flex-shrink: 0;">
+                                        <div style="flex: 1;">
+                                            <strong style="color: var(--text); font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">${v.fullName}</strong>
+                                            <div style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6;">
+                                                <div><strong>Company:</strong> ${v.company}</div>
+                                                <div><strong>Visiting:</strong> ${v.hostName}</div>
+                                                <div><strong>Phone:</strong> ${v.phone}</div>
+                                                <div><strong>Checked in:</strong> ${new Date(v.checkInTime).toLocaleString()}</div>
+                                            </div>
+                                        </div>
+                                    </label>
                                 </div>
                             `).join('')}
                         </div>
                         
-                        <div style="margin-top: 1.5rem; text-align: center;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+                            <button onclick="checkOutSelected()" style="background: var(--accent); color: var(--primary); border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: 'JetBrains Mono', monospace;">
+                                ✓ Check Out Selected (<span id="selectedCount">0</span>)
+                            </button>
+                            <button onclick="checkOutAllVisitors()" style="background: var(--danger); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: 'JetBrains Mono', monospace;">
+                                ✓ Check Out All (${stillIn.length})
+                            </button>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 1rem;">
                             <button onclick="closeEODModal()" style="background: var(--secondary); color: var(--text); border: 1px solid var(--border); padding: 0.75rem 2rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Close</button>
                         </div>
                     </div>
@@ -708,7 +733,98 @@
             
             document.body.insertAdjacentHTML('beforeend', modalHTML);
         }
-
+        
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.visitor-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            
+            updateSelection();
+        }
+        
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.visitor-checkbox');
+            const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            document.getElementById('selectedCount').textContent = selectedCount;
+            
+            // Update select all checkbox state
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            const someChecked = Array.from(checkboxes).some(cb => cb.checked);
+            
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = someChecked && !allChecked;
+        }
+        
+        function checkOutSelected() {
+            const checkboxes = document.querySelectorAll('.visitor-checkbox:checked');
+            const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (selectedIds.length === 0) {
+                alert('⚠️ Please select at least one visitor to check out');
+                return;
+            }
+            
+            if (!confirm(`Check out ${selectedIds.length} visitor(s)?`)) {
+                return;
+            }
+            
+            visitors = JSON.parse(localStorage.getItem('visitors')) || [];
+            const now = new Date().toISOString();
+            let checkedOutNames = [];
+            
+            selectedIds.forEach(id => {
+                const visitor = visitors.find(v => v.id === id);
+                if (visitor && visitor.status === 'IN') {
+                    visitor.checkOutTime = now;
+                    visitor.status = 'OUT';
+                    checkedOutNames.push(visitor.fullName);
+                }
+            });
+            
+            localStorage.setItem('visitors', JSON.stringify(visitors));
+            
+            alert(`✅ Successfully checked out:\n\n${checkedOutNames.join('\n')}`);
+            closeEODModal();
+            updateDashboard();
+            
+            if (document.getElementById('current').classList.contains('active')) {
+                displayCurrentVisitors();
+            }
+        }
+        
+        function checkOutAllVisitors() {
+            visitors = JSON.parse(localStorage.getItem('visitors')) || [];
+            const stillIn = visitors.filter(v => v.status === 'IN');
+            
+            if (!confirm(`⚠️ Check out ALL ${stillIn.length} visitor(s)?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+            
+            const now = new Date().toISOString();
+            let checkedOutNames = [];
+            
+            stillIn.forEach(visitor => {
+                visitor.checkOutTime = now;
+                visitor.status = 'OUT';
+                checkedOutNames.push(visitor.fullName);
+            });
+            
+            localStorage.setItem('visitors', JSON.stringify(visitors));
+            
+            alert(`✅ Successfully checked out all ${checkedOutNames.length} visitors:\n\n${checkedOutNames.join('\n')}`);
+            closeEODModal();
+            updateDashboard();
+            
+            if (document.getElementById('current').classList.contains('active')) {
+                displayCurrentVisitors();
+            }
+        }
+        
         function manualCheckOut(visitorId) {
             if (!confirm('Confirm manual check-out for this visitor?')) {
                 return;
@@ -726,13 +842,12 @@
                 closeEODModal();
                 updateDashboard();
                 
-                // If on current visitors tab, refresh it
                 if (document.getElementById('current').classList.contains('active')) {
                     displayCurrentVisitors();
                 }
             }
         }
-
+        
         function closeEODModal() {
             const modal = document.getElementById('eodModal');
             if (modal) {
