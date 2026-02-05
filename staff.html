@@ -903,9 +903,9 @@
             }).join(',')).join('\n');
             
             const rangeStr = range === 'today' ? 'daily' : range === 'week' ? 'weekly' : range === 'month' ? 'monthly' : 'all-history';
-            const filename = `PPC-visitors-${rangeStr}-2026.xlsx`;
+            const filename = `PPC-visitors-${rangeStr}-2026.csv`;
             
-            const blob = new Blob([csv], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8;' });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -1011,7 +1011,10 @@
             document.getElementById('syncStatus').textContent = 'Configured ✅';
             document.getElementById('syncStatus').style.color = 'var(--accent)';
             
-            alert('✅ Google Sheets configured!\n\nAll new visitor check-ins will automatically sync to your sheet.');
+            // Auto-collapse the configuration fields after save
+            document.getElementById('googleSheetsConfig').style.display = 'none';
+            
+            alert('✅ Google Sheets configured!\n\nAll new visitor check-ins will automatically sync to your sheet.\n\nIMPORTANT: Make sure your API key has:\n1. Google Sheets API enabled\n2. HTTP referrer: https://chrisppdubai-dot.github.io/*');
         }
 
         function loadGoogleSheetsConfig() {
