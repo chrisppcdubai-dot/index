@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visitor Check-In</title>
+    <title>Visitor Check-In - PPC</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Work+Sans:wght@400;500;600;700&display=swap');
         
@@ -18,12 +18,11 @@
             --secondary: #1a1a1a;
             --accent: #00ff88;
             --accent-dim: #00cc6a;
-            --danger: #ff4444;
-            --warning: #ffaa00;
             --text: #ffffff;
             --text-dim: #a0a0a0;
             --border: #2a2a2a;
             --card-bg: #151515;
+            --warning: #ffaa00;
         }
 
         body {
@@ -32,37 +31,107 @@
             color: var(--text);
             min-height: 100vh;
             line-height: 1.6;
-            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 136, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
             padding: 2rem 0;
             border-bottom: 1px solid var(--border);
         }
 
         h1 {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
             background: linear-gradient(135deg, var(--accent) 0%, var(--text) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .subtitle {
             color: var(--text-dim);
+            font-size: 1rem;
             font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: var(--accent);
+            color: var(--primary);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card {
@@ -70,7 +139,8 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 2rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
         .form-group {
@@ -85,6 +155,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         input, select, textarea {
@@ -94,14 +165,20 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--text);
-            font-size: 1rem;
             font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+            background: var(--primary);
+        }
+
+        select {
+            cursor: pointer;
         }
 
         .btn {
@@ -114,9 +191,10 @@
             font-size: 0.9rem;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
         }
 
         .btn:hover {
@@ -124,31 +202,18 @@
             box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
         }
 
+        .btn:active {
+            transform: translateY(0);
+        }
+
         .btn-secondary {
             background: var(--secondary);
             color: var(--text);
             border: 1px solid var(--border);
-            margin-top: 1rem;
         }
 
-        .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .alert-success {
-            background: rgba(0, 255, 136, 0.1);
-            border-left-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .alert-error {
-            background: rgba(255, 68, 68, 0.1);
-            border-left-color: var(--danger);
-            color: var(--danger);
+        .btn-block {
+            width: 100%;
         }
 
         .modal {
@@ -163,6 +228,7 @@
             align-items: center;
             justify-content: center;
             padding: 1rem;
+            overflow-y: auto;
         }
 
         .modal.active {
@@ -174,9 +240,10 @@
             border: 2px solid var(--accent);
             border-radius: 12px;
             padding: 2rem;
-            max-width: 400px;
+            max-width: 500px;
             width: 100%;
-            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .badge-preview {
@@ -185,22 +252,38 @@
             padding: 1.5rem;
             border-radius: 8px;
             margin: 1rem 0;
+            text-align: center;
             border: 2px solid var(--accent);
+        }
+
+        .badge-preview h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .badge-preview h2 {
             color: black;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             margin-bottom: 0.5rem;
         }
 
         .badge-preview p {
-            color: #333;
+            color: #666;
             margin: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .badge-preview hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 1rem 0;
         }
 
         #qrcode {
             margin: 1rem 0;
+            display: flex;
+            justify-content: center;
         }
 
         .action-buttons {
@@ -209,18 +292,34 @@
             margin-top: 1.5rem;
         }
 
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .search-box {
+            margin-bottom: 1.5rem;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .visitor-item {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .visitor-item.checked-out {
+            border-left-color: var(--text-dim);
+            opacity: 0.7;
+        }
+
+        .visitor-info h3 {
+            color: var(--text);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .visitor-details {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.8;
         }
 
         @media print {
@@ -231,10 +330,26 @@
                 visibility: visible;
             }
             .badge-preview {
-                position: fixed;
-                top: 2cm;
-                left: 50%;
-                transform: translateX(-50%);
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 10cm;
+                height: 6.5cm;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .nav-tabs {
+                flex-direction: column;
+            }
+            .nav-tab {
+                width: 100%;
             }
         }
     </style>
@@ -246,74 +361,107 @@
             <p class="subtitle">Plastic Powder Coating Company</p>
         </header>
 
-        <div id="alertContainer"></div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('newVisitor')">New Visitor</button>
+            <button class="nav-tab" onclick="switchTab('quickCheckin')">Quick Check-In</button>
+            <button class="nav-tab" onclick="switchTab('checkout')">Check Out</button>
+        </div>
 
-        <div class="card">
-            <form id="visitorForm">
-                <div class="form-group">
-                    <label for="fullName">Full Name *</label>
-                    <input type="text" id="fullName" required>
-                </div>
+        <!-- NEW VISITOR TAB -->
+        <div id="newVisitor" class="tab-content active">
+            <div class="card">
+                <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">New Visitor Registration</h2>
+                <form id="newVisitorForm">
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="company">Company *</label>
-                    <input type="text" id="company" required>
-                </div>
+                    <div class="form-group">
+                        <label for="company">Company *</label>
+                        <input type="text" id="company" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="phone">Phone Number *</label>
-                    <input type="tel" id="phone" required>
-                </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="email">Email (Optional)</label>
-                    <input type="email" id="email">
-                </div>
+                    <div class="form-group">
+                        <label for="email">Email (Optional)</label>
+                        <input type="email" id="email">
+                    </div>
 
-                <div class="form-group">
-                    <label for="hostName">Visiting (Host Name)</label>
-                    <input type="text" id="hostName">
-                </div>
+                    <div class="form-group">
+                        <label for="hostName">Visiting (Host Name) *</label>
+                        <select id="hostName" required>
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="purpose">Purpose of Visit *</label>
-                    <select id="purpose" required>
-                        <option value="">Select purpose...</option>
-                        <option value="Meeting">Meeting</option>
-                        <option value="Delivery">Delivery</option>
-                        <option value="Interview">Interview</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label for="purpose">Purpose of Visit *</label>
+                        <select id="purpose" required>
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="vehicle">Vehicle Details (Optional)</label>
-                    <input type="text" id="vehicle" placeholder="e.g., DXB-12345">
-                </div>
+                    <div class="form-group">
+                        <label for="vehicle">Vehicle Details (Optional)</label>
+                        <input type="text" id="vehicle" placeholder="e.g., DXB-12345">
+                    </div>
 
-                <button type="submit" class="btn">
-                    <span id="submitText">Check In & Generate Badge</span>
-                    <span id="submitLoading" style="display: none;" class="loading"></span>
+                    <button type="submit" class="btn btn-block">Check In & Generate Badge</button>
+                </form>
+
+                <button onclick="window.location.href='staff.html'" class="btn btn-secondary btn-block" style="margin-top: 1rem;">
+                    🔒 Staff Portal
                 </button>
-            </form>
+            </div>
+        </div>
 
-            <button onclick="window.location.href='staff.html'" class="btn btn-secondary">
-                🔒 Staff Portal
-            </button>
+        <!-- QUICK CHECK-IN TAB -->
+        <div id="quickCheckin" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Quick Check-In</h2>
+                <p style="color: var(--text-dim); margin-bottom: 1.5rem;">For returning visitors - just enter phone number</p>
+                
+                <div class="form-group">
+                    <label for="quickPhone">Phone Number</label>
+                    <input type="tel" id="quickPhone" placeholder="Enter phone number">
+                </div>
+
+                <button onclick="quickCheckin()" class="btn btn-block">Search & Check In</button>
+
+                <div id="quickResult" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- CHECK OUT TAB -->
+        <div id="checkout" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Check Out Visitor</h2>
+                
+                <div class="form-group">
+                    <label for="searchCheckout">Search by Name or Phone</label>
+                    <input type="text" id="searchCheckout" placeholder="Search..." oninput="searchForCheckout()">
+                </div>
+
+                <div id="checkoutList"></div>
+            </div>
         </div>
     </div>
 
     <!-- Badge Modal -->
     <div id="badgeModal" class="modal">
         <div class="modal-content">
-            <h2 style="color: var(--accent); margin-bottom: 1rem;">Visitor Badge</h2>
+            <h2 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">Visitor Badge Generated</h2>
             
             <div class="badge-preview" id="badgeContent">
-                <h3 style="margin-bottom: 0.5rem;">Guest Card</h3>
+                <h3>Guest Card</h3>
                 <h2 id="badgeName"></h2>
                 <p id="badgeCompany"></p>
-                <hr style="margin: 1rem 0; border: 1px solid #ccc;">
+                <hr>
                 <p style="font-weight: bold;">Plastic Powder Coating Company LLC</p>
                 <div id="qrcode"></div>
                 <p style="font-size: 0.8rem; color: #666;">Please return this ticket when you leave. Have a nice day and welcome back!</p>
@@ -323,8 +471,7 @@
             <div class="action-buttons">
                 <button onclick="downloadPDF()" class="btn">📄 Save PDF</button>
                 <button onclick="printBadge()" class="btn btn-secondary">🖨️ Save & Print</button>
-                <button onclick="emailBadge()" class="btn btn-secondary">📧 Email Badge</button>
-                <button onclick="sendToMobile()" class="btn btn-secondary">📱 Send to Mobile</button>
+                <button onclick="sendNotifications()" class="btn btn-secondary">📧 Notify Host</button>
                 <button onclick="closeModal()" class="btn btn-secondary">Close</button>
             </div>
         </div>
@@ -335,34 +482,109 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
-        // Cloud-based configuration
-        const WEB_APP_URL = localStorage.getItem('webAppUrl') || '';
+        // Configuration
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwC4oUm3holztMyeFmPbfofAyLvZDg4bHrIsWgHHsfhpAwovC32eCOuva7fqEI-vKgo2Q/exec';
         
         let currentVisitor = null;
+        let allVisitors = [];
+        let staffList = [];
+        let purposesList = [];
 
-        // Check-in form submission
-        document.getElementById('visitorForm').addEventListener('submit', async function(e) {
+        // Auto-configure on load
+        if (!localStorage.getItem('webAppUrl')) {
+            localStorage.setItem('webAppUrl', WEB_APP_URL);
+        }
+
+        // Load data on page load
+        window.addEventListener('DOMContentLoaded', async function() {
+            await loadStaffList();
+            await loadPurposesList();
+            await loadVisitors();
+        });
+
+        // Load staff list from Google Sheets
+        async function loadStaffList() {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=getStaff`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    staffList = data.staff;
+                    const select = document.getElementById('hostName');
+                    select.innerHTML = '<option value="">Select host...</option>';
+                    staffList.forEach(staff => {
+                        select.innerHTML += `<option value="${staff.Name}" data-phone="${staff.Phone}" data-email="${staff.Email}">${staff.Name}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading staff:', error);
+            }
+        }
+
+        // Load purposes list from Google Sheets
+        async function loadPurposesList() {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=getPurposes`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    purposesList = data.purposes;
+                    const select = document.getElementById('purpose');
+                    select.innerHTML = '<option value="">Select purpose...</option>';
+                    purposesList.forEach(purpose => {
+                        select.innerHTML += `<option value="${purpose}">${purpose}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading purposes:', error);
+            }
+        }
+
+        // Load all visitors from Google Sheets
+        async function loadVisitors() {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=getVisitors`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allVisitors = data.visitors;
+                }
+            } catch (error) {
+                console.error('Error loading visitors:', error);
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const navTabs = document.querySelectorAll('.nav-tab');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'checkout') {
+                displayCheckoutList();
+            }
+        }
+
+        // New visitor form submission
+        document.getElementById('newVisitorForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            if (!WEB_APP_URL) {
-                showAlert('error', 'System not configured. Please contact staff.');
-                return;
-            }
-
-            const submitBtn = document.querySelector('button[type="submit"]');
-            const submitText = document.getElementById('submitText');
-            const submitLoading = document.getElementById('submitLoading');
+            const hostSelect = document.getElementById('hostName');
+            const selectedHost = hostSelect.options[hostSelect.selectedIndex];
             
-            submitBtn.disabled = true;
-            submitText.style.display = 'none';
-            submitLoading.style.display = 'inline-block';
-
             const visitor = {
                 fullName: document.getElementById('fullName').value,
                 company: document.getElementById('company').value,
                 phone: document.getElementById('phone').value,
                 email: document.getElementById('email').value || '',
-                hostName: document.getElementById('hostName').value || '',
+                hostName: hostSelect.value,
+                hostPhone: selectedHost.getAttribute('data-phone') || '',
+                hostEmail: selectedHost.getAttribute('data-email') || '',
                 hostCompany: 'Plastic Powder Coating Company LLC',
                 purpose: document.getElementById('purpose').value,
                 vehicle: document.getElementById('vehicle').value || '',
@@ -376,19 +598,15 @@
                 await syncToCloud(visitor);
                 currentVisitor = visitor;
                 generateBadge(visitor);
-                document.getElementById('visitorForm').reset();
-                showAlert('success', 'Check-in successful!');
+                document.getElementById('newVisitorForm').reset();
+                await loadVisitors(); // Refresh visitor list
             } catch (error) {
                 console.error('Check-in error:', error);
-                showAlert('error', 'Check-in failed. Please try again.');
-            } finally {
-                submitBtn.disabled = false;
-                submitText.style.display = 'inline';
-                submitLoading.style.display = 'none';
+                alert('❌ Check-in failed. Please try again.');
             }
         });
 
-        // Sync to cloud (Google Sheets)
+        // Sync visitor to cloud (Google Sheets)
         async function syncToCloud(visitor) {
             const checkInDate = new Date(visitor.checkInTime);
             const data = {
@@ -416,7 +634,7 @@
                 body: JSON.stringify(data)
             });
 
-            console.log('✅ Synced to cloud successfully');
+            console.log('✅ Synced to cloud');
         }
 
         // Generate badge
@@ -448,13 +666,13 @@
             
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: [100, 65]
+                orientation: 'landscape',
+                unit: 'cm',
+                format: [10, 6.5]
             });
             
-            pdf.addImage(imgData, 'PNG', 0, 0, 100, 65);
-            pdf.save(`visitor-badge-${currentVisitor.id}.pdf`);
+            pdf.addImage(imgData, 'PNG', 0, 0, 10, 6.5);
+            pdf.save(`visitor-badge-${currentVisitor.fullName.replace(/\s+/g, '-')}.pdf`);
         }
 
         // Print badge
@@ -465,24 +683,173 @@
             }, 500);
         }
 
-        // Email badge
-        function emailBadge() {
-            const email = currentVisitor.email || prompt('Enter email address:');
-            if (email) {
-                alert(`📧 Badge will be emailed to: ${email}\n\nNote: Please setup email integration in staff portal.`);
+        // Send notifications to host
+        function sendNotifications() {
+            if (!currentVisitor.hostEmail && !currentVisitor.hostPhone) {
+                alert('⚠️ No contact information available for host.\n\nPlease add phone/email in Staff Management.');
+                return;
+            }
+
+            const message = `🔔 Visitor Alert!\n\n${currentVisitor.fullName} from ${currentVisitor.company} is here to see you.\n\nPurpose: ${currentVisitor.purpose}\nTime: ${new Date().toLocaleString()}\n\nPlease come to reception.\n\n- PPC Reception`;
+
+            let sent = false;
+
+            // WhatsApp notification
+            if (currentVisitor.hostPhone) {
+                const whatsappUrl = `https://wa.me/${currentVisitor.hostPhone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+                sent = true;
+            }
+
+            // Email notification
+            if (currentVisitor.hostEmail) {
+                const subject = `Visitor Alert: ${currentVisitor.fullName} from ${currentVisitor.company}`;
+                const mailtoUrl = `mailto:${currentVisitor.hostEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+                window.location.href = mailtoUrl;
+                sent = true;
+            }
+
+            if (sent) {
+                alert('✅ Notification sent to host!');
             }
         }
 
-        // Send to mobile
-        function sendToMobile() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Visitor Badge',
-                    text: `Visitor Badge for ${currentVisitor.fullName}`,
-                    url: window.location.href
-                });
-            } else {
-                alert('📱 Share feature not available on this device.');
+        // Quick check-in
+        async function quickCheckin() {
+            const phone = document.getElementById('quickPhone').value.trim();
+            if (!phone) {
+                alert('Please enter a phone number');
+                return;
+            }
+
+            await loadVisitors(); // Refresh data
+            const previousVisitor = allVisitors.find(v => v.Phone === phone);
+
+            if (!previousVisitor) {
+                document.getElementById('quickResult').innerHTML = `
+                    <div class="visitor-item" style="border-left-color: var(--warning);">
+                        <p style="color: var(--warning);">❌ No previous visit found for this number.</p>
+                        <p style="color: var(--text-dim); margin-top: 0.5rem;">Please use the "New Visitor" tab to register.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Create new visit with previous visitor data
+            const hostSelect = document.getElementById('hostName');
+            const hostOption = Array.from(hostSelect.options).find(opt => opt.value === previousVisitor['Host Name']);
+            
+            const visitor = {
+                fullName: previousVisitor['Full Name'],
+                company: previousVisitor.Company,
+                phone: previousVisitor.Phone,
+                email: previousVisitor.Email || '',
+                hostName: previousVisitor['Host Name'],
+                hostPhone: hostOption ? hostOption.getAttribute('data-phone') : '',
+                hostEmail: hostOption ? hostOption.getAttribute('data-email') : '',
+                hostCompany: 'Plastic Powder Coating Company LLC',
+                purpose: previousVisitor.Purpose,
+                vehicle: previousVisitor.Vehicle || '',
+                id: 'VIS-' + Date.now(),
+                checkInTime: new Date().toISOString(),
+                checkOutTime: '',
+                status: 'IN'
+            };
+
+            try {
+                await syncToCloud(visitor);
+                currentVisitor = visitor;
+                
+                document.getElementById('quickResult').innerHTML = `
+                    <div class="visitor-item">
+                        <h3>${visitor.fullName}</h3>
+                        <div class="visitor-details">
+                            <p><strong>Company:</strong> ${visitor.company}</p>
+                            <p><strong>Visiting:</strong> ${visitor.hostName}</p>
+                            <p style="color: var(--accent); margin-top: 1rem;">✅ Checked in successfully!</p>
+                        </div>
+                        <button onclick="generateBadge(currentVisitor)" class="btn btn-block" style="margin-top: 1rem;">
+                            Generate Badge
+                        </button>
+                    </div>
+                `;
+                await loadVisitors();
+            } catch (error) {
+                console.error('Quick check-in error:', error);
+                alert('❌ Check-in failed. Please try again.');
+            }
+        }
+
+        // Display checkout list
+        async function displayCheckoutList() {
+            await loadVisitors();
+            const currentVisitors = allVisitors.filter(v => v.Status === 'IN');
+            const listDiv = document.getElementById('checkoutList');
+
+            if (currentVisitors.length === 0) {
+                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No visitors currently checked in</p>';
+                return;
+            }
+
+            listDiv.innerHTML = currentVisitors.map(v => `
+                <div class="visitor-item">
+                    <h3>${v['Full Name']}</h3>
+                    <div class="visitor-details">
+                        <p><strong>Company:</strong> ${v.Company}</p>
+                        <p><strong>Phone:</strong> ${v.Phone}</p>
+                        <p><strong>Check-In:</strong> ${v.Date} ${v['Check-In Time']}</p>
+                    </div>
+                    <button onclick="checkoutVisitor('${v['Visitor ID']}')" class="btn btn-block" style="margin-top: 1rem;">
+                        Check Out
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Search for checkout
+        function searchForCheckout() {
+            const query = document.getElementById('searchCheckout').value.toLowerCase();
+            const currentVisitors = allVisitors.filter(v => 
+                v.Status === 'IN' && 
+                (v['Full Name'].toLowerCase().includes(query) || v.Phone.includes(query))
+            );
+
+            const listDiv = document.getElementById('checkoutList');
+
+            if (currentVisitors.length === 0) {
+                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No matching visitors</p>';
+                return;
+            }
+
+            listDiv.innerHTML = currentVisitors.map(v => `
+                <div class="visitor-item">
+                    <h3>${v['Full Name']}</h3>
+                    <div class="visitor-details">
+                        <p><strong>Company:</strong> ${v.Company}</p>
+                        <p><strong>Phone:</strong> ${v.Phone}</p>
+                        <p><strong>Check-In:</strong> ${v.Date} ${v['Check-In Time']}</p>
+                    </div>
+                    <button onclick="checkoutVisitor('${v['Visitor ID']}')" class="btn btn-block" style="margin-top: 1rem;">
+                        Check Out
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Checkout visitor
+        async function checkoutVisitor(visitorId) {
+            if (!confirm('Check out this visitor?')) return;
+
+            try {
+                const checkoutTime = new Date().toLocaleTimeString('en-US', { hour12: false });
+                const response = await fetch(`${WEB_APP_URL}?action=checkout&visitorId=${visitorId}&checkoutTime=${checkoutTime}`);
+                
+                alert('✅ Visitor checked out successfully!');
+                await loadVisitors();
+                displayCheckoutList();
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('❌ Checkout failed. Please try again.');
             }
         }
 
@@ -490,25 +857,6 @@
         function closeModal() {
             document.getElementById('badgeModal').classList.remove('active');
         }
-
-        // Show alert
-        function showAlert(type, message) {
-            const alertDiv = document.getElementById('alertContainer');
-            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-            setTimeout(() => {
-                alertDiv.innerHTML = '';
-            }, 5000);
-        }
-
-        // Load configuration on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            const config = localStorage.getItem('webAppUrl');
-            if (!config) {
-                console.warn('⚠️ Web App URL not configured');
-            } else {
-                console.log('✅ System configured and ready');
-            }
-        });
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Portal - Cloud-Based</title>
+    <title>Staff Portal - PPC Hybrid System</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Work+Sans:wght@400;500;600;700&display=swap');
         
@@ -25,7 +25,6 @@
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
             color: var(--text);
             min-height: 100vh;
-            line-height: 1.6;
         }
 
         .container {
@@ -36,7 +35,7 @@
 
         header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             padding: 2rem 0;
             border-bottom: 1px solid var(--border);
         }
@@ -44,7 +43,6 @@
         h1 {
             font-family: 'JetBrains Mono', monospace;
             font-size: 2.5rem;
-            font-weight: 700;
             background: linear-gradient(135deg, var(--accent) 0%, var(--text) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -87,7 +85,6 @@
         .nav-tab.active {
             background: var(--accent);
             color: var(--primary);
-            border-color: var(--accent);
         }
 
         .tab-content {
@@ -120,7 +117,7 @@
             text-transform: uppercase;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 0.875rem 1rem;
             background: var(--secondary);
@@ -130,7 +127,7 @@
             font-size: 1rem;
         }
 
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
@@ -166,6 +163,10 @@
             color: var(--text);
         }
 
+        .btn-block {
+            width: 100%;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -179,18 +180,7 @@
             border-radius: 12px;
             padding: 1.5rem;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--accent);
+            border-top: 3px solid var(--accent);
         }
 
         .stat-value {
@@ -204,22 +194,16 @@
             color: var(--text-dim);
             font-size: 0.9rem;
             text-transform: uppercase;
-        }
-
-        .visitor-list {
-            display: grid;
-            gap: 1rem;
+            margin-top: 0.5rem;
         }
 
         .visitor-item {
-            background: var(--card-bg);
+            background: var(--secondary);
             border: 1px solid var(--border);
             border-left: 4px solid var(--accent);
-            border-radius: 8px;
             padding: 1.25rem;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
         }
 
         .visitor-item.checked-out {
@@ -230,40 +214,20 @@
         .visitor-info h3 {
             font-size: 1.1rem;
             margin-bottom: 0.5rem;
-            color: var(--text);
             font-family: 'JetBrains Mono', monospace;
         }
 
         .visitor-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 0.5rem;
-            font-size: 0.9rem;
             color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.8;
         }
 
-        .detail-label {
-            font-weight: 600;
-            color: var(--accent);
-        }
-
-        .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-in {
-            background: var(--accent);
-            color: var(--primary);
-        }
-
-        .status-out {
-            background: var(--text-dim);
-            color: var(--primary);
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
         }
 
         .alert {
@@ -271,7 +235,6 @@
             border-radius: 8px;
             margin-bottom: 1.5rem;
             border-left: 4px solid;
-            font-family: 'JetBrains Mono', monospace;
         }
 
         .alert-success {
@@ -286,29 +249,65 @@
             color: var(--danger);
         }
 
-        .login-form {
-            max-width: 400px;
-            margin: 4rem auto;
+        .collapsible-section {
+            margin-bottom: 2rem;
         }
 
-        .action-buttons {
+        .collapsible-header {
+            background: var(--secondary);
+            padding: 1rem 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
             display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .collapsible-header:hover {
+            border-color: var(--accent);
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .collapsible-content {
+            display: none;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .collapsible-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .nav-tabs {
+                flex-direction: column;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -316,28 +315,25 @@
     <div class="container">
         <header>
             <h1>🔒 Staff Portal</h1>
-            <p class="subtitle">Cloud-Based Visitor Management</p>
+            <p class="subtitle">Hybrid Cloud System</p>
         </header>
 
         <!-- Login Screen -->
         <div id="loginScreen">
-            <div class="login-form card">
-                <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace; text-align: center;">Staff Login</h2>
+            <div class="card" style="max-width: 400px; margin: 4rem auto;">
+                <h2 style="margin-bottom: 1.5rem; text-align: center; font-family: 'JetBrains Mono', monospace;">Staff Login</h2>
                 <div id="loginAlert"></div>
                 <div class="form-group">
                     <label for="adminPassword">Password</label>
                     <div style="position: relative;">
                         <input type="password" id="adminPassword" placeholder="Enter staff password" style="padding-right: 3.5rem;">
-                        <button type="button" onclick="togglePassword('adminPassword', 'loginEye')" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent); padding: 0.5rem;">
+                        <button type="button" onclick="togglePassword('adminPassword', 'loginEye')" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent);">
                             <span id="loginEye">👁️</span>
                         </button>
                     </div>
                 </div>
-                <button onclick="staffLogin()" class="btn" style="width: 100%;">
-                    <span id="loginBtnText">Login</span>
-                    <span id="loginLoading" style="display: none;" class="loading"></span>
-                </button>
-                <p style="color: var(--text-dim); margin-top: 1rem; text-align: center; font-size: 0.85rem;">
+                <button onclick="staffLogin()" class="btn btn-block">Login</button>
+                <p style="text-align: center; margin-top: 1rem;">
                     <a href="index.html" style="color: var(--accent); text-decoration: none;">← Back to Visitor Check-In</a>
                 </p>
             </div>
@@ -349,6 +345,7 @@
                 <button class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</button>
                 <button class="nav-tab" onclick="switchTab('current')">Current Visitors</button>
                 <button class="nav-tab" onclick="switchTab('history')">History</button>
+                <button class="nav-tab" onclick="switchTab('management')">Management</button>
                 <button class="nav-tab" onclick="switchTab('settings')">Settings</button>
             </div>
 
@@ -356,15 +353,15 @@
             <div id="dashboard" class="tab-content active">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-value" id="currentVisitors">-</div>
+                        <div class="stat-value" id="currentCount">-</div>
                         <div class="stat-label">Currently In</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="todayVisitors">-</div>
+                        <div class="stat-value" id="todayCount">-</div>
                         <div class="stat-label">Today's Visitors</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="totalVisitors">-</div>
+                        <div class="stat-value" id="totalCount">-</div>
                         <div class="stat-label">Total Visitors</div>
                     </div>
                 </div>
@@ -373,25 +370,25 @@
                     <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Quick Actions</h2>
                     <div class="action-buttons">
                         <button onclick="switchTab('current')" class="btn">View Current Visitors</button>
-                        <button onclick="refreshData()" class="btn btn-secondary">
-                            <span id="refreshText">🔄 Refresh Data</span>
-                            <span id="refreshLoading" style="display: none;" class="loading"></span>
-                        </button>
+                        <button onclick="refreshData()" class="btn btn-secondary">🔄 Refresh Data</button>
+                        <button onclick="checkEndOfDay()" class="btn btn-secondary">📊 Check End of Day</button>
+                        <button onclick="exportData('today')" class="btn btn-secondary">📥 Export Today</button>
                         <button onclick="staffLogout()" class="btn btn-danger">Logout</button>
                     </div>
                 </div>
 
-                <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">☁️ Cloud Configuration</h2>
-                    <div style="background: rgba(0, 255, 136, 0.05); border: 1px solid var(--accent); border-radius: 8px; padding: 1.25rem;">
+                <!-- Google Sheets Config (Collapsed by default) -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleCollapsible('sheetsConfig')">
+                        <span style="font-family: 'JetBrains Mono', monospace; color: var(--accent);">☁️ Cloud Configuration</span>
+                        <span id="sheetsConfigIcon">▼</span>
+                    </div>
+                    <div id="sheetsConfig" class="collapsible-content">
                         <div class="form-group">
-                            <label>WEB APP URL</label>
-                            <input type="text" id="webAppUrlConfig" placeholder="https://script.google.com/macros/s/.../exec">
+                            <label>Web App URL</label>
+                            <input type="text" id="webAppUrlInput" readonly style="background: var(--primary); color: var(--text-dim);">
                         </div>
-                        <button onclick="saveConfig()" class="btn" style="width: 100%;">💾 Save Configuration</button>
-                        <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 1rem;">
-                            ✅ Status: <span id="configStatus">Not configured</span>
-                        </p>
+                        <p style="color: var(--accent); font-size: 0.9rem;">✅ System configured and connected to Google Sheets</p>
                     </div>
                 </div>
             </div>
@@ -399,10 +396,8 @@
             <!-- Current Visitors Tab -->
             <div id="current" class="tab-content">
                 <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Current Visitors (Checked In)</h2>
-                    <div id="currentVisitorsList" class="visitor-list">
-                        <p style="color: var(--text-dim); text-align: center;">Loading...</p>
-                    </div>
+                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Currently Checked In</h2>
+                    <div id="currentVisitorsList"></div>
                 </div>
             </div>
 
@@ -410,23 +405,58 @@
             <div id="history" class="tab-content">
                 <div class="card">
                     <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Visitor History</h2>
-                    <div id="visitorHistory" class="visitor-list">
-                        <p style="color: var(--text-dim); text-align: center;">Loading...</p>
+                    <div class="action-buttons" style="margin-bottom: 1.5rem;">
+                        <button onclick="filterHistory('today')" class="btn btn-secondary">Today</button>
+                        <button onclick="filterHistory('week')" class="btn btn-secondary">This Week</button>
+                        <button onclick="filterHistory('month')" class="btn btn-secondary">This Month</button>
+                        <button onclick="filterHistory('all')" class="btn btn-secondary">All</button>
                     </div>
+                    <div id="historyList"></div>
+                </div>
+            </div>
+
+            <!-- Management Tab -->
+            <div id="management" class="tab-content">
+                <div class="card">
+                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">📋 Staff Management</h2>
+                    <div id="staffAlert"></div>
+                    <table id="staffTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffTableBody"></tbody>
+                    </table>
+                    <button onclick="showAddStaffForm()" class="btn" style="margin-top: 1rem;">➕ Add Staff Member</button>
+                </div>
+
+                <div class="card">
+                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">🎯 Purpose Management</h2>
+                    <div id="purposeAlert"></div>
+                    <div id="purposeList"></div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Add New Purpose</label>
+                        <input type="text" id="newPurpose" placeholder="Enter purpose name">
+                    </div>
+                    <button onclick="addPurpose()" class="btn">➕ Add Purpose</button>
                 </div>
             </div>
 
             <!-- Settings Tab -->
             <div id="settings" class="tab-content">
                 <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Change Password</h2>
+                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">🔐 Change Password</h2>
                     <div id="settingsAlert"></div>
                     <form id="passwordForm">
                         <div class="form-group">
                             <label for="currentPassword">Current Password</label>
                             <div style="position: relative;">
                                 <input type="password" id="currentPassword" required style="padding-right: 3.5rem;">
-                                <button type="button" onclick="togglePassword('currentPassword', 'currentEye')" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent); padding: 0.5rem;">
+                                <button type="button" onclick="togglePassword('currentPassword', 'currentEye')" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent);">
                                     <span id="currentEye">👁️</span>
                                 </button>
                             </div>
@@ -435,7 +465,7 @@
                             <label for="newPassword">New Password</label>
                             <div style="position: relative;">
                                 <input type="password" id="newPassword" required minlength="6" style="padding-right: 3.5rem;">
-                                <button type="button" onclick="togglePassword('newPassword', 'newEye')" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent); padding: 0.5rem;">
+                                <button type="button" onclick="togglePassword('newPassword', 'newEye')" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent);">
                                     <span id="newEye">👁️</span>
                                 </button>
                             </div>
@@ -444,7 +474,7 @@
                             <label for="confirmPassword">Confirm New Password</label>
                             <div style="position: relative;">
                                 <input type="password" id="confirmPassword" required minlength="6" style="padding-right: 3.5rem;">
-                                <button type="button" onclick="togglePassword('confirmPassword', 'confirmEye')" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent); padding: 0.5rem;">
+                                <button type="button" onclick="togglePassword('confirmPassword', 'confirmEye')" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent);">
                                     <span id="confirmEye">👁️</span>
                                 </button>
                             </div>
@@ -454,12 +484,13 @@
                 </div>
 
                 <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">System Information</h2>
+                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">ℹ️ System Information</h2>
                     <div style="color: var(--text-dim); line-height: 2;">
-                        <p><strong style="color: var(--accent);">System Type:</strong> Cloud-Based ☁️</p>
-                        <p><strong style="color: var(--accent);">Data Storage:</strong> Google Sheets</p>
+                        <p><strong style="color: var(--accent);">System Type:</strong> Hybrid Cloud ☁️</p>
+                        <p><strong style="color: var(--accent);">Data Storage:</strong> Google Sheets (Cloud)</p>
                         <p><strong style="color: var(--accent);">Multi-Device Support:</strong> ✅ Enabled</p>
-                        <p><strong style="color: var(--accent);">System Version:</strong> 3.0 (Cloud)</p>
+                        <p><strong style="color: var(--accent);">Features:</strong> Staff Management, Purpose Management, Notifications</p>
+                        <p><strong style="color: var(--accent);">Version:</strong> 3.0 Hybrid</p>
                     </div>
                 </div>
             </div>
@@ -467,11 +498,20 @@
     </div>
 
     <script>
-        let WEB_APP_URL = localStorage.getItem('webAppUrl') || '';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwC4oUm3holztMyeFmPbfofAyLvZDg4bHrIsWgHHsfhpAwovC32eCOuva7fqEI-vKgo2Q/exec';
+        
         let isLoggedIn = false;
-        let allVisitors = [];
         let cloudPassword = '';
+        let allVisitors = [];
+        let staffList = [];
+        let purposesList = [];
 
+        // Auto-configure
+        if (!localStorage.getItem('webAppUrl')) {
+            localStorage.setItem('webAppUrl', WEB_APP_URL);
+        }
+
+        // Password toggle
         function togglePassword(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
@@ -485,20 +525,9 @@
             }
         }
 
+        // Staff login
         async function staffLogin() {
             const password = document.getElementById('adminPassword').value;
-            const loginBtn = document.querySelector('#loginScreen .btn');
-            const loginBtnText = document.getElementById('loginBtnText');
-            const loginLoading = document.getElementById('loginLoading');
-
-            if (!WEB_APP_URL) {
-                showAlert('loginAlert', 'error', 'System not configured. Please contact administrator.');
-                return;
-            }
-
-            loginBtn.disabled = true;
-            loginBtnText.style.display = 'none';
-            loginLoading.style.display = 'inline-block';
 
             try {
                 const response = await fetch(`${WEB_APP_URL}?action=getPassword`);
@@ -509,150 +538,337 @@
                     cloudPassword = data.password;
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('staffPanel').style.display = 'block';
+                    document.getElementById('webAppUrlInput').value = WEB_APP_URL;
                     await loadAllData();
                 } else {
                     showAlert('loginAlert', 'error', 'Incorrect password');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showAlert('loginAlert', 'error', 'Login failed. Check configuration.');
-            } finally {
-                loginBtn.disabled = false;
-                loginBtnText.style.display = 'inline';
-                loginLoading.style.display = 'none';
+                showAlert('loginAlert', 'error', 'Login failed. Check connection.');
             }
         }
 
+        // Load all data
         async function loadAllData() {
+            await Promise.all([
+                loadVisitors(),
+                loadStaff(),
+                loadPurposes()
+            ]);
+            updateDashboard();
+            displayCurrentVisitors();
+            displayHistory('all');
+        }
+
+        // Load visitors
+        async function loadVisitors() {
             try {
                 const response = await fetch(`${WEB_APP_URL}?action=getVisitors`);
                 const data = await response.json();
-                
                 if (data.success) {
                     allVisitors = data.visitors;
-                    updateDashboard();
-                    displayCurrentVisitors();
-                    displayVisitorHistory();
                 }
             } catch (error) {
-                console.error('Load data error:', error);
+                console.error('Load visitors error:', error);
             }
         }
 
-        async function refreshData() {
-            const refreshText = document.getElementById('refreshText');
-            const refreshLoading = document.getElementById('refreshLoading');
-            
-            refreshText.style.display = 'none';
-            refreshLoading.style.display = 'inline-block';
-            
-            await loadAllData();
-            
-            refreshText.style.display = 'inline';
-            refreshLoading.style.display = 'none';
+        // Load staff
+        async function loadStaff() {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=getStaff`);
+                const data = await response.json();
+                if (data.success) {
+                    staffList = data.staff;
+                    displayStaffTable();
+                }
+            } catch (error) {
+                console.error('Load staff error:', error);
+            }
         }
 
+        // Load purposes
+        async function loadPurposes() {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=getPurposes`);
+                const data = await response.json();
+                if (data.success) {
+                    purposesList = data.purposes;
+                    displayPurposesList();
+                }
+            } catch (error) {
+                console.error('Load purposes error:', error);
+            }
+        }
+
+        // Update dashboard stats
         function updateDashboard() {
             const currentIn = allVisitors.filter(v => v.Status === 'IN').length;
             const today = new Date().toLocaleDateString('en-GB');
             const todayCount = allVisitors.filter(v => v.Date === today).length;
             
-            document.getElementById('currentVisitors').textContent = currentIn;
-            document.getElementById('todayVisitors').textContent = todayCount;
-            document.getElementById('totalVisitors').textContent = allVisitors.length;
+            document.getElementById('currentCount').textContent = currentIn;
+            document.getElementById('todayCount').textContent = todayCount;
+            document.getElementById('totalCount').textContent = allVisitors.length;
         }
 
+        // Display current visitors
         function displayCurrentVisitors() {
-            const currentVisitors = allVisitors.filter(v => v.Status === 'IN');
+            const current = allVisitors.filter(v => v.Status === 'IN');
             const listDiv = document.getElementById('currentVisitorsList');
-            
-            if (currentVisitors.length === 0) {
-                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No visitors currently checked in</p>';
+
+            if (current.length === 0) {
+                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No visitors currently checked in</p>';
                 return;
             }
 
-            listDiv.innerHTML = currentVisitors.map(v => `
+            listDiv.innerHTML = current.map(v => `
                 <div class="visitor-item">
                     <div class="visitor-info">
                         <h3>${v['Full Name']}</h3>
                         <div class="visitor-details">
-                            <div><span class="detail-label">Company:</span> ${v.Company}</div>
-                            <div><span class="detail-label">Phone:</span> ${v.Phone}</div>
-                            <div><span class="detail-label">Check-In:</span> ${v.Date} ${v['Check-In Time']}</div>
-                            <div><span class="detail-label">Purpose:</span> ${v.Purpose}</div>
+                            <p><strong>Company:</strong> ${v.Company}</p>
+                            <p><strong>Phone:</strong> ${v.Phone}</p>
+                            <p><strong>Visiting:</strong> ${v['Host Name']}</p>
+                            <p><strong>Check-In:</strong> ${v.Date} ${v['Check-In Time']}</p>
                         </div>
                     </div>
-                    <span class="status-badge status-in">IN</span>
+                    <div class="action-buttons">
+                        <button onclick="checkoutVisitor('${v['Visitor ID']}')" class="btn btn-secondary">Check Out</button>
+                    </div>
                 </div>
             `).join('');
         }
 
-        function displayVisitorHistory() {
-            const historyDiv = document.getElementById('visitorHistory');
-            
-            if (allVisitors.length === 0) {
-                historyDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center;">No visitor history</p>';
-                return;
+        // Display history
+        function displayHistory(filter) {
+            let filtered = allVisitors;
+            const today = new Date();
+            const todayStr = today.toLocaleDateString('en-GB');
+
+            if (filter === 'today') {
+                filtered = allVisitors.filter(v => v.Date === todayStr);
+            } else if (filter === 'week') {
+                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                filtered = allVisitors.filter(v => {
+                    const vDate = new Date(v.Date.split('/').reverse().join('-'));
+                    return vDate >= weekAgo;
+                });
+            } else if (filter === 'month') {
+                const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                filtered = allVisitors.filter(v => {
+                    const vDate = new Date(v.Date.split('/').reverse().join('-'));
+                    return vDate >= monthAgo;
+                });
             }
 
-            const sorted = [...allVisitors].reverse();
+            const listDiv = document.getElementById('historyList');
+            const sorted = [...filtered].reverse();
 
-            historyDiv.innerHTML = sorted.map(v => `
+            listDiv.innerHTML = sorted.map(v => `
                 <div class="visitor-item ${v.Status === 'OUT' ? 'checked-out' : ''}">
                     <div class="visitor-info">
                         <h3>${v['Full Name']} (${v['Visitor ID']})</h3>
                         <div class="visitor-details">
-                            <div><span class="detail-label">Company:</span> ${v.Company}</div>
-                            <div><span class="detail-label">Check-In:</span> ${v.Date} ${v['Check-In Time']}</div>
-                            ${v['Check-Out Time'] ? `<div><span class="detail-label">Check-Out:</span> ${v['Check-Out Time']}</div>` : ''}
-                            <div><span class="detail-label">Purpose:</span> ${v.Purpose}</div>
+                            <p><strong>Company:</strong> ${v.Company}</p>
+                            <p><strong>Check-In:</strong> ${v.Date} ${v['Check-In Time']}</p>
+                            ${v['Check-Out Time'] ? `<p><strong>Check-Out:</strong> ${v['Check-Out Time']}</p>` : ''}
+                            <p><strong>Status:</strong> ${v.Status}</p>
                         </div>
                     </div>
-                    <span class="status-badge ${v.Status === 'IN' ? 'status-in' : 'status-out'}">${v.Status}</span>
                 </div>
             `).join('');
         }
 
-        function staffLogout() {
-            isLoggedIn = false;
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('staffPanel').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
+        // Display staff table
+        function displayStaffTable() {
+            const tbody = document.getElementById('staffTableBody');
+            tbody.innerHTML = staffList.map(s => `
+                <tr>
+                    <td>${s.Name}</td>
+                    <td>${s.Phone || '-'}</td>
+                    <td>${s.Email || '-'}</td>
+                    <td>
+                        <button onclick="editStaff('${s.Name}')" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Edit</button>
+                        <button onclick="deleteStaff('${s.Name}')" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.8rem; margin-left: 0.5rem;">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        function switchTab(tabName) {
-            const tabs = document.querySelectorAll('.tab-content');
-            const navTabs = document.querySelectorAll('.nav-tab');
-            
-            tabs.forEach(tab => tab.classList.remove('active'));
-            navTabs.forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-
-            if (tabName === 'current') {
-                displayCurrentVisitors();
-            } else if (tabName === 'history') {
-                displayVisitorHistory();
-            }
+        // Display purposes list
+        function displayPurposesList() {
+            const listDiv = document.getElementById('purposeList');
+            listDiv.innerHTML = `
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                    ${purposesList.map(p => `
+                        <span style="background: var(--secondary); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 0.5rem;">
+                            ${p}
+                            <button onclick="deletePurpose('${p}')" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem;">×</button>
+                        </span>
+                    `).join('')}
+                </div>
+            `;
         }
 
-        function saveConfig() {
-            const url = document.getElementById('webAppUrlConfig').value.trim();
+        // Add purpose
+        async function addPurpose() {
+            const input = document.getElementById('newPurpose');
+            const purpose = input.value.trim();
             
-            if (!url || !url.includes('script.google.com')) {
-                alert('❌ Invalid Web App URL');
+            if (!purpose) {
+                alert('Please enter a purpose name');
                 return;
             }
 
-            localStorage.setItem('webAppUrl', url);
-            WEB_APP_URL = url;
-            document.getElementById('configStatus').textContent = 'Configured ✅';
-            document.getElementById('configStatus').style.color = 'var(--accent)';
+            if (purposesList.includes(purpose)) {
+                alert('This purpose already exists');
+                return;
+            }
+
+            purposesList.push(purpose);
             
-            alert('✅ Configuration saved!\n\nPlease refresh the page and login again.');
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=updatePurposes&data=${encodeURIComponent(JSON.stringify(purposesList))}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('purposeAlert', 'success', 'Purpose added successfully');
+                    input.value = '';
+                    displayPurposesList();
+                }
+            } catch (error) {
+                console.error('Add purpose error:', error);
+                alert('Failed to add purpose');
+            }
         }
 
+        // Delete purpose
+        async function deletePurpose(purpose) {
+            if (!confirm(`Delete purpose: ${purpose}?`)) return;
+
+            purposesList = purposesList.filter(p => p !== purpose);
+            
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=updatePurposes&data=${encodeURIComponent(JSON.stringify(purposesList))}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('purposeAlert', 'success', 'Purpose deleted successfully');
+                    displayPurposesList();
+                }
+            } catch (error) {
+                console.error('Delete purpose error:', error);
+                alert('Failed to delete purpose');
+            }
+        }
+
+        // Show add staff form
+        function showAddStaffForm() {
+            const name = prompt('Enter staff name:');
+            if (!name) return;
+            
+            const phone = prompt('Enter phone number (optional):');
+            const email = prompt('Enter email (optional):');
+            
+            staffList.push({ Name: name, Phone: phone || '', Email: email || '' });
+            updateStaffList();
+        }
+
+        // Edit staff
+        function editStaff(name) {
+            const staff = staffList.find(s => s.Name === name);
+            if (!staff) return;
+            
+            const newPhone = prompt('Enter phone number:', staff.Phone);
+            const newEmail = prompt('Enter email:', staff.Email);
+            
+            staff.Phone = newPhone || '';
+            staff.Email = newEmail || '';
+            
+            updateStaffList();
+        }
+
+        // Delete staff
+        async function deleteStaff(name) {
+            if (!confirm(`Delete staff member: ${name}?`)) return;
+            
+            staffList = staffList.filter(s => s.Name !== name);
+            updateStaffList();
+        }
+
+        // Update staff list in cloud
+        async function updateStaffList() {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=updateStaff&data=${encodeURIComponent(JSON.stringify(staffList))}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('staffAlert', 'success', 'Staff list updated successfully');
+                    displayStaffTable();
+                }
+            } catch (error) {
+                console.error('Update staff error:', error);
+                alert('Failed to update staff list');
+            }
+        }
+
+        // Checkout visitor
+        async function checkoutVisitor(visitorId) {
+            if (!confirm('Check out this visitor?')) return;
+
+            try {
+                const checkoutTime = new Date().toLocaleTimeString('en-US', { hour12: false });
+                const response = await fetch(`${WEB_APP_URL}?action=checkout&visitorId=${visitorId}&checkoutTime=${checkoutTime}`);
+                
+                alert('✅ Visitor checked out successfully!');
+                await loadAllData();
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('Failed to checkout visitor');
+            }
+        }
+
+        // Refresh data
+        async function refreshData() {
+            await loadAllData();
+            alert('✅ Data refreshed!');
+        }
+
+        // Check end of day
+        function checkEndOfDay() {
+            const current = allVisitors.filter(v => v.Status === 'IN');
+            if (current.length === 0) {
+                alert('✅ All visitors have checked out!\n\nEnd of day complete.');
+            } else {
+                alert(`⚠️ ${current.length} visitor(s) still checked in:\n\n${current.map(v => `• ${v['Full Name']} (${v.Company})`).join('\n')}\n\nPlease check them out before closing.`);
+            }
+        }
+
+        // Export data
+        function exportData(period) {
+            let data = allVisitors;
+            const today = new Date().toLocaleDateString('en-GB');
+            
+            if (period === 'today') {
+                data = allVisitors.filter(v => v.Date === today);
+            }
+
+            const csv = [
+                ['Date', 'Check-In Time', 'Full Name', 'Visitor ID', 'Phone', 'Email', 'Company', 'Host Name', 'Host Company', 'Purpose', 'Vehicle', 'Check-Out Time', 'Status'],
+                ...data.map(v => [v.Date, v['Check-In Time'], v['Full Name'], v['Visitor ID'], v.Phone, v.Email, v.Company, v['Host Name'], v['Host Company'], v.Purpose, v.Vehicle, v['Check-Out Time'] || '', v.Status])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PPC-visitors-${period}-${today.replace(/\//g, '-')}.csv`;
+            a.click();
+        }
+
+        // Password change
         document.getElementById('passwordForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -662,11 +878,6 @@
 
             if (current !== cloudPassword) {
                 showAlert('settingsAlert', 'error', 'Current password is incorrect');
-                return;
-            }
-
-            if (newPass.length < 6) {
-                showAlert('settingsAlert', 'error', 'New password must be at least 6 characters');
                 return;
             }
 
@@ -681,34 +892,68 @@
                 
                 if (data.success) {
                     cloudPassword = newPass;
-                    showAlert('settingsAlert', 'success', 'Password changed successfully! All devices will use the new password.');
+                    showAlert('settingsAlert', 'success', '✅ Password changed! All devices will use the new password.');
                     document.getElementById('passwordForm').reset();
-                } else {
-                    showAlert('settingsAlert', 'error', 'Failed to update password');
                 }
             } catch (error) {
                 console.error('Password change error:', error);
-                showAlert('settingsAlert', 'error', 'Password change failed');
+                showAlert('settingsAlert', 'error', 'Failed to change password');
             }
         });
 
+        // Toggle collapsible
+        function toggleCollapsible(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(id + 'Icon');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('active');
+                icon.textContent = '▲';
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const navTabs = document.querySelectorAll('.nav-tab');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'current') {
+                displayCurrentVisitors();
+            } else if (tabName === 'history') {
+                displayHistory('all');
+            }
+        }
+
+        // Filter history
+        function filterHistory(period) {
+            displayHistory(period);
+        }
+
+        // Staff logout
+        function staffLogout() {
+            isLoggedIn = false;
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('staffPanel').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        // Show alert
         function showAlert(elementId, type, message) {
             const alertDiv = document.getElementById(elementId);
             alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-            
             setTimeout(() => {
                 alertDiv.innerHTML = '';
             }, 5000);
         }
-
-        window.addEventListener('DOMContentLoaded', function() {
-            const config = localStorage.getItem('webAppUrl');
-            if (config) {
-                document.getElementById('webAppUrlConfig').value = config;
-                document.getElementById('configStatus').textContent = 'Configured ✅';
-                document.getElementById('configStatus').style.color = '#00ff88';
-            }
-        });
     </script>
 </body>
 </html>
