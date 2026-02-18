@@ -410,6 +410,7 @@
                         <button onclick="filterHistory('week')" class="btn btn-secondary">This Week</button>
                         <button onclick="filterHistory('month')" class="btn btn-secondary">This Month</button>
                         <button onclick="filterHistory('all')" class="btn btn-secondary">All</button>
+                        <button onclick="showClearMenu()" class="btn btn-danger">🗑️ Clear History</button>
                     </div>
                     <div id="historyList"></div>
                 </div>
@@ -953,6 +954,169 @@
             setTimeout(() => {
                 alertDiv.innerHTML = '';
             }, 5000);
+        }
+        // Show clear menu
+        function showClearMenu() {
+            const menu = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 1rem;" onclick="if(event.target === this) closeClearMenu()">
+                    <div style="background: var(--card-bg); border: 2px solid var(--danger); border-radius: 12px; padding: 2rem; max-width: 500px; width: 100%;" onclick="event.stopPropagation()">
+                        <h2 style="color: var(--danger); margin-bottom: 1.5rem; text-align: center; font-family: 'JetBrains Mono', monospace;">🗑️ Clear History</h2>
+                        
+                        <p style="color: var(--text-dim); margin-bottom: 1.5rem; text-align: center;">Select what to delete:</p>
+                        
+                        <div style="display: grid; gap: 1rem;">
+                            <button onclick="showManualSelection()" class="btn btn-secondary btn-block">
+                                ✓ Manual Selection (Pick Specific Records)
+                            </button>
+                            
+                            <button onclick="clearHistory('today')" class="btn btn-secondary btn-block">
+                                Clear Today's Records
+                            </button>
+                            
+                            <button onclick="clearHistory('week')" class="btn btn-secondary btn-block">
+                                Clear This Week's Records
+                            </button>
+                            
+                            <button onclick="clearHistory('month')" class="btn btn-secondary btn-block">
+                                Clear This Month's Records
+                            </button>
+                            
+                            <button onclick="clearHistory('checkedout')" class="btn btn-secondary btn-block">
+                                Clear All Checked-Out Visitors
+                            </button>
+                            
+                            <button onclick="clearHistory('all')" class="btn btn-danger btn-block">
+                                ⚠️ Clear ALL History
+                            </button>
+                            
+                            <button onclick="closeClearMenu()" class="btn btn-secondary btn-block">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', `<div id="clearMenuModal">${menu}</div>`);
+        }
+        
+        // Show manual selection screen
+        function showManualSelection() {
+            closeClearMenu();
+            
+            const selectionScreen = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; overflow-y: auto; padding: 2rem;" onclick="if(event.target === this) closeManualSelection()">
+                    <div style="background: var(--card-bg); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; max-width: 900px; margin: 0 auto;" onclick="event.stopPropagation()">
+                        <h2 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">✓ Select Records to Delete</h2>
+                        
+                        <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button onclick="selectAllRecords()" class="btn btn-secondary">Select All</button>
+                            <button onclick="deselectAllRecords()" class="btn btn-secondary">Deselect All</button>
+                            <button onclick="selectCheckedOut()" class="btn btn-secondary">Select Checked-Out Only</button>
+                        </div>
+                        
+                        <div id="selectionList" style="max-height: 400px; overflow-y: auto; margin-bottom: 1.5rem;"></div>
+                        
+                        <div style="display: flex; gap: 1rem;">
+                            <button onclick="deleteSelectedRecords()" class="btn btn-danger" style="flex: 1;">
+                                Delete Selected Records
+                            </button>
+                            <button onclick="closeManualSelection()" class="btn btn-secondary" style="flex: 1;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', `<div id="manualSelectionModal">${selectionScreen}</div>`);
+            
+            renderSelectionList();
+        }
+        
+        // Render selection list with checkboxes
+        function renderSelectionList() {
+            const listDiv = document.getElementById('selectionList');
+            const sorted = [...allVisitors].reverse(); // Most recent first
+            
+            if (sorted.length === 0) {
+                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No records to display</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = sorted.map((v, index) => `
+                <div style="background: var(--secondary); border: 1px solid var(--border); border-left: 4px solid ${v.Status === 'IN' ? 'var(--accent)' : 'var(--text-dim)'}; padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem;">
+                    <input type="checkbox" id="record_${index}" data-visitor-id="${v['Visitor ID']}" style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="record_${index}" style="flex: 1; cursor: pointer; margin: 0; color: var(--text); text-transform: none; letter-spacing: normal; font-family: 'Work Sans', sans-serif;">
+                        <div style="font-weight: bold; font-size: 1rem; margin-bottom: 0.25rem;">${v['Full Name']}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">
+                            ${v.Company} • ${v.Date} ${v['Check-In Time']} • ${v.Status}
+                            ${v['Check-Out Time'] ? ` → ${v['Check-Out Time']}` : ''}
+                        </div>
+                    </label>
+                </div>
+            `).join('');
+        }
+        
+        // Select all records
+        function selectAllRecords() {
+            document.querySelectorAll('#selectionList input[type="checkbox"]').forEach(cb => cb.checked = true);
+        }
+        
+        // Deselect all records
+        function deselectAllRecords() {
+            document.querySelectorAll('#selectionList input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+        
+        // Select only checked-out records
+        function selectCheckedOut() {
+            deselectAllRecords();
+            allVisitors.forEach((v, index) => {
+                if (v.Status === 'OUT') {
+                    const cb = document.getElementById(`record_${allVisitors.length - 1 - index}`);
+                    if (cb) cb.checked = true;
+                }
+            });
+        }
+        
+        // Delete selected records
+        async function deleteSelectedRecords() {
+            const checkboxes = document.querySelectorAll('#selectionList input[type="checkbox"]:checked');
+            
+            if (checkboxes.length === 0) {
+                alert('⚠️ No records selected');
+                return;
+            }
+            
+            if (!confirm(`Delete ${checkboxes.length} selected record(s)?`)) {
+                return;
+            }
+            
+            const visitorIds = Array.from(checkboxes).map(cb => cb.getAttribute('data-visitor-id'));
+            
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=clearVisitors&clearType=manual&visitorIds=${encodeURIComponent(JSON.stringify(visitorIds))}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ ${checkboxes.length} record(s) deleted successfully!`);
+                    closeManualSelection();
+                    await loadAllData();
+                } else {
+                    alert('❌ Failed to delete records: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('❌ Failed to delete records. Please try again.');
+            }
+        }
+        
+        // Close manual selection
+        function closeManualSelection() {
+            const modal = document.getElementById('manualSelectionModal');
+            if (modal) {
+                modal.remove();
+            }
         }
     </script>
 </body>
