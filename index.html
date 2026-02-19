@@ -766,7 +766,7 @@
         
             await loadVisitors(); // Refresh data
             const previousVisitor = allVisitors.find(v => 
-                v.Phone.includes(search) || 
+                String(v.Phone).includes(search) || 
                 v['Full Name'].toLowerCase().includes(search)
             );
         
