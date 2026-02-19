@@ -617,36 +617,42 @@
         // Display current visitors
         function displayCurrentVisitors() {
             const current = allVisitors.filter(v => v.Status === 'IN');
-            
-            // DEBUG: See what data we have
-            console.log('Current visitors:', current);
-            if (current.length > 0) {
-                console.log('Sample visitor:', current[0]);
-            }
-            
             const listDiv = document.getElementById('currentVisitorsList');
-            
+        
             if (current.length === 0) {
                 listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No visitors currently checked in</p>';
                 return;
             }
-
-            listDiv.innerHTML = current.map(v => `
-                <div class="visitor-item">
-                    <div class="visitor-info">
-                        <h3>${v['Full Name']}</h3>
-                        <div class="visitor-details">
-                            <p><strong>Company:</strong> ${v.Company}</p>
-                            <p><strong>Phone:</strong> ${v.Phone}</p>
-                            <p><strong>Visiting:</strong> ${v['Host Name']}</p>
-                            <p><strong>Check-In:</strong> ${v.Date} ${v['Check-In Time']}</p>
+        
+            listDiv.innerHTML = current.map(v => {
+                // Handle property names with spaces
+                const date = v['Date '] || v['Date'] || v.Date || 'N/A';
+                const time = v[' Check-In Time'] || v['Check-In Time'] || v['Check-In Time'] || '';
+                
+                // Format time if it's in ISO format
+                let displayTime = time;
+                if (time && time.includes('T')) {
+                    const timeObj = new Date(time);
+                    displayTime = timeObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                }
+                
+                return `
+                    <div class="visitor-item">
+                        <div class="visitor-info">
+                            <h3>${v['Full Name']}</h3>
+                            <div class="visitor-details">
+                                <p><strong>Company:</strong> ${v.Company}</p>
+                                <p><strong>Phone:</strong> ${v.Phone}</p>
+                                <p><strong>Visiting:</strong> ${v['Host Name']}</p>
+                                <p><strong>Check-In:</strong> ${date} ${displayTime}</p>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="checkoutVisitor('${v['Visitor ID']}')" class="btn btn-secondary">Check Out</button>
                         </div>
                     </div>
-                    <div class="action-buttons">
-                        <button onclick="checkoutVisitor('${v['Visitor ID']}')" class="btn btn-secondary">Check Out</button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Display history
