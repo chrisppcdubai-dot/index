@@ -617,8 +617,15 @@
         // Display current visitors
         function displayCurrentVisitors() {
             const current = allVisitors.filter(v => v.Status === 'IN');
+            
+            // DEBUG: See what data we have
+            console.log('Current visitors:', current);
+            if (current.length > 0) {
+                console.log('Sample visitor:', current[0]);
+            }
+            
             const listDiv = document.getElementById('currentVisitorsList');
-
+            
             if (current.length === 0) {
                 listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No visitors currently checked in</p>';
                 return;
