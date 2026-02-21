@@ -14,6 +14,7 @@
             --secondary: #1a1a1a;
             --accent: #00ff88;
             --danger: #ff4444;
+            --warning: #ffaa00;
             --text: #ffffff;
             --text-dim: #a0a0a0;
             --border: #2a2a2a;
@@ -890,7 +891,7 @@
             // Show end of day modal with checkout options
             const modal = `
                 <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; overflow-y: auto; padding: 2rem;" onclick="if(event.target === this) closeEndOfDay()">
-                    <div style="background: var(--card-bg); border: 2px solid var(--warning); border-radius: 12px; padding: 2rem; max-width: 900px; margin: 0 auto;" onclick="event.stopPropagation()">
+                    <div style="background: var(--card-bg); border: 2px solid ; border-radius: 12px; padding: 2rem; max-width: 900px; margin: 0 auto;" onclick="event.stopPropagation()">
                         <h2 style="color: var(--warning); margin-bottom: 1rem; text-align: center; font-family: 'JetBrains Mono', monospace;">📊 End of Day Report</h2>
                         
                         <p style="color: var(--text); text-align: center; margin-bottom: 1.5rem;">
