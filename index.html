@@ -1,1643 +1,2058 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPC Visitor Management</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="description" content="Complete Visitor Management System for Plastic Powder Coating Company">
-    <meta name="theme-color" content="#e63946">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PPC Visitors">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Work+Sans:wght@400;500;600;700&display=swap');
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#003087">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PPC Visitors">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>PPC Visitor Management</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003087;
+    --navy-dark: #001f5c;
+    --navy-light: #0047b8;
+    --gold: #C8A951;
+    --gold-light: #e0c46a;
+    --white: #ffffff;
+    --off-white: #f5f6fa;
+    --gray-100: #e8eaf0;
+    --gray-200: #d0d4e0;
+    --gray-400: #8892a8;
+    --gray-600: #4a5568;
+    --gray-800: #1a2035;
+    --green: #00875a;
+    --green-light: #e3f9f0;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --orange: #e07b00;
+    --orange-light: #fff3e0;
+    --shadow-sm: 0 1px 4px rgba(0,48,135,0.10);
+    --shadow-md: 0 4px 16px rgba(0,48,135,0.13);
+    --shadow-lg: 0 8px 32px rgba(0,48,135,0.18);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 20px;
+    --font: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
 
-        :root {
-            --primary: #0a0a0a;
-            --secondary: #1a1a1a;
-            --accent: #00ff88;
-            --danger: #ff4444;
-            --warning: #ffaa00;
-            --text: #ffffff;
-            --text-dim: #a0a0a0;
-            --border: #2a2a2a;
-            --card-bg: #151515;
-        }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        body {
-            font-family: 'Work Sans', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            color: var(--text);
-            min-height: 100vh;
-            line-height: 1.6;
-            position: relative;
-            overflow-x: hidden;
-        }
+  body {
+    font-family: var(--font);
+    background: var(--off-white);
+    color: var(--gray-800);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 255, 136, 0.02) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
+  /* ========== SCREENS ========== */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
-        header { text-align: center; margin-bottom: 3rem; padding: 2rem 0; border-bottom: 1px solid var(--border); }
+  /* ========== ROLE SELECTION ========== */
+  #screen-role {
+    background: linear-gradient(160deg, var(--navy-dark) 0%, var(--navy) 50%, var(--navy-light) 100%);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  #screen-role::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,169,81,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  #screen-role::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,169,81,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .role-logo {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeInDown 0.6s ease;
+  }
+  .role-logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px; height: 80px;
+    background: var(--gold);
+    border-radius: 20px;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy-dark);
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    box-shadow: 0 8px 24px rgba(200,169,81,0.4);
+  }
+  .role-logo h1 {
+    color: white;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .role-logo p {
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .role-cards {
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeInUp 0.6s ease 0.2s both;
+  }
+  .role-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .role-card:hover, .role-card:active {
+    background: rgba(255,255,255,0.15);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .role-card-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .role-card-icon.reception { background: rgba(200,169,81,0.2); border: 1px solid rgba(200,169,81,0.4); }
+  .role-card-icon.staff { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+  .role-card-text h3 { color: white; font-size: 17px; font-weight: 600; margin-bottom: 3px; }
+  .role-card-text p { color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 300; }
+  .role-card-arrow { margin-left: auto; color: rgba(255,255,255,0.3); font-size: 18px; flex-shrink: 0; }
 
-        h1 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--text) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+  /* ========== TOP BAR ========== */
+  .top-bar {
+    background: var(--navy);
+    color: white;
+    padding: 0 16px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-md);
+    flex-shrink: 0;
+  }
+  .top-bar-back {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: white;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .top-bar-back:hover { background: rgba(255,255,255,0.1); }
+  .top-bar-title { font-size: 17px; font-weight: 600; flex: 1; }
+  .top-bar-subtitle { font-size: 11px; color: var(--gold-light); font-weight: 300; letter-spacing: 0.5px; margin-top: 1px; }
+  .top-bar-badge {
+    background: var(--gold);
+    color: var(--navy-dark);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
 
-        .subtitle { color: var(--text-dim); font-size: 1rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; text-transform: uppercase; }
-        
-        .role-selection {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+  /* ========== BOTTOM NAV ========== */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    z-index: 100;
+    box-shadow: 0 -4px 16px rgba(0,48,135,0.08);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    background: none;
+    position: relative;
+    gap: 3px;
+  }
+  .nav-btn .nav-icon { font-size: 20px; transition: transform 0.2s; }
+  .nav-btn .nav-label { font-size: 10px; font-weight: 500; color: var(--gray-400); font-family: var(--font); transition: color 0.2s; }
+  .nav-btn.active .nav-label { color: var(--navy); }
+  .nav-btn.active .nav-icon { transform: translateY(-1px); }
+  .nav-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 2px;
+    background: var(--navy);
+    border-radius: 0 0 4px 4px;
+  }
 
-        .role-card {
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 3rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
+  /* ========== CONTENT AREA ========== */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+  .content-fullpad { padding: 0; }
 
-        .role-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
-        }
+  /* ========== CARDS ========== */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--gray-100);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+  }
 
-        .role-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent), var(--text));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+  /* ========== FORMS ========== */
+  .form-group { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-600); margin-bottom: 6px; }
+  .form-label span.req { color: var(--red); margin-left: 2px; }
+  .form-input, .form-select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: var(--font);
+    color: var(--gray-800);
+    background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+  .form-input:focus, .form-select:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(0,48,135,0.1);
+  }
+  .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238892a8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
 
-        .role-card:hover::before { opacity: 1; }
+  /* ========== BUTTONS ========== */
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    width: 100%;
+    letter-spacing: 0.2px;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--navy); color: white; box-shadow: var(--shadow-sm); }
+  .btn-primary:hover { background: var(--navy-light); }
+  .btn-secondary { background: var(--gray-100); color: var(--gray-800); }
+  .btn-secondary:hover { background: var(--gray-200); }
+  .btn-gold { background: var(--gold); color: var(--navy-dark); }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-danger { background: var(--red); color: white; }
+  .btn-danger:hover { background: #a93226; }
+  .btn-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+  .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 6px; width: auto; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        .role-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            display: block;
-        }
+  /* ========== STATS ========== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--gray-100);
+    box-shadow: var(--shadow-sm);
+  }
+  .stat-card.full { grid-column: 1 / -1; }
+  .stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label { font-size: 12px; color: var(--gray-400); margin-top: 4px; font-weight: 500; }
+  .stat-sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
 
-        .role-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--accent);
-        }
+  /* ========== VISITOR CARDS ========== */
+  .visitor-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    border: 1px solid var(--gray-100);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .visitor-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .visitor-info { flex: 1; min-width: 0; }
+  .visitor-name { font-size: 15px; font-weight: 600; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .visitor-detail { font-size: 13px; color: var(--gray-400); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .visitor-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+  .badge-in { background: var(--green-light); color: var(--green); }
+  .badge-out { background: var(--gray-100); color: var(--gray-400); }
+  .badge-gold { background: rgba(200,169,81,0.15); color: var(--gold); border: 1px solid rgba(200,169,81,0.3); }
 
-        .role-description {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
+  /* ========== SEARCH ========== */
+  .search-box {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: var(--font);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search-box input:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(0,48,135,0.1);
+  }
+  .search-icon {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--gray-400);
+    pointer-events: none;
+  }
+  .search-clear {
+    position: absolute;
+    right: 10px; top: 50%;
+    transform: translateY(-50%);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    border: none;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--gray-600);
+  }
+  .search-clear.visible { display: flex; }
 
-        .nav-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  /* ========== ALERTS ========== */
+  .alert {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.4;
+  }
+  .alert-success { background: var(--green-light); color: var(--green); border: 1px solid rgba(0,135,90,0.2); }
+  .alert-error { background: var(--red-light); color: var(--red); border: 1px solid rgba(192,57,43,0.2); }
+  .alert-info { background: rgba(0,48,135,0.06); color: var(--navy); border: 1px solid rgba(0,48,135,0.15); }
+  .alert-warning { background: var(--orange-light); color: var(--orange); border: 1px solid rgba(224,123,0,0.2); }
 
-        .nav-tab {
-            background: var(--secondary);
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: all 0.3s ease;
-        }
+  /* ========== EMPTY STATE ========== */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+  }
+  .empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state h3 { font-size: 17px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+  .empty-state p { font-size: 14px; color: var(--gray-400); line-height: 1.5; }
 
-        .nav-tab:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
-        .nav-tab.active { background: var(--accent); color: var(--primary); border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
+  /* ========== BADGE / QR ========== */
+  .visitor-badge-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    text-align: center;
+    border: 2px solid var(--gold);
+    box-shadow: var(--shadow-lg);
+    margin: 12px 0;
+  }
+  .badge-header {
+    background: var(--navy);
+    color: white;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+  }
+  .badge-header h2 { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .badge-visitor-name { font-size: 24px; font-weight: 700; color: var(--navy); margin: 12px 0 4px; }
+  .badge-details { font-size: 14px; color: var(--gray-600); line-height: 1.7; }
+  .badge-qr {
+    background: var(--off-white);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .badge-token {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--navy);
+    letter-spacing: 3px;
+    background: var(--off-white);
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    border: 1px dashed var(--gray-200);
+    margin: 12px 0;
+    display: block;
+  }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  /* ========== SCANNER ========== */
+  #qr-video-container {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: black;
+    margin-bottom: 12px;
+    position: relative;
+    aspect-ratio: 1;
+  }
+  #qr-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .scanner-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .scanner-frame {
+    width: 60%; aspect-ratio: 1;
+    border: 3px solid var(--gold);
+    border-radius: 12px;
+    box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .scanner-frame::before, .scanner-frame::after {
+    content: '';
+    position: absolute;
+    top: -3px; left: -3px;
+    width: 20px; height: 20px;
+    border-top: 4px solid white;
+    border-left: 4px solid white;
+    border-radius: 2px;
+  }
+  .scanner-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    animation: scanLine 2s ease-in-out infinite;
+  }
+  @keyframes scanLine { 0%,100% { top: 10%; } 50% { top: 85%; } }
 
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); }
-        .form-group { margin-bottom: 1.5rem; }
+  /* ========== PASSWORD SCREEN ========== */
+  #screen-password {
+    background: linear-gradient(160deg, var(--navy-dark), var(--navy));
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .password-box {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-lg);
+    padding: 32px 24px;
+    width: 100%;
+    max-width: 340px;
+    backdrop-filter: blur(10px);
+    text-align: center;
+  }
+  .password-box h2 { color: white; font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+  .password-box p { color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 24px; }
+  .password-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-family: var(--font);
+    background: rgba(255,255,255,0.08);
+    color: white;
+    outline: none;
+    text-align: center;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .password-input::placeholder { letter-spacing: 0; color: rgba(255,255,255,0.3); }
+  .password-input:focus { border-color: var(--gold); }
+  .password-error { color: #ff7b7b; font-size: 13px; margin-top: 10px; display: none; }
 
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--accent);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+  /* ========== SECTION HEADER ========== */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-header h2 { font-size: 15px; font-weight: 600; color: var(--gray-800); }
+  .section-count { font-size: 12px; color: var(--gray-400); background: var(--gray-100); padding: 2px 8px; border-radius: 20px; }
 
-        input, select { width: 100%; padding: 0.875rem 1rem; background: var(--secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Work Sans', sans-serif; font-size: 1rem; transition: all 0.3s ease; }
-        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1); background: var(--primary); }
-        select { cursor: pointer; }
+  /* ========== DIVIDER ========== */
+  .divider { height: 1px; background: var(--gray-100); margin: 16px 0; }
 
-        .btn {
-            background: var(--accent);
-            color: var(--primary);
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
-        }
+  /* ========== TOAST ========== */
+  .toast {
+    position: fixed;
+    bottom: 80px; left: 16px; right: 16px;
+    background: var(--gray-800);
+    color: white;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
 
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4); }
-        .btn:active { transform: translateY(0); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: var(--secondary); color: var(--text); border: 1px solid var(--border); }
-        .btn-danger { background: var(--danger); color: var(--text); }
-        .btn-block { width: 100%; }
+  /* ========== LOADING ========== */
+  .loading {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .loading span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: loadBounce 0.9s ease infinite;
+  }
+  .loading span:nth-child(2) { animation-delay: 0.15s; }
+  .loading span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes loadBounce { 0%,60%,100% { transform: translateY(0); opacity:0.6; } 30% { transform: translateY(-5px); opacity:1; } }
 
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--secondary);
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
-        }
+  /* ========== MODAL ========== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9000;
+    display: none;
+    align-items: flex-end;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px;
+    animation: slideUp 0.3s ease;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .modal-subtitle { font-size: 14px; color: var(--gray-400); margin-bottom: 20px; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+  /* ========== MANAGEMENT ========== */
+  .mgmt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .mgmt-item:last-child { border-bottom: none; }
+  .mgmt-item-text { font-size: 15px; color: var(--gray-800); }
+  .mgmt-item-sub { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; border-top: 3px solid var(--accent); }
-        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 2.5rem; font-weight: 700; color: var(--accent); }
-        .stat-label { color: var(--text-dim); font-size: 0.9rem; text-transform: uppercase; margin-top: 0.5rem; }
+  /* ========== ANIMATIONS ========== */
+  @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
-        .visitor-item { background: var(--secondary); border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 1.25rem; border-radius: 8px; margin-bottom: 1rem; }
-        .visitor-item.checked-out { border-left-color: var(--text-dim); opacity: 0.7; }
-        .visitor-item.archived { border-left-color: var(--warning); }
-        .visitor-info h3 { color: var(--text); font-size: 1.1rem; margin-bottom: 0.5rem; font-family: 'JetBrains Mono', monospace; }
-        .visitor-details { color: var(--text-dim); font-size: 0.9rem; line-height: 1.8; }
-        .action-buttons { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+  .animate-in { animation: fadeIn 0.3s ease; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--card-bg); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+  /* ========== UTILITY ========== */
+  .hidden { display: none !important; }
+  .text-center { text-align: center; }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .gap-8 { display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; gap: 8px; }
+  .row .btn { flex: 1; }
 
-        .badge-preview { background: white; color: black; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; text-align: center; border: 2px solid var(--accent); }
-        .badge-preview h3 { color: #333; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        .badge-preview h2 { color: black; font-size: 1.8rem; margin-bottom: 0.5rem; }
-        .badge-preview p { color: #666; margin: 0.25rem 0; font-size: 0.95rem; }
-        .badge-preview hr { border: none; border-top: 1px solid #ccc; margin: 1rem 0; }
-        #qrcode { margin: 1rem 0; display: flex; justify-content: center; }
-
-        table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid var(--border); }
-        th { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; text-transform: uppercase; }
-
-        .view-mode { display: none; }
-        .view-mode.active { display: block; }
-
-        @media print {
-            body * { visibility: hidden; }
-            .badge-preview, .badge-preview * { visibility: visible; }
-            .badge-preview { position: absolute; top: 0; left: 0; width: 10cm; height: 6.5cm; }
-        }
-
-        @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            h1 { font-size: 2rem; }
-            .nav-tabs { flex-direction: column; }
-            .action-buttons { flex-direction: column; }
-            .role-selection { grid-template-columns: 1fr; }
-        }
-    </style>
+  /* scroll fix */
+  .content::-webkit-scrollbar { display: none; }
+  .content { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Role Selection Screen -->
-        <div id="roleSelection" class="view-mode active">
-            <header>
-                <h1>👋 PPC Visitor Management</h1>
-                <p class="subtitle">Plastic Powder Coating Company</p>
-            </header>
 
-            <div class="role-selection">
-                <div class="role-card" onclick="selectRole('visitor')">
-                    <span class="role-icon">👥</span>
-                    <h2 class="role-title">Reception</h2>
-                    <p class="role-description">Check-in visitors, generate badges, and manage check-outs</p>
-                </div>
+<!-- ================================================
+     SCREEN: ROLE SELECTION
+================================================ -->
+<div id="screen-role" class="screen active">
+  <div class="role-logo">
+    <div class="role-logo-mark">PPC</div>
+    <h1>Visitor Management</h1>
+    <p>System v3.0</p>
+  </div>
+  <div class="role-cards">
+    <div class="role-card" onclick="goReception()">
+      <div class="role-card-icon reception">👥</div>
+      <div class="role-card-text">
+        <h3>Reception</h3>
+        <p>Register &amp; check-in visitors</p>
+      </div>
+      <div class="role-card-arrow">›</div>
+    </div>
+    <div class="role-card" onclick="goStaffLogin()">
+      <div class="role-card-icon staff">🔒</div>
+      <div class="role-card-text">
+        <h3>Staff Portal</h3>
+        <p>Dashboard, reports &amp; management</p>
+      </div>
+      <div class="role-card-arrow">›</div>
+    </div>
+  </div>
+</div>
 
-                <div class="role-card" onclick="selectRole('staff')">
-                    <span class="role-icon">🔒</span>
-                    <h2 class="role-title">Staff Portal</h2>
-                    <p class="role-description">Monitor visitors, view history, and access management tools</p>
-                </div>
-            </div>
+<!-- ================================================
+     SCREEN: STAFF PASSWORD
+================================================ -->
+<div id="screen-password" class="screen">
+  <div class="password-box">
+    <div style="font-size:40px;margin-bottom:16px">🔐</div>
+    <h2>Staff Access</h2>
+    <p>Enter the staff password to continue</p>
+    <input type="password" class="password-input" id="passwordInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="btn btn-gold" onclick="checkPassword()">Unlock Portal</button>
+    <p class="password-error" id="passwordError">❌ Incorrect password. Try again.</p>
+    <button class="btn btn-secondary mt-12" onclick="showScreen('screen-role')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);margin-top:12px">← Back</button>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN: RECEPTION
+================================================ -->
+<div id="screen-reception" class="screen">
+  <div class="top-bar">
+    <div class="top-bar-back" onclick="showScreen('screen-role')">←</div>
+    <div style="flex:1">
+      <div class="top-bar-title">Reception</div>
+    </div>
+    <div class="top-bar-badge">NO LOGIN</div>
+  </div>
+
+  <!-- Bottom Nav: Reception -->
+  <div class="bottom-nav" id="reception-nav">
+    <button class="nav-btn active" onclick="recTab('register')" data-tab="register">
+      <span class="nav-icon">📝</span>
+      <span class="nav-label">Register</span>
+    </button>
+    <button class="nav-btn" onclick="recTab('checkin')" data-tab="checkin">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-label">Quick In</span>
+    </button>
+    <button class="nav-btn" onclick="recTab('checkout')" data-tab="checkout">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-label">Check Out</span>
+    </button>
+  </div>
+
+  <div class="content" id="reception-content">
+
+    <!-- TAB: REGISTER -->
+    <div id="rec-tab-register" class="animate-in">
+      <div id="registerResult"></div>
+
+      <div class="card">
+        <div class="card-title">New Visitor Registration</div>
+
+        <div class="form-group">
+          <label class="form-label">Visitor Name <span class="req">*</span></label>
+          <input type="text" class="form-input" id="visitorName" placeholder="Full name">
         </div>
 
-        <!-- Visitor Section (No login required) -->
-        <div id="visitorSection" class="view-mode">
-            <button class="back-btn" onclick="backToRoleSelection()">← Back to Home</button>
-            
-            <header>
-                <h1>👋 Visitor Check-In</h1>
-                <p class="subtitle">Reception Portal</p>
-            </header>
-
-            <div class="nav-tabs">
-                <button class="nav-tab active" onclick="switchVisitorTab('newVisitor')">New Visitor</button>
-                <button class="nav-tab" onclick="switchVisitorTab('quickCheckin')">Quick Check-In</button>
-                <button class="nav-tab" onclick="switchVisitorTab('checkout')">Check Out</button>
-            </div>
-
-            <!-- NEW VISITOR TAB -->
-            <div id="newVisitor" class="tab-content active">
-                <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">New Visitor Registration</h2>
-                    <form id="newVisitorForm">
-                        <div class="form-group">
-                            <label for="fullName">Full Name *</label>
-                            <input type="text" id="fullName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="company">Company *</label>
-                            <input type="text" id="company" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone Number *</label>
-                            <input type="tel" id="phone" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email (Optional)</label>
-                            <input type="email" id="email">
-                        </div>
-                        <div class="form-group">
-                            <label for="hostName">Visiting (Host Name) *</label>
-                            <select id="hostName" required><option value="">Loading...</option></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="purpose">Purpose of Visit *</label>
-                            <select id="purpose" required><option value="">Loading...</option></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="vehicle">Vehicle Details (Optional)</label>
-                            <input type="text" id="vehicle" placeholder="e.g., DXB-12345">
-                        </div>
-                        <button type="submit" class="btn btn-block">Check In & Generate Badge</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- QUICK CHECK-IN TAB -->
-            <div id="quickCheckin" class="tab-content">
-                <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Quick Check-In</h2>
-                    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">For returning visitors - search by name or phone</p>
-                    <div class="form-group">
-                        <label for="quickSearch">Search by Name or Phone</label>
-                        <input type="text" id="quickSearch" placeholder="Enter name or phone number">
-                    </div>
-                    <button onclick="quickCheckin()" class="btn btn-block">Search & Check In</button>
-                    <div id="quickResult" style="margin-top: 1.5rem;"></div>
-                </div>
-            </div>
-
-            <!-- CHECK OUT TAB -->
-            <div id="checkout" class="tab-content">
-                <div class="card">
-                    <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Check Out Visitor</h2>
-                    <div style="background: var(--secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 1rem; margin-bottom: 1rem;">📷 Scan Badge QR Code</h3>
-                        <div id="qrScanner" style="display: none; margin-bottom: 1rem;">
-                            <video id="qrVideo" style="width: 100%; max-width: 400px; border-radius: 8px; margin: 0 auto; display: block;"></video>
-                        </div>
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <button onclick="startQRScanner()" class="btn" id="startScanBtn">📷 Start QR Scanner</button>
-                            <button onclick="stopQRScanner()" class="btn btn-secondary" id="stopScanBtn" style="display: none;">⏹️ Stop Scanner</button>
-                        </div>
-                        <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 1rem;">💡 Point camera at the QR code on visitor's badge</p>
-                    </div>
-                    <div style="background: var(--secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 1rem; margin-bottom: 1rem;">🔍 Manual Search</h3>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="searchCheckout">Search by Name, Phone, or Visitor ID</label>
-                            <input type="text" id="searchCheckout" placeholder="Enter name, phone number, or visitor ID..." oninput="searchForCheckout()">
-                        </div>
-                    </div>
-                    <div id="checkoutList"></div>
-                </div>
-            </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" id="visitorPhone" placeholder="+971 50 000 0000">
         </div>
 
-        <!-- Staff Section (Login required) -->
-        <div id="staffSection" class="view-mode">
-            <!-- Login Screen -->
-            <div id="staffLoginScreen">
-                <button class="back-btn" onclick="backToRoleSelection()">← Back to Home</button>
-                
-                <div class="card" style="max-width: 400px; margin: 4rem auto;">
-                    <h2 style="margin-bottom: 1.5rem; text-align: center; font-family: 'JetBrains Mono', monospace;">Staff Login</h2>
-                    <div class="form-group">
-                        <label for="staffPassword">Password</label>
-                        <input type="password" id="staffPassword" placeholder="Enter staff password">
-                    </div>
-                    <button onclick="staffLogin()" class="btn btn-block">Login</button>
-                </div>
-            </div>
-
-            <!-- Staff Panel -->
-            <div id="staffPanel" style="display: none;">
-                <button class="back-btn" onclick="staffLogout()">← Logout</button>
-                
-                <header>
-                    <h1>🔒 Staff Portal</h1>
-                    <p class="subtitle">Management Dashboard</p>
-                </header>
-
-                <div class="nav-tabs">
-                    <button class="nav-tab active" onclick="switchStaffTab('dashboard')">Dashboard</button>
-                    <button class="nav-tab" onclick="switchStaffTab('current')">Current Visitors</button>
-                    <button class="nav-tab" onclick="switchStaffTab('history')">History</button>
-                    <button class="nav-tab" onclick="switchStaffTab('universalCheckout')">Universal Checkout</button>
-                    <button class="nav-tab" onclick="switchStaffTab('management')">Management</button>
-                    <button class="nav-tab" onclick="switchStaffTab('settings')">Settings</button>
-                </div>
-
-                <!-- Dashboard -->
-                <div id="dashboard" class="tab-content active">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="currentCount">-</div>
-                            <div class="stat-label">Currently In</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="todayCount">-</div>
-                            <div class="stat-label">Today's Visitors</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalCount">-</div>
-                            <div class="stat-label">Total Active</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="archivedCount">-</div>
-                            <div class="stat-label">Archived (30+ days)</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Quick Actions</h2>
-                        <div class="action-buttons">
-                            <button onclick="switchStaffTab('current')" class="btn">View Current Visitors</button>
-                            <button onclick="refreshStaffData()" class="btn btn-secondary">🔄 Refresh Data</button>
-                            <button onclick="checkEndOfDay()" class="btn btn-secondary">📊 End of Day</button>
-                            <button onclick="exportData('today')" class="btn btn-secondary">📥 Export Today</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Current Visitors -->
-                <div id="current" class="tab-content">
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Currently Checked In</h2>
-                        <div id="currentVisitorsList"></div>
-                    </div>
-                </div>
-
-                <!-- History -->
-                <div id="history" class="tab-content">
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Visitor History</h2>
-                        <div class="action-buttons" style="margin-bottom: 1.5rem;">
-                            <button onclick="filterHistory('today')" class="btn btn-secondary">Today</button>
-                            <button onclick="filterHistory('week')" class="btn btn-secondary">This Week</button>
-                            <button onclick="filterHistory('month')" class="btn btn-secondary">This Month</button>
-                            <button onclick="filterHistory('all')" class="btn btn-secondary">All Active</button>
-                            <button onclick="viewArchived()" class="btn" style="background: var(--warning);">📦 View Archived</button>
-                        </div>
-                        <div id="historyList"></div>
-                    </div>
-                </div>
-
-                <!-- Universal Checkout -->
-                <div id="universalCheckout" class="tab-content">
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">Universal QR Scanner</h2>
-                        <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Scan any visitor's badge to check them out instantly</p>
-                        
-                        <div style="background: var(--secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                            <div id="universalQrScanner" style="display: none; margin-bottom: 1rem;">
-                                <video id="universalQrVideo" style="width: 100%; max-width: 400px; border-radius: 8px; margin: 0 auto; display: block;"></video>
-                            </div>
-                            
-                            <div style="display: flex; gap: 1rem; justify-content: center;">
-                                <button onclick="startUniversalScanner()" class="btn" id="startUniversalBtn">📷 Start Scanner</button>
-                                <button onclick="stopUniversalScanner()" class="btn btn-secondary" id="stopUniversalBtn" style="display: none;">⏹️ Stop Scanner</button>
-                            </div>
-                            
-                            <p style="color: var(--accent); font-size: 0.85rem; margin-top: 1rem; text-align: center;">
-                                ✨ Scan any visitor badge - automatic checkout!
-                            </p>
-                        </div>
-
-                        <div id="scanResult" style="margin-top: 1.5rem;"></div>
-                    </div>
-                </div>
-
-                <!-- Management -->
-                <div id="management" class="tab-content">
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">📋 Staff Management</h2>
-                        <table id="staffTable">
-                            <thead>
-                                <tr><th>Name</th><th>Phone</th><th>Email</th><th>Actions</th></tr>
-                            </thead>
-                            <tbody id="staffTableBody"></tbody>
-                        </table>
-                        <button onclick="showAddStaffForm()" class="btn" style="margin-top: 1rem;">➕ Add Staff</button>
-                    </div>
-
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">🎯 Purpose Management</h2>
-                        <div id="purposeList"></div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Add New Purpose</label>
-                            <input type="text" id="newPurpose" placeholder="Enter purpose name">
-                        </div>
-                        <button onclick="addPurpose()" class="btn">➕ Add Purpose</button>
-                    </div>
-                </div>
-
-                <!-- Settings -->
-                <div id="settings" class="tab-content">
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">🔐 Change Password</h2>
-                        <form id="passwordForm">
-                            <div class="form-group">
-                                <label for="currentPassword">Current Password</label>
-                                <input type="password" id="currentPassword" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="newPassword">New Password</label>
-                                <input type="password" id="newPassword" required minlength="6">
-                            </div>
-                            <div class="form-group">
-                                <label for="confirmPassword">Confirm New Password</label>
-                                <input type="password" id="confirmPassword" required minlength="6">
-                            </div>
-                            <button type="submit" class="btn">Change Password</button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace;">ℹ️ System Information</h2>
-                        <div style="color: var(--text-dim); line-height: 2;">
-                            <p><strong style="color: var(--accent);">System:</strong> Unified PWA with Auto-Archive</p>
-                            <p><strong style="color: var(--accent);">Storage:</strong> Google Sheets</p>
-                            <p><strong style="color: var(--accent);">Archive:</strong> Auto (30+ days)</p>
-                            <p><strong style="color: var(--accent);">Version:</strong> 5.0 Unified</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="form-group">
+          <label class="form-label">Company / Organisation</label>
+          <input type="text" class="form-input" id="visitorCompany" placeholder="Company name (optional)">
         </div>
+
+        <div class="form-group">
+          <label class="form-label">Purpose of Visit <span class="req">*</span></label>
+          <select class="form-select" id="visitPurpose">
+            <option value="">Select purpose...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Host / Meeting With <span class="req">*</span></label>
+          <select class="form-select" id="visitHost">
+            <option value="">Select host...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Additional Notes</label>
+          <input type="text" class="form-input" id="visitNotes" placeholder="Any extra info (optional)">
+        </div>
+
+        <button class="btn btn-primary" id="registerBtn" onclick="registerVisitor()">
+          <span>✓</span> Register &amp; Print Badge
+        </button>
+      </div>
     </div>
 
-    <!-- Badge Modal -->
-    <div id="badgeModal" class="modal">
-        <div class="modal-content">
-            <h2 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">Visitor Badge Generated</h2>
-            <div class="badge-preview" id="badgeContent">
-                <h3>Guest Card</h3>
-                <p id="badgeDateTime" style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;"></p>
-                <h2 id="badgeName"></h2>
-                <p id="badgeCompany"></p>
-                <p id="badgeHost" style="font-weight: bold; color: #333; margin-top: 0.5rem;"></p>
-                <hr>
-                <p style="font-weight: bold;">Plastic Powder Coating Company LLC</p>
-                <div id="qrcode"></div>
-                <p style="font-size: 0.8rem; color: #666;">Please return this ticket when you leave. Have a nice day and welcome back!</p>
-                <p style="font-size: 0.75rem; color: #999;">Visitor ID: <span id="badgeId"></span></p>
-            </div>
-            <div class="action-buttons">
-                <button onclick="downloadPDF()" class="btn">📄 Save PDF</button>
-                <button onclick="printBadge()" class="btn btn-secondary">🖨️ Save & Print</button>
-                <button onclick="emailVisitor()" class="btn btn-secondary">📧 Email Visitor</button>
-                <button onclick="sendToVisitorMobile()" class="btn btn-secondary">📱 Send to Visitor</button>
-                <button onclick="closeModal()" class="btn btn-secondary">Close</button>
-            </div>
+    <!-- TAB: QUICK CHECK-IN -->
+    <div id="rec-tab-checkin" class="hidden animate-in">
+      <div id="checkinResult"></div>
+
+      <div class="card">
+        <div class="card-title">Quick Check-In</div>
+        <p style="font-size:13px;color:var(--gray-400);margin-bottom:14px">Search by name to check in a returning visitor</p>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="checkinSearch" placeholder="Type visitor name..." oninput="searchCheckin(this.value)">
+          <button class="search-clear" id="checkinClear" onclick="clearCheckin()">✕</button>
         </div>
+        <div id="checkinList"></div>
+      </div>
+
+      <div id="checkinBadgeSection" class="hidden">
+        <div class="visitor-badge-card" id="checkinBadge"></div>
+        <button class="btn btn-outline mt-12" onclick="checkinAnother()">+ Check In Another Visitor</button>
+      </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-    <script>
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(registration => {
-                        console.log('✅ Service Worker registered:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('❌ Service Worker registration failed:', error);
-                    });
-            });
+    <!-- TAB: CHECKOUT -->
+    <div id="rec-tab-checkout" class="hidden animate-in">
+      <div class="card">
+        <div class="card-title">Check Out Visitor</div>
+        <div class="alert alert-info">
+          <span>ℹ️</span>
+          <span>Search by name or scan QR badge to check out a visitor</span>
+        </div>
+
+        <!-- Search checkout -->
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="checkoutSearch" placeholder="Search visitor name..." oninput="searchCheckout(this.value)">
+          <button class="search-clear" id="checkoutClear" onclick="clearCheckout()">✕</button>
+        </div>
+        <div id="checkoutList">
+          <!-- Empty by default — FIX #3 applied -->
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- QR Scan -->
+        <button class="btn btn-outline" onclick="toggleCheckoutScanner()">
+          <span>📷</span> Scan QR Badge
+        </button>
+        <div id="checkoutScannerArea" class="hidden mt-12">
+          <div id="qr-video-container">
+            <video id="qr-video" playsinline muted></video>
+            <div class="scanner-overlay">
+              <div class="scanner-frame">
+                <div class="scanner-line"></div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" onclick="stopScanner()">Stop Scanner</button>
+        </div>
+
+        <div id="checkoutResult" class="mt-12"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN: STAFF PORTAL
+================================================ -->
+<div id="screen-staff" class="screen">
+  <div class="top-bar">
+    <div class="top-bar-back" onclick="staffLogout()">←</div>
+    <div style="flex:1">
+      <div class="top-bar-title">Staff Portal</div>
+      <div class="top-bar-subtitle">SECURED ACCESS</div>
+    </div>
+    <div style="font-size:20px">🔒</div>
+  </div>
+
+  <!-- Bottom Nav: Staff -->
+  <div class="bottom-nav" id="staff-nav">
+    <button class="nav-btn active" onclick="staffTab('dashboard')" data-tab="dashboard">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-btn" onclick="staffTab('current')" data-tab="current">
+      <span class="nav-icon">👁️</span>
+      <span class="nav-label">Current</span>
+    </button>
+    <button class="nav-btn" onclick="staffTab('history')" data-tab="history">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">History</span>
+    </button>
+    <button class="nav-btn" onclick="staffTab('scanner')" data-tab="scanner">
+      <span class="nav-icon">📷</span>
+      <span class="nav-label">Scanner</span>
+    </button>
+    <button class="nav-btn" onclick="staffTab('manage')" data-tab="manage">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Manage</span>
+    </button>
+  </div>
+
+  <div class="content" id="staff-content">
+
+    <!-- TAB: DASHBOARD -->
+    <div id="staff-tab-dashboard" class="animate-in">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="stat-today">—</div>
+          <div class="stat-label">Today's Visitors</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-inside">—</div>
+          <div class="stat-label">Currently Inside</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-week">—</div>
+          <div class="stat-label">This Week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-month">—</div>
+          <div class="stat-label">This Month</div>
+        </div>
+        <div class="stat-card full">
+          <div class="stat-number" id="stat-total">—</div>
+          <div class="stat-label">All Time Total</div>
+          <div class="stat-sub" id="stat-archived"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Currently Inside</div>
+        <div id="dashboard-current"></div>
+      </div>
+    </div>
+
+    <!-- TAB: CURRENT VISITORS -->
+    <div id="staff-tab-current" class="hidden animate-in">
+      <div class="section-header">
+        <h2>Visitors Inside</h2>
+        <span class="section-count" id="current-count">0</span>
+      </div>
+      <button class="btn btn-secondary mt-8" onclick="loadCurrentVisitors()" style="margin-bottom:12px">
+        🔄 Refresh
+      </button>
+      <div id="current-visitors-list"></div>
+    </div>
+
+    <!-- TAB: HISTORY -->
+    <div id="staff-tab-history" class="hidden animate-in">
+      <div class="section-header">
+        <h2>Visit History</h2>
+        <span class="section-count" id="history-count">0</span>
+      </div>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="historySearch" placeholder="Search visitor or host..." oninput="filterHistory(this.value)">
+        <button class="search-clear" id="historyClear" onclick="clearHistorySearch()">✕</button>
+      </div>
+
+      <div id="history-list"></div>
+    </div>
+
+    <!-- TAB: SCANNER (Universal Checkout) -->
+    <div id="staff-tab-scanner" class="hidden animate-in">
+      <div class="card">
+        <div class="card-title">Universal Checkout Scanner</div>
+        <p style="font-size:13px;color:var(--gray-400);margin-bottom:14px">Scan visitor QR badge to check them out</p>
+        <div id="qr-staff-container">
+          <div id="qr-staff-video-container" class="hidden">
+            <div id="qr-video-container2" style="border-radius:var(--radius);overflow:hidden;background:black;margin-bottom:12px;position:relative;aspect-ratio:1;">
+              <video id="qr-video2" playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+              <div class="scanner-overlay">
+                <div class="scanner-frame"><div class="scanner-line"></div></div>
+              </div>
+            </div>
+            <button class="btn btn-secondary" onclick="stopStaffScanner()">Stop Scanner</button>
+          </div>
+          <button class="btn btn-primary" id="startStaffScanBtn" onclick="startStaffScanner()">
+            <span>📷</span> Start Scanner
+          </button>
+        </div>
+        <div id="staff-scan-result" class="mt-12"></div>
+      </div>
+
+      <!-- Manual checkout search -->
+      <div class="card mt-12">
+        <div class="card-title">Manual Checkout Search</div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="staffCheckoutSearch" placeholder="Search visitor name..." oninput="searchStaffCheckout(this.value)">
+          <button class="search-clear" id="staffCheckoutClear" onclick="clearStaffCheckout()">✕</button>
+        </div>
+        <div id="staff-checkout-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB: MANAGE -->
+    <div id="staff-tab-manage" class="hidden animate-in">
+      <!-- Staff Management -->
+      <div class="card">
+        <div class="section-header" style="margin-bottom:8px">
+          <div class="card-title" style="margin:0">Staff / Hosts</div>
+          <button class="btn btn-sm btn-primary" onclick="openAddStaffModal()">+ Add</button>
+        </div>
+        <div id="staff-list-mgmt"></div>
+      </div>
+
+      <!-- Purposes Management -->
+      <div class="card">
+        <div class="section-header" style="margin-bottom:8px">
+          <div class="card-title" style="margin:0">Visit Purposes</div>
+          <button class="btn btn-sm btn-primary" onclick="openAddPurposeModal()">+ Add</button>
+        </div>
+        <div id="purpose-list-mgmt"></div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="card" style="border-color:var(--red-light)">
+        <div class="card-title" style="color:var(--red)">⚠️ Data Management</div>
+        <button class="btn btn-secondary" style="margin-bottom:8px" onclick="exportData()">
+          📤 Export All Data (CSV)
+        </button>
+        <p style="font-size:12px;color:var(--gray-400);margin-top:8px">
+          Delete individual records from History tab. All data stored in Google Sheets.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================
+     MODALS
+================================================ -->
+<div class="modal-overlay" id="modal-add-staff">
+  <div class="modal">
+    <div class="modal-title">Add Staff Member</div>
+    <div class="modal-subtitle">This person can be selected as a host</div>
+    <div class="form-group">
+      <label class="form-label">Full Name <span class="req">*</span></label>
+      <input type="text" class="form-input" id="newStaffName" placeholder="e.g. Ahmed Al Mansoori">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Department / Role</label>
+      <input type="text" class="form-input" id="newStaffDept" placeholder="e.g. Operations">
+    </div>
+    <div class="row mt-16">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-staff')">Cancel</button>
+      <button class="btn btn-primary" onclick="addStaff()">Add Staff</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-purpose">
+  <div class="modal">
+    <div class="modal-title">Add Visit Purpose</div>
+    <div class="modal-subtitle">Add a new reason visitors can select</div>
+    <div class="form-group">
+      <label class="form-label">Purpose Name <span class="req">*</span></label>
+      <input type="text" class="form-input" id="newPurposeName" placeholder="e.g. Client Meeting">
+    </div>
+    <div class="row mt-16">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-purpose')">Cancel</button>
+      <button class="btn btn-primary" onclick="addPurpose()">Add Purpose</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-delete-confirm">
+  <div class="modal">
+    <div style="font-size:40px;text-align:center;margin-bottom:12px">🗑️</div>
+    <div class="modal-title text-center">Delete Visit Record?</div>
+    <div class="modal-subtitle text-center" id="delete-confirm-text">This action cannot be undone.</div>
+    <div class="row mt-16">
+      <button class="btn btn-secondary" onclick="closeModal('modal-delete-confirm')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ================================================
+     SCRIPTS
+================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script>
+
+// ============================================================
+// CONFIG
+// ============================================================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwC4oUm3holztMyeFmPbfofAyLvZDg4bHrIsWgHHsfhpAwovC32eCOuva7fqEI-vKgo2Q/exec';
+const STAFF_PASSWORD = 'DXB@ppc2026';
+
+// ============================================================
+// STATE
+// ============================================================
+let allVisitors = [];
+let staffList = [];
+let purposeList = [];
+let currentScanStream = null;
+let currentScanInterval = null;
+let deleteRowId = null;
+let historyData = [];
+
+// ============================================================
+// SCREEN NAVIGATION
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goReception() {
+  showScreen('screen-reception');
+  recTab('register');
+  loadFormData();
+}
+
+function goStaffLogin() {
+  showScreen('screen-password');
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('passwordError').style.display = 'none';
+  setTimeout(() => document.getElementById('passwordInput').focus(), 300);
+}
+
+function checkPassword() {
+  const val = document.getElementById('passwordInput').value;
+  if (val === STAFF_PASSWORD) {
+    showScreen('screen-staff');
+    staffTab('dashboard');
+    loadDashboard();
+  } else {
+    document.getElementById('passwordError').style.display = 'block';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+  }
+}
+
+function staffLogout() {
+  stopAllScanners();
+  showScreen('screen-role');
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function recTab(tab) {
+  const tabs = ['register', 'checkin', 'checkout'];
+  tabs.forEach(t => {
+    document.getElementById('rec-tab-' + t).classList.toggle('hidden', t !== tab);
+  });
+  document.querySelectorAll('#reception-nav .nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+
+  // FIX #3: Reset checkout list when switching TO checkout tab
+  if (tab === 'checkout') {
+    document.getElementById('checkoutSearch').value = '';
+    document.getElementById('checkoutList').innerHTML = '';
+    document.getElementById('checkoutClear').classList.remove('visible');
+    document.getElementById('checkoutResult').innerHTML = '';
+    stopScanner();
+  }
+  // FIX #4: Clear checkin when switching away
+  if (tab !== 'checkin') {
+    stopScanner();
+  }
+}
+
+function staffTab(tab) {
+  const tabs = ['dashboard', 'current', 'history', 'scanner'];
+  tabs.forEach(t => {
+    const el = document.getElementById('staff-tab-' + t);
+    if (el) el.classList.toggle('hidden', t !== tab);
+  });
+  document.getElementById('staff-tab-manage').classList.toggle('hidden', tab !== 'manage');
+  document.querySelectorAll('#staff-nav .nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+
+  if (tab === 'dashboard') loadDashboard();
+  if (tab === 'current') loadCurrentVisitors();
+  if (tab === 'history') loadHistory();
+  if (tab === 'manage') loadManagement();
+  if (tab !== 'scanner') stopStaffScanner();
+}
+
+// ============================================================
+// API HELPER
+// ============================================================
+async function apiCall(params) {
+  const url = APPS_SCRIPT_URL + '?' + new URLSearchParams(params);
+  const resp = await fetch(url);
+  return resp.json();
+}
+
+async function apiPost(payload) {
+  const resp = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  return resp.json();
+}
+
+// ============================================================
+// LOAD FORM DATA (Staff + Purposes)
+// ============================================================
+async function loadFormData() {
+  try {
+    const data = await apiCall({ action: 'getConfig' });
+    if (data.staff) {
+      staffList = data.staff;
+      const hostSel = document.getElementById('visitHost');
+      hostSel.innerHTML = '<option value="">Select host...</option>';
+      data.staff.forEach(s => {
+        hostSel.innerHTML += `<option value="${s.name}">${s.name}${s.dept ? ' – ' + s.dept : ''}</option>`;
+      });
+    }
+    if (data.purposes) {
+      purposeList = data.purposes;
+      const purposeSel = document.getElementById('visitPurpose');
+      purposeSel.innerHTML = '<option value="">Select purpose...</option>';
+      data.purposes.forEach(p => {
+        purposeSel.innerHTML += `<option value="${p}">${p}</option>`;
+      });
+    }
+  } catch(e) {
+    // Use defaults if API fails
+    const defaultPurposes = ['Client Meeting','Interview','Delivery','Personal','Government','Maintenance','Other'];
+    const purposeSel = document.getElementById('visitPurpose');
+    purposeSel.innerHTML = '<option value="">Select purpose...</option>';
+    defaultPurposes.forEach(p => purposeSel.innerHTML += `<option value="${p}">${p}</option>`);
+  }
+}
+
+// ============================================================
+// REGISTER VISITOR
+// ============================================================
+async function registerVisitor() {
+  const name = document.getElementById('visitorName').value.trim();
+  const phone = document.getElementById('visitorPhone').value.trim();
+  const company = document.getElementById('visitorCompany').value.trim();
+  const purpose = document.getElementById('visitPurpose').value;
+  const host = document.getElementById('visitHost').value;
+  const notes = document.getElementById('visitNotes').value.trim();
+
+  if (!name) { showToast('Please enter visitor name', 'error'); return; }
+  if (!purpose) { showToast('Please select a purpose', 'error'); return; }
+  if (!host) { showToast('Please select a host', 'error'); return; }
+
+  const btn = document.getElementById('registerBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"><span></span><span></span><span></span></span> Registering...';
+
+  try {
+    const token = generateToken(name);
+    const payload = {
+      action: 'register',
+      name, phone, company, purpose, host, notes,
+      token,
+      timestamp: new Date().toISOString()
+    };
+
+    const result = await apiPost(payload);
+
+    if (result.success) {
+      showRegistrationBadge({ name, phone, company, purpose, host, token });
+      clearRegistrationForm();
+    } else {
+      document.getElementById('registerResult').innerHTML =
+        `<div class="alert alert-error">❌ ${result.message || 'Registration failed. Please try again.'}</div>`;
+    }
+  } catch(e) {
+    document.getElementById('registerResult').innerHTML =
+      `<div class="alert alert-error">❌ Network error. Please check your connection and try again.</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>✓</span> Register &amp; Print Badge';
+}
+
+function generateToken(name) {
+  const initials = name.replace(/[^a-zA-Z ]/g, '').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0,3);
+  const num = String(Math.floor(1000 + Math.random() * 9000));
+  return initials + num;
+}
+
+function showRegistrationBadge(visitor) {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  document.getElementById('registerResult').innerHTML = `
+    <div class="alert alert-success">✅ Visitor registered successfully!</div>
+    <div class="visitor-badge-card">
+      <div class="badge-header">
+        <h2>PPC — VISITOR PASS</h2>
+      </div>
+      <div class="badge-visitor-name">${escHtml(visitor.name)}</div>
+      <div class="badge-details">
+        ${visitor.company ? `<strong>${escHtml(visitor.company)}</strong><br>` : ''}
+        Meeting: ${escHtml(visitor.host)}<br>
+        Purpose: ${escHtml(visitor.purpose)}<br>
+        ${timeStr} · ${dateStr}
+      </div>
+      <div class="badge-qr">
+        <div>
+          <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px">Visitor Token</div>
+          <code class="badge-token">${visitor.token}</code>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Show this to reception on exit</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="clearRegistrationBadge()">← Register Another Visitor</button>
+  `;
+  document.getElementById('registerResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function clearRegistrationBadge() {
+  document.getElementById('registerResult').innerHTML = '';
+}
+
+function clearRegistrationForm() {
+  document.getElementById('visitorName').value = '';
+  document.getElementById('visitorPhone').value = '';
+  document.getElementById('visitorCompany').value = '';
+  document.getElementById('visitPurpose').value = '';
+  document.getElementById('visitHost').value = '';
+  document.getElementById('visitNotes').value = '';
+}
+
+// ============================================================
+// QUICK CHECK-IN (FIX #1: startsWith, FIX #4: clear after)
+// ============================================================
+async function searchCheckin(query) {
+  const clearBtn = document.getElementById('checkinClear');
+  clearBtn.classList.toggle('visible', query.length > 0);
+
+  if (query.length < 2) {
+    document.getElementById('checkinList').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('checkinList').innerHTML = `
+    <div class="empty-state" style="padding:24px">
+      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
+    </div>`;
+
+  try {
+    const data = await apiCall({ action: 'search', query: query.trim(), status: 'checkedout' });
+    renderCheckinResults(data.visitors || [], query.trim());
+  } catch(e) {
+    document.getElementById('checkinList').innerHTML = `<div class="alert alert-error">Search failed. Check connection.</div>`;
+  }
+}
+
+function renderCheckinResults(visitors, query) {
+  // FIX #1: Filter client-side with startsWith for accuracy
+  const filtered = visitors.filter(v =>
+    v.name && v.name.toLowerCase().startsWith(query.toLowerCase())
+  );
+
+  if (filtered.length === 0) {
+    document.getElementById('checkinList').innerHTML = `
+      <div class="empty-state" style="padding:24px">
+        <div class="empty-state-icon">👤</div>
+        <h3>No Match Found</h3>
+        <p>No previous visitor named "${escHtml(query)}"<br>Use Register tab for new visitors</p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('checkinList').innerHTML = filtered.map(v => `
+    <div class="visitor-card" style="cursor:pointer" onclick="doCheckin('${v.id || v.row}', '${escHtml(v.name)}', '${escHtml(v.host || '')}', '${escHtml(v.purpose || '')}')">
+      <div class="visitor-avatar">${getInitials(v.name)}</div>
+      <div class="visitor-info">
+        <div class="visitor-name">${escHtml(v.name)}</div>
+        <div class="visitor-detail">${escHtml(v.company || '')} ${v.host ? '· Host: ' + v.host : ''}</div>
+        <div class="visitor-detail" style="margin-top:2px;font-size:11px;color:var(--gray-400)">Last visit: ${formatDate(v.lastVisit || v.checkoutTime)}</div>
+      </div>
+      <div class="visitor-badge badge-gold">TAP TO CHECK IN</div>
+    </div>
+  `).join('');
+}
+
+async function doCheckin(id, name, host, purpose) {
+  showToast('Checking in ' + name + '...', '');
+  try {
+    const result = await apiPost({ action: 'checkin', visitorId: id, name, host, purpose, timestamp: new Date().toISOString() });
+    if (result.success) {
+      const token = result.token || generateToken(name);
+      showCheckinBadge(name, host, purpose, token);
+    } else {
+      showToast(result.message || 'Check-in failed', 'error');
+    }
+  } catch(e) {
+    showToast('Network error. Please try again.', 'error');
+  }
+}
+
+function showCheckinBadge(name, host, purpose, token) {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  // FIX #4: Clear the search area first
+  document.getElementById('checkinSearch').value = '';
+  document.getElementById('checkinList').innerHTML = '';
+  document.getElementById('checkinClear').classList.remove('visible');
+
+  document.getElementById('checkinBadgeSection').classList.remove('hidden');
+  document.getElementById('checkinBadge').innerHTML = `
+    <div class="badge-header"><h2>PPC — VISITOR PASS</h2></div>
+    <div class="badge-visitor-name">${escHtml(name)}</div>
+    <div class="badge-details">
+      Meeting: ${escHtml(host)}<br>
+      ${timeStr} · ${dateStr}
+    </div>
+    <div class="badge-qr">
+      <div>
+        <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px">Visitor Token</div>
+        <code class="badge-token">${token}</code>
+        <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Show this to reception on exit</div>
+      </div>
+    </div>
+    <div class="alert alert-success" style="text-align:left">✅ ${escHtml(name)} checked in successfully!</div>
+  `;
+  document.getElementById('checkinBadgeSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+// FIX #4: "Check In Another" clears everything
+function checkinAnother() {
+  document.getElementById('checkinBadgeSection').classList.add('hidden');
+  document.getElementById('checkinBadge').innerHTML = '';
+  document.getElementById('checkinSearch').value = '';
+  document.getElementById('checkinList').innerHTML = '';
+  document.getElementById('checkinClear').classList.remove('visible');
+  document.getElementById('checkinResult').innerHTML = '';
+  document.getElementById('checkinSearch').focus();
+}
+
+function clearCheckin() {
+  document.getElementById('checkinSearch').value = '';
+  document.getElementById('checkinList').innerHTML = '';
+  document.getElementById('checkinClear').classList.remove('visible');
+}
+
+// ============================================================
+// CHECKOUT (FIX #3: Empty by default, search to populate)
+// ============================================================
+async function searchCheckout(query) {
+  const clearBtn = document.getElementById('checkoutClear');
+  clearBtn.classList.toggle('visible', query.length > 0);
+
+  // FIX #3: Show empty state if no query
+  if (query.length < 2) {
+    document.getElementById('checkoutList').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('checkoutList').innerHTML = `
+    <div class="empty-state" style="padding:24px">
+      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
+    </div>`;
+
+  try {
+    const data = await apiCall({ action: 'search', query: query.trim(), status: 'inside' });
+    renderCheckoutResults(data.visitors || [], query.trim(), 'checkoutList', 'doCheckout');
+  } catch(e) {
+    document.getElementById('checkoutList').innerHTML = `<div class="alert alert-error">Search failed. Check connection.</div>`;
+  }
+}
+
+function renderCheckoutResults(visitors, query, listId, checkoutFn) {
+  // FIX #1: startsWith filter
+  const filtered = visitors.filter(v =>
+    v.name && v.name.toLowerCase().startsWith(query.toLowerCase())
+  );
+
+  if (filtered.length === 0) {
+    document.getElementById(listId).innerHTML = `
+      <div class="empty-state" style="padding:24px">
+        <div class="empty-state-icon">✅</div>
+        <h3>No Match Found</h3>
+        <p>No visitor named "${escHtml(query)}" currently inside</p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById(listId).innerHTML = filtered.map(v => `
+    <div class="visitor-card" style="cursor:pointer" onclick="${checkoutFn}('${v.id || v.row}', '${escHtml(v.name)}')">
+      <div class="visitor-avatar">${getInitials(v.name)}</div>
+      <div class="visitor-info">
+        <div class="visitor-name">${escHtml(v.name)}</div>
+        <div class="visitor-detail">Host: ${escHtml(v.host || '—')} · ${escHtml(v.purpose || '—')}</div>
+        <div class="visitor-detail" style="font-size:11px;color:var(--gray-400)">In: ${formatTime(v.checkInTime)}</div>
+      </div>
+      <div class="visitor-badge badge-in">CHECK OUT</div>
+    </div>
+  `).join('');
+}
+
+async function doCheckout(id, name) {
+  if (!confirm(`Check out ${name}?`)) return;
+  showToast('Checking out ' + name + '...');
+  try {
+    const result = await apiPost({ action: 'checkout', visitorId: id, timestamp: new Date().toISOString() });
+    if (result.success) {
+      showToast(name + ' checked out ✓', 'success');
+      document.getElementById('checkoutSearch').value = '';
+      document.getElementById('checkoutList').innerHTML = '';
+      document.getElementById('checkoutClear').classList.remove('visible');
+      document.getElementById('checkoutResult').innerHTML = `
+        <div class="alert alert-success">✅ ${escHtml(name)} has been checked out at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.</div>`;
+    } else {
+      showToast(result.message || 'Checkout failed', 'error');
+    }
+  } catch(e) {
+    showToast('Network error. Please try again.', 'error');
+  }
+}
+
+function clearCheckout() {
+  document.getElementById('checkoutSearch').value = '';
+  document.getElementById('checkoutList').innerHTML = '';
+  document.getElementById('checkoutClear').classList.remove('visible');
+}
+
+// ============================================================
+// QR SCANNER (Reception)
+// ============================================================
+function toggleCheckoutScanner() {
+  const area = document.getElementById('checkoutScannerArea');
+  if (area.classList.contains('hidden')) {
+    area.classList.remove('hidden');
+    startScanner('qr-video', (token) => handleCheckoutQR(token));
+  } else {
+    area.classList.add('hidden');
+    stopScanner();
+  }
+}
+
+async function handleCheckoutQR(token) {
+  stopScanner();
+  document.getElementById('checkoutScannerArea').classList.add('hidden');
+  document.getElementById('checkoutResult').innerHTML = `
+    <div class="empty-state" style="padding:24px">
+      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
+      <p style="margin-top:12px;color:var(--gray-400)">Looking up token ${token}...</p>
+    </div>`;
+  try {
+    const data = await apiCall({ action: 'lookupToken', token });
+    if (data.visitor) {
+      const v = data.visitor;
+      document.getElementById('checkoutResult').innerHTML = `
+        <div class="visitor-card">
+          <div class="visitor-avatar">${getInitials(v.name)}</div>
+          <div class="visitor-info">
+            <div class="visitor-name">${escHtml(v.name)}</div>
+            <div class="visitor-detail">Host: ${escHtml(v.host || '—')}</div>
+            <div class="visitor-detail">In: ${formatTime(v.checkInTime)}</div>
+          </div>
+          <span class="visitor-badge badge-in">INSIDE</span>
+        </div>
+        <button class="btn btn-primary" onclick="doCheckout('${v.id || v.row}', '${escHtml(v.name)}')">
+          🚪 Check Out ${escHtml(v.name)}
+        </button>`;
+    } else {
+      document.getElementById('checkoutResult').innerHTML = `
+        <div class="alert alert-error">❌ Token not found or visitor already checked out.</div>`;
+    }
+  } catch(e) {
+    document.getElementById('checkoutResult').innerHTML = `<div class="alert alert-error">Network error.</div>`;
+  }
+}
+
+// ============================================================
+// STAFF: DASHBOARD
+// ============================================================
+async function loadDashboard() {
+  document.getElementById('stat-today').innerHTML = '<span class="loading"><span></span><span></span><span></span></span>';
+
+  try {
+    const data = await apiCall({ action: 'getStats' });
+    document.getElementById('stat-today').textContent = data.today ?? '—';
+    document.getElementById('stat-inside').textContent = data.inside ?? '—';
+    document.getElementById('stat-week').textContent = data.week ?? '—';
+    document.getElementById('stat-month').textContent = data.month ?? '—';
+    document.getElementById('stat-total').textContent = data.total ?? '—';
+    if (data.archived) {
+      document.getElementById('stat-archived').textContent = data.archived + ' archived (30+ days)';
+    }
+
+    if (data.currentVisitors && data.currentVisitors.length > 0) {
+      document.getElementById('dashboard-current').innerHTML = data.currentVisitors.map(v => `
+        <div class="visitor-card">
+          <div class="visitor-avatar">${getInitials(v.name)}</div>
+          <div class="visitor-info">
+            <div class="visitor-name">${escHtml(v.name)}</div>
+            <div class="visitor-detail">${escHtml(v.host || '')} · ${escHtml(v.purpose || '')}</div>
+            <div class="visitor-detail" style="font-size:11px;color:var(--gray-400)">In: ${formatTime(v.checkInTime)}</div>
+          </div>
+          <span class="visitor-badge badge-in">IN</span>
+        </div>
+      `).join('');
+    } else {
+      document.getElementById('dashboard-current').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🏢</div>
+          <h3>No Visitors Inside</h3>
+          <p>All clear!</p>
+        </div>`;
+    }
+  } catch(e) {
+    document.getElementById('stat-today').textContent = '—';
+    showToast('Could not load dashboard data', 'error');
+  }
+}
+
+// ============================================================
+// STAFF: CURRENT VISITORS
+// ============================================================
+async function loadCurrentVisitors() {
+  document.getElementById('current-visitors-list').innerHTML = `
+    <div class="empty-state" style="padding:32px">
+      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
+    </div>`;
+
+  try {
+    const data = await apiCall({ action: 'getCurrentVisitors' });
+    const visitors = (data.visitors || []).reverse(); // FIX #5: newest first
+    document.getElementById('current-count').textContent = visitors.length;
+
+    if (visitors.length === 0) {
+      document.getElementById('current-visitors-list').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">✅</div>
+          <h3>No Visitors Inside</h3>
+          <p>Currently no visitors checked in</p>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('current-visitors-list').innerHTML = visitors.map(v => `
+      <div class="visitor-card">
+        <div class="visitor-avatar">${getInitials(v.name)}</div>
+        <div class="visitor-info">
+          <div class="visitor-name">${escHtml(v.name)}</div>
+          <div class="visitor-detail">Host: ${escHtml(v.host || '—')} · ${escHtml(v.purpose || '—')}</div>
+          <div class="visitor-detail">${escHtml(v.company || '')}</div>
+          <div class="visitor-detail" style="font-size:11px;color:var(--gray-400)">In: ${formatTime(v.checkInTime)}</div>
+        </div>
+        <button class="btn btn-sm btn-secondary" onclick="staffCheckoutDirect('${v.id || v.row}','${escHtml(v.name)}')">Out</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('current-visitors-list').innerHTML = `<div class="alert alert-error">Failed to load visitors.</div>`;
+  }
+}
+
+async function staffCheckoutDirect(id, name) {
+  if (!confirm(`Check out ${name}?`)) return;
+  try {
+    const result = await apiPost({ action: 'checkout', visitorId: id, timestamp: new Date().toISOString() });
+    if (result.success) {
+      showToast(name + ' checked out ✓', 'success');
+      loadCurrentVisitors();
+    } else {
+      showToast(result.message || 'Failed', 'error');
+    }
+  } catch(e) {
+    showToast('Network error', 'error');
+  }
+}
+
+// ============================================================
+// STAFF: HISTORY
+// ============================================================
+async function loadHistory() {
+  document.getElementById('history-list').innerHTML = `
+    <div class="empty-state" style="padding:32px">
+      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
+    </div>`;
+
+  try {
+    const data = await apiCall({ action: 'getHistory' });
+    historyData = (data.visitors || []).reverse(); // FIX #5: newest first
+    document.getElementById('history-count').textContent = historyData.length;
+    renderHistory(historyData);
+  } catch(e) {
+    document.getElementById('history-list').innerHTML = `<div class="alert alert-error">Failed to load history.</div>`;
+  }
+}
+
+function renderHistory(visitors) {
+  if (visitors.length === 0) {
+    document.getElementById('history-list').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <h3>No History</h3>
+        <p>No visits recorded yet</p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('history-list').innerHTML = visitors.map(v => `
+    <div class="visitor-card">
+      <div class="visitor-avatar" style="background:var(--gray-200);color:var(--gray-600)">${getInitials(v.name)}</div>
+      <div class="visitor-info">
+        <div class="visitor-name">${escHtml(v.name)}</div>
+        <div class="visitor-detail">${escHtml(v.host || '—')} · ${escHtml(v.purpose || '—')}</div>
+        <div class="visitor-detail" style="font-size:11px;color:var(--gray-400)">${formatDate(v.checkInTime)} — ${formatTime(v.checkoutTime)}</div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="openDeleteModal('${v.id || v.row}','${escHtml(v.name)}')">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function filterHistory(query) {
+  const clearBtn = document.getElementById('historyClear');
+  clearBtn.classList.toggle('visible', query.length > 0);
+
+  if (!query) { renderHistory(historyData); return; }
+  const filtered = historyData.filter(v =>
+    v.name && v.name.toLowerCase().startsWith(query.toLowerCase()) ||
+    v.host && v.host.toLowerCase().startsWith(query.toLowerCase())
+  );
+  document.getElementById('history-count').textContent = filtered.length;
+  renderHistory(filtered);
+}
+
+function clearHistorySearch() {
+  document.getElementById('historySearch').value = '';
+  document.getElementById('historyClear').classList.remove('visible');
+  document.getElementById('history-count').textContent = historyData.length;
+  renderHistory(historyData);
+}
+
+// ============================================================
+// STAFF SCANNER
+// ============================================================
+function startStaffScanner() {
+  document.getElementById('qr-staff-video-container').classList.remove('hidden');
+  document.getElementById('startStaffScanBtn').classList.add('hidden');
+  startScanner('qr-video2', async (token) => {
+    stopStaffScanner();
+    document.getElementById('staff-scan-result').innerHTML = `
+      <div class="empty-state" style="padding:24px">
+        <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
+      </div>`;
+    try {
+      const data = await apiCall({ action: 'lookupToken', token });
+      if (data.visitor) {
+        const v = data.visitor;
+        document.getElementById('staff-scan-result').innerHTML = `
+          <div class="visitor-card">
+            <div class="visitor-avatar">${getInitials(v.name)}</div>
+            <div class="visitor-info">
+              <div class="visitor-name">${escHtml(v.name)}</div>
+              <div class="visitor-detail">Host: ${escHtml(v.host || '—')}</div>
+            </div>
+            <span class="visitor-badge badge-in">INSIDE</span>
+          </div>
+          <button class="btn btn-primary" onclick="staffCheckoutDirect('${v.id || v.row}','${escHtml(v.name)}')">
+            🚪 Check Out ${escHtml(v.name)}
+          </button>`;
+      } else {
+        document.getElementById('staff-scan-result').innerHTML = `<div class="alert alert-error">Token not found.</div>`;
+      }
+    } catch(e) {
+      document.getElementById('staff-scan-result').innerHTML = `<div class="alert alert-error">Network error.</div>`;
+    }
+  });
+}
+
+function stopStaffScanner() {
+  stopScanner('qr-video2');
+  const vc = document.getElementById('qr-staff-video-container');
+  if (vc) vc.classList.add('hidden');
+  const btn = document.getElementById('startStaffScanBtn');
+  if (btn) btn.classList.remove('hidden');
+}
+
+// ============================================================
+// STAFF CHECKOUT SEARCH
+// ============================================================
+async function searchStaffCheckout(query) {
+  const clearBtn = document.getElementById('staffCheckoutClear');
+  clearBtn.classList.toggle('visible', query.length > 0);
+
+  if (query.length < 2) {
+    document.getElementById('staff-checkout-list').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('staff-checkout-list').innerHTML = `
+    <div class="empty-state" style="padding:24px">
+      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
+    </div>`;
+
+  try {
+    const data = await apiCall({ action: 'search', query: query.trim(), status: 'inside' });
+    renderCheckoutResults(data.visitors || [], query.trim(), 'staff-checkout-list', 'staffCheckoutDirect');
+  } catch(e) {
+    document.getElementById('staff-checkout-list').innerHTML = `<div class="alert alert-error">Search failed.</div>`;
+  }
+}
+
+function clearStaffCheckout() {
+  document.getElementById('staffCheckoutSearch').value = '';
+  document.getElementById('staff-checkout-list').innerHTML = '';
+  document.getElementById('staffCheckoutClear').classList.remove('visible');
+}
+
+// ============================================================
+// MANAGEMENT
+// ============================================================
+async function loadManagement() {
+  try {
+    const data = await apiCall({ action: 'getConfig' });
+    staffList = data.staff || [];
+    purposeList = data.purposes || [];
+
+    document.getElementById('staff-list-mgmt').innerHTML = staffList.length === 0
+      ? '<p style="font-size:14px;color:var(--gray-400);padding:12px 0">No staff added yet</p>'
+      : staffList.map((s, i) => `
+          <div class="mgmt-item">
+            <div>
+              <div class="mgmt-item-text">${escHtml(s.name)}</div>
+              ${s.dept ? `<div class="mgmt-item-sub">${escHtml(s.dept)}</div>` : ''}
+            </div>
+            <button class="btn btn-sm btn-danger" onclick="deleteStaff(${i})">Remove</button>
+          </div>`).join('');
+
+    document.getElementById('purpose-list-mgmt').innerHTML = purposeList.length === 0
+      ? '<p style="font-size:14px;color:var(--gray-400);padding:12px 0">No purposes added yet</p>'
+      : purposeList.map((p, i) => `
+          <div class="mgmt-item">
+            <div class="mgmt-item-text">${escHtml(p)}</div>
+            <button class="btn btn-sm btn-danger" onclick="deletePurpose(${i})">Remove</button>
+          </div>`).join('');
+  } catch(e) {
+    showToast('Failed to load settings', 'error');
+  }
+}
+
+function openAddStaffModal() { document.getElementById('modal-add-staff').classList.add('active'); document.getElementById('newStaffName').focus(); }
+function openAddPurposeModal() { document.getElementById('modal-add-purpose').classList.add('active'); document.getElementById('newPurposeName').focus(); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+async function addStaff() {
+  const name = document.getElementById('newStaffName').value.trim();
+  const dept = document.getElementById('newStaffDept').value.trim();
+  if (!name) { showToast('Enter a name', 'error'); return; }
+
+  try {
+    const result = await apiPost({ action: 'addStaff', name, dept });
+    if (result.success) {
+      showToast(name + ' added ✓', 'success');
+      closeModal('modal-add-staff');
+      document.getElementById('newStaffName').value = '';
+      document.getElementById('newStaffDept').value = '';
+      loadManagement();
+    } else { showToast(result.message || 'Failed', 'error'); }
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+async function addPurpose() {
+  const name = document.getElementById('newPurposeName').value.trim();
+  if (!name) { showToast('Enter a purpose', 'error'); return; }
+  try {
+    const result = await apiPost({ action: 'addPurpose', purpose: name });
+    if (result.success) {
+      showToast(name + ' added ✓', 'success');
+      closeModal('modal-add-purpose');
+      document.getElementById('newPurposeName').value = '';
+      loadManagement();
+    } else { showToast(result.message || 'Failed', 'error'); }
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+async function deleteStaff(index) {
+  if (!confirm('Remove this staff member?')) return;
+  try {
+    const result = await apiPost({ action: 'deleteStaff', index });
+    if (result.success) { showToast('Removed ✓', 'success'); loadManagement(); }
+    else { showToast(result.message || 'Failed', 'error'); }
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+async function deletePurpose(index) {
+  if (!confirm('Remove this purpose?')) return;
+  try {
+    const result = await apiPost({ action: 'deletePurpose', index });
+    if (result.success) { showToast('Removed ✓', 'success'); loadManagement(); }
+    else { showToast(result.message || 'Failed', 'error'); }
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+// ============================================================
+// DELETE VISIT RECORD
+// ============================================================
+function openDeleteModal(rowId, name) {
+  deleteRowId = rowId;
+  document.getElementById('delete-confirm-text').textContent = `Delete visit record for "${name}"? This cannot be undone.`;
+  document.getElementById('modal-delete-confirm').classList.add('active');
+}
+
+async function confirmDelete() {
+  closeModal('modal-delete-confirm');
+  if (!deleteRowId) return;
+  try {
+    const result = await apiPost({ action: 'deleteVisit', rowId: deleteRowId });
+    if (result.success) {
+      showToast('Record deleted ✓', 'success');
+      loadHistory();
+    } else { showToast(result.message || 'Delete failed', 'error'); }
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+async function exportData() {
+  showToast('Preparing export...');
+  try {
+    const data = await apiCall({ action: 'getAll' });
+    const visitors = data.visitors || [];
+    const headers = ['Name', 'Company', 'Phone', 'Purpose', 'Host', 'Check In', 'Check Out', 'Token', 'Notes'];
+    const rows = visitors.map(v => [
+      v.name, v.company, v.phone, v.purpose, v.host,
+      v.checkInTime, v.checkoutTime, v.token, v.notes
+    ].map(f => `"${(f || '').toString().replace(/"/g, '""')}"`));
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'PPC_Visitors_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    showToast('Export ready ✓', 'success');
+  } catch(e) {
+    showToast('Export failed', 'error');
+  }
+}
+
+// ============================================================
+// QR SCANNER ENGINE
+// ============================================================
+let scanStreams = {};
+
+async function startScanner(videoId, callback) {
+  const video = document.getElementById(videoId);
+  if (!video) return;
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    scanStreams[videoId] = { stream, interval: null };
+    video.srcObject = stream;
+    video.play();
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const interval = setInterval(() => {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+        if (code && code.data) {
+          clearInterval(interval);
+          callback(code.data);
         }
+      }
+    }, 300);
+    scanStreams[videoId].interval = interval;
+  } catch(e) {
+    showToast('Camera access denied. Please allow camera permission.', 'error');
+  }
+}
 
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwC4oUm3holztMyeFmPbfofAyLvZDg4bHrIsWgHHsfhpAwovC32eCOuva7fqEI-vKgo2Q/exec';
-        
-        let currentVisitor = null;
-        let allVisitors = [];
-        let archivedVisitors = [];
-        let staffList = [];
-        let purposesList = [];
-        let isStaffLoggedIn = false;
-        let cloudPassword = '';
+function stopScanner(videoId) {
+  if (videoId) {
+    if (scanStreams[videoId]) {
+      clearInterval(scanStreams[videoId].interval);
+      if (scanStreams[videoId].stream) {
+        scanStreams[videoId].stream.getTracks().forEach(t => t.stop());
+      }
+      delete scanStreams[videoId];
+    }
+    const video = document.getElementById(videoId);
+    if (video) { video.srcObject = null; }
+  } else {
+    // Stop all
+    stopScanner('qr-video');
+    stopScanner('qr-video2');
+  }
+}
 
-        // View Management
-        function selectRole(role) {
-            document.getElementById('roleSelection').classList.remove('active');
-            if (role === 'visitor') {
-                document.getElementById('visitorSection').classList.add('active');
-                loadVisitorData();
-            } else if (role === 'staff') {
-                document.getElementById('staffSection').classList.add('active');
-            }
-        }
+function stopAllScanners() { stopScanner(); }
 
-        function backToRoleSelection() {
-            document.querySelectorAll('.view-mode').forEach(view => view.classList.remove('active'));
-            document.getElementById('roleSelection').classList.add('active');
-            
-            // Reset staff login if logged out
-            if (isStaffLoggedIn) {
-                document.getElementById('staffPanel').style.display = 'none';
-                document.getElementById('staffLoginScreen').style.display = 'block';
-                isStaffLoggedIn = false;
-            }
-        }
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
+}
 
-        // Visitor Section Functions
-        async function loadVisitorData() {
-            await loadStaffList();
-            await loadPurposesList();
-            await loadVisitors();
-        }
+// ============================================================
+// HELPERS
+// ============================================================
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 
-        async function loadStaffList() {
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=getStaff`);
-                const data = await response.json();
-                if (data.success) {
-                    staffList = data.staff;
-                    const select = document.getElementById('hostName');
-                    select.innerHTML = '<option value="">Select host...</option>';
-                    staffList.forEach(staff => {
-                        select.innerHTML += `<option value="${staff.Name}" data-phone="${staff.Phone}" data-email="${staff.Email}">${staff.Name}</option>`;
-                    });
-                }
-            } catch (error) { console.error('Error loading staff:', error); }
-        }
+function getInitials(name) {
+  return String(name || '').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0,2) || '?';
+}
 
-        async function loadPurposesList() {
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=getPurposes`);
-                const data = await response.json();
-                if (data.success) {
-                    purposesList = data.purposes;
-                    const select = document.getElementById('purpose');
-                    select.innerHTML = '<option value="">Select purpose...</option>';
-                    purposesList.forEach(purpose => {
-                        select.innerHTML += `<option value="${purpose}">${purpose}</option>`;
-                    });
-                }
-            } catch (error) { console.error('Error loading purposes:', error); }
-        }
+function formatTime(ts) {
+  if (!ts) return '—';
+  try {
+    return new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  } catch(e) { return ts; }
+}
 
-        async function loadVisitors() {
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=getVisitors`);
-                const data = await response.json();
-                if (data.success) allVisitors = data.visitors;
-            } catch (error) { console.error('Error loading visitors:', error); }
-        }
+function formatDate(ts) {
+  if (!ts) return '—';
+  try {
+    return new Date(ts).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch(e) { return ts; }
+}
 
-        function switchVisitorTab(tabName) {
-            document.querySelectorAll('#visitorSection .tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('#visitorSection .nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-            if (tabName === 'checkout') displayCheckoutList();
-        }
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
 
-        document.getElementById('newVisitorForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            if (submitBtn.disabled) return;
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Checking in...';
-            
-            const hostSelect = document.getElementById('hostName');
-            const selectedHost = hostSelect.options[hostSelect.selectedIndex];
-            const visitor = {
-                fullName: document.getElementById('fullName').value,
-                company: document.getElementById('company').value,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value || '',
-                hostName: hostSelect.value,
-                hostPhone: selectedHost.getAttribute('data-phone') || '',
-                hostEmail: selectedHost.getAttribute('data-email') || '',
-                hostCompany: 'Plastic Powder Coating Company LLC',
-                purpose: document.getElementById('purpose').value,
-                vehicle: document.getElementById('vehicle').value || '',
-                id: 'VIS-' + Date.now(),
-                checkInTime: new Date().toISOString(),
-                checkOutTime: '',
-                status: 'IN'
-            };
-            try {
-                await syncToCloud(visitor);
-                currentVisitor = visitor;
-                generateBadge(visitor);
-                document.getElementById('newVisitorForm').reset();
-                await loadVisitors();
-            } catch (error) {
-                console.error('Check-in error:', error);
-                alert('❌ Check-in failed. Please try again.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Check In & Generate Badge';
-            }
-        });
+// Service Worker registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
 
-        async function syncToCloud(visitor) {
-            const checkInDate = new Date(visitor.checkInTime);
-            const data = {
-                date: checkInDate.toLocaleDateString('en-GB'),
-                checkInTime: checkInDate.toLocaleTimeString('en-US', { hour12: false }),
-                fullName: visitor.fullName,
-                visitorId: visitor.id,
-                phone: visitor.phone,
-                email: visitor.email,
-                company: visitor.company,
-                hostName: visitor.hostName,
-                hostCompany: visitor.hostCompany,
-                purpose: visitor.purpose,
-                vehicle: visitor.vehicle,
-                checkOutTime: '',
-                status: visitor.status
-            };
-            await fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-        }
-
-        function generateBadge(visitor) {
-            const checkInDate = new Date(visitor.checkInTime);
-            document.getElementById('badgeName').textContent = visitor.fullName;
-            document.getElementById('badgeCompany').textContent = visitor.company;
-            const dateStr = checkInDate.toLocaleDateString('en-GB').replace(/\//g, '.');
-            const timeStr = checkInDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-            document.getElementById('badgeDateTime').textContent = `${dateStr} ${timeStr}`;
-            document.getElementById('badgeHost').textContent = visitor.hostName ? `- ${visitor.hostName}` : '-';
-            document.getElementById('badgeId').textContent = visitor.id;
-            const qrDiv = document.getElementById('qrcode');
-            qrDiv.innerHTML = '';
-            new QRCode(qrDiv, { text: visitor.id, width: 128, height: 128 });
-            document.getElementById('badgeModal').classList.add('active');
-            setTimeout(() => sendNotificationsAuto(visitor), 500);
-        }
-        
-        function sendNotificationsAuto(visitor) {
-            if (!visitor.hostEmail && !visitor.hostPhone) return;
-            const message = `🔔 Visitor Alert!\n\n${visitor.fullName} from ${visitor.company} is here to see you.\n\nPurpose: ${visitor.purpose}\nTime: ${new Date().toLocaleString()}\n\nPlease come to reception.\n\n- PPC Reception`;
-            if (visitor.hostPhone) {
-                const cleanPhone = String(visitor.hostPhone).replace(/\D/g, '');
-                const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank', 'width=600,height=400');
-            }
-            if (visitor.hostEmail) {
-                setTimeout(() => {
-                    const subject = `Visitor Alert: ${visitor.fullName} from ${visitor.company}`;
-                    window.location.href = `mailto:${visitor.hostEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-                }, 2000);
-            }
-        }
-
-        async function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const canvas = await html2canvas(document.getElementById('badgeContent'), { scale: 2, backgroundColor: '#ffffff' });
-            const pdf = new jsPDF({ orientation: 'landscape', unit: 'cm', format: [10, 6.5] });
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 10, 6.5);
-            pdf.save(`visitor-badge-${currentVisitor.fullName.replace(/\s+/g, '-')}.pdf`);
-        }
-
-        function printBadge() { downloadPDF(); }
-
-        async function quickCheckin() {
-            const searchInput = document.getElementById('quickSearch');
-            const searchBtn = event.target;
-            const search = searchInput.value.trim().toLowerCase();
-            
-            if (!search) { 
-                alert('Please enter a name or phone number'); 
-                return; 
-            }
-            
-            searchBtn.disabled = true;
-            searchBtn.textContent = 'Searching...';
-            
-            await loadVisitors();
-            
-            const previousVisitor = allVisitors.find(v => {
-                const name = (v['Full Name'] || '').toLowerCase();
-                const phone = String(v.Phone || '');
-                return name.startsWith(search) || phone.includes(search);
-            });
-            
-            if (!previousVisitor) {
-                document.getElementById('quickResult').innerHTML = `<div class="visitor-item" style="border-left-color: var(--warning);"><p style="color: var(--warning);">❌ No previous visit found.</p><p style="color: var(--text-dim); margin-top: 0.5rem;">Please use the "New Visitor" tab to register.</p></div>`;
-                searchBtn.disabled = false;
-                searchBtn.textContent = 'Search & Check In';
-                return;
-            }
-            
-            const hostSelect = document.getElementById('hostName');
-            const hostOption = Array.from(hostSelect.options).find(opt => opt.value === previousVisitor['Host Name']);
-            const visitor = {
-                fullName: previousVisitor['Full Name'],
-                company: previousVisitor.Company,
-                phone: previousVisitor.Phone,
-                email: previousVisitor.Email || '',
-                hostName: previousVisitor['Host Name'],
-                hostPhone: hostOption ? hostOption.getAttribute('data-phone') : '',
-                hostEmail: hostOption ? hostOption.getAttribute('data-email') : '',
-                hostCompany: 'Plastic Powder Coating Company LLC',
-                purpose: previousVisitor.Purpose,
-                vehicle: previousVisitor.Vehicle || '',
-                id: 'VIS-' + Date.now(),
-                checkInTime: new Date().toISOString(),
-                checkOutTime: '',
-                status: 'IN'
-            };
-            
-            try {
-                await syncToCloud(visitor);
-                currentVisitor = visitor;
-                document.getElementById('quickResult').innerHTML = `<div class="visitor-item"><h3>${visitor.fullName}</h3><div class="visitor-details"><p><strong>Company:</strong> ${visitor.company}</p><p><strong>Visiting:</strong> ${visitor.hostName}</p><p style="color: var(--accent); margin-top: 1rem;">✅ Checked in successfully!</p></div><button onclick="generateBadge(currentVisitor)" class="btn btn-block" style="margin-top: 1rem;">Generate Badge</button></div>`;
-                await loadVisitors();
-                searchBtn.disabled = false;
-                searchBtn.textContent = 'Search & Check In';
-            } catch (error) {
-                console.error('Quick check-in error:', error);
-                alert('❌ Check-in failed. Please try again.');
-                searchBtn.disabled = false;
-                searchBtn.textContent = 'Search & Check In';
-            }
-        }
-
-        async function displayCheckoutList() {
-            await loadVisitors();
-            const currentVisitors = allVisitors.filter(v => v.Status === 'IN');
-            const listDiv = document.getElementById('checkoutList');
-            if (currentVisitors.length === 0) {
-                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No visitors currently checked in</p>';
-                return;
-            }
-            listDiv.innerHTML = currentVisitors.reverse().map(v => {
-                const date = (v['Date '] || v['Date'] || v.Date || 'N/A').toString().trim();
-                const time = v[' Check-In Time'] || v['Check-In Time'] || '';
-                let displayTime = time;
-                if (time && time.includes('T')) {
-                    displayTime = new Date(time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                }
-                return `<div class="visitor-item"><h3>${v['Full Name']}</h3><div class="visitor-details"><p><strong>Company:</strong> ${v.Company}</p><p><strong>Phone:</strong> ${v.Phone}</p><p><strong>Check-In:</strong> ${date} ${displayTime}</p></div><button onclick="checkoutVisitor('${v['Visitor ID']}')" class="btn btn-block" style="margin-top: 1rem;">Check Out</button></div>`;
-            }).join('');
-        }
-
-        function searchForCheckout() {
-            const query = document.getElementById('searchCheckout').value.toLowerCase().trim();
-            if (!query) { displayCheckoutList(); return; }
-            const currentVisitors = allVisitors.filter(v => v.Status === 'IN' && (v['Full Name'].toLowerCase().includes(query) || String(v.Phone).includes(query) || v['Visitor ID'].toLowerCase().includes(query)));
-            const listDiv = document.getElementById('checkoutList');
-            if (currentVisitors.length === 0) {
-                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No matching visitors</p>';
-                return;
-            }
-            listDiv.innerHTML = currentVisitors.map(v => {
-                const date = (v['Date '] || v['Date'] || v.Date || 'N/A').toString().trim();
-                const time = v[' Check-In Time'] || v['Check-In Time'] || '';
-                let displayTime = time;
-                if (time && time.includes('T')) displayTime = new Date(time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                return `<div class="visitor-item"><h3>${v['Full Name']}</h3><div class="visitor-details"><p><strong>Company:</strong> ${v.Company}</p><p><strong>Phone:</strong> ${v.Phone}</p><p><strong>Visitor ID:</strong> ${v['Visitor ID']}</p><p><strong>Check-In:</strong> ${date} ${displayTime}</p></div><button onclick="checkoutVisitor('${v['Visitor ID']}')" class="btn btn-block" style="margin-top: 1rem;">Check Out</button></div>`;
-            }).join('');
-        }
-
-        async function checkoutVisitor(visitorId) {
-            if (!confirm('Check out this visitor?')) return;
-            try {
-                await fetch(`${WEB_APP_URL}?action=checkout&visitorId=${visitorId}&checkoutTime=${new Date().toLocaleTimeString('en-US', { hour12: false })}`);
-                await loadVisitors();
-                displayCheckoutList();
-            } catch (error) {
-                console.error('Checkout error:', error);
-                alert('❌ Checkout failed. Please try again.');
-            }
-        }
-
-        function emailVisitor() {
-            let email = currentVisitor.email;
-            if (!email) {
-                email = prompt('Enter visitor email address:');
-                if (!email) { alert('⚠️ Email address required to send badge.'); return; }
-                if (!email.includes('@')) { alert('⚠️ Please enter a valid email address.'); return; }
-            }
-            const subject = `Your Visitor Badge - ${currentVisitor.fullName}`;
-            const body = `Dear ${currentVisitor.fullName},\n\nThank you for visiting Plastic Powder Coating Company LLC.\n\nYour Visitor ID: ${currentVisitor.id}\nCheck-In Time: ${new Date(currentVisitor.checkInTime).toLocaleString()}\n\nPlease keep this email for your records.\n\nBest regards,\nPPC Reception`;
-            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        }
-        
-        function sendToVisitorMobile() {
-            let phone = currentVisitor.phone;
-            if (!phone) {
-                phone = prompt('Enter visitor phone number (with country code):');
-                if (!phone) { alert('⚠️ Phone number required to send badge.'); return; }
-            }
-            const message = `Thank you for visiting PPC!\n\nYour Visitor ID: ${currentVisitor.id}\nCheck-In: ${new Date(currentVisitor.checkInTime).toLocaleString()}\n\nPlease show this message when leaving.\n\n- PPC Reception`;
-            window.open(`https://wa.me/${String(phone).replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
-        }
-
-        function closeModal() { document.getElementById('badgeModal').classList.remove('active'); }
-        
-        // QR Scanner for visitor checkout
-        let qrStream = null, qrCanvas = null, qrContext = null, qrScanning = false;
-
-        async function startQRScanner() {
-            const video = document.getElementById('qrVideo');
-            try {
-                qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                video.srcObject = qrStream;
-                video.setAttribute('playsinline', true);
-                video.play();
-                document.getElementById('qrScanner').style.display = 'block';
-                document.getElementById('startScanBtn').style.display = 'none';
-                document.getElementById('stopScanBtn').style.display = 'inline-block';
-                qrCanvas = document.createElement('canvas');
-                qrContext = qrCanvas.getContext('2d');
-                qrScanning = true;
-                requestAnimationFrame(scanQRCode);
-            } catch (error) {
-                console.error('Camera error:', error);
-                alert('❌ Unable to access camera.\n\nPlease:\n1. Allow camera permissions\n2. Use HTTPS connection\n3. Try using manual search instead');
-            }
-        }
-
-        function stopQRScanner() {
-            qrScanning = false;
-            if (qrStream) {
-                qrStream.getTracks().forEach(track => track.stop());
-                qrStream = null;
-            }
-            document.getElementById('qrVideo').srcObject = null;
-            document.getElementById('qrScanner').style.display = 'none';
-            document.getElementById('startScanBtn').style.display = 'inline-block';
-            document.getElementById('stopScanBtn').style.display = 'none';
-        }
-
-        function scanQRCode() {
-            const video = document.getElementById('qrVideo');
-            if (!qrScanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
-                if (qrScanning) requestAnimationFrame(scanQRCode);
-                return;
-            }
-            qrCanvas.height = video.videoHeight;
-            qrCanvas.width = video.videoWidth;
-            qrContext.drawImage(video, 0, 0, qrCanvas.width, qrCanvas.height);
-            const code = jsQR(qrContext.getImageData(0, 0, qrCanvas.width, qrCanvas.height).data, qrCanvas.width, qrCanvas.height, { inversionAttempts: 'dontInvert' });
-            if (code && code.data) {
-                stopQRScanner();
-                checkoutByVisitorId(code.data);
-                return;
-            }
-            if (qrScanning) requestAnimationFrame(scanQRCode);
-        }
-
-        async function checkoutByVisitorId(visitorId) {
-            await loadVisitors();
-            const visitor = allVisitors.find(v => v['Visitor ID'] === visitorId && v.Status === 'IN');
-            if (!visitor) {
-                alert('❌ Visitor not found or already checked out.\n\nVisitor ID: ' + visitorId);
-                return;
-            }
-            const date = (visitor['Date '] || visitor['Date'] || visitor.Date || 'N/A').toString().trim();
-            const time = visitor[' Check-In Time'] || visitor['Check-In Time'] || '';
-            if (!confirm(`Check out this visitor?\n\nName: ${visitor['Full Name']}\nCompany: ${visitor.Company}\nCheck-In: ${date} ${time}`)) return;
-            try {
-                await fetch(`${WEB_APP_URL}?action=checkout&visitorId=${visitorId}&checkoutTime=${new Date().toLocaleTimeString('en-US', { hour12: false })}`);
-                await loadVisitors();
-                displayCheckoutList();
-            } catch (error) {
-                console.error('Checkout error:', error);
-                alert('❌ Checkout failed. Please try again.');
-            }
-        }
-
-        // Staff Section Functions
-        async function staffLogin() {
-            const password = document.getElementById('staffPassword').value;
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=getPassword`);
-                const data = await response.json();
-                
-                if (data.success && password === data.password) {
-                    isStaffLoggedIn = true;
-                    cloudPassword = data.password;
-                    document.getElementById('staffLoginScreen').style.display = 'none';
-                    document.getElementById('staffPanel').style.display = 'block';
-                    await loadAllStaffData();
-                } else {
-                    alert('❌ Incorrect password');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('❌ Login failed');
-            }
-        }
-
-        function staffLogout() {
-            isStaffLoggedIn = false;
-            document.getElementById('staffPanel').style.display = 'none';
-            document.getElementById('staffLoginScreen').style.display = 'block';
-            document.getElementById('staffPassword').value = '';
-            backToRoleSelection();
-        }
-
-        async function loadAllStaffData() {
-            await Promise.all([loadVisitors(), loadStaffList(), loadPurposesList()]);
-            autoArchiveOldRecords();
-            updateDashboard();
-            displayCurrentVisitors();
-            displayHistory('all');
-        }
-
-        function autoArchiveOldRecords() {
-            const today = new Date();
-            let archivedCount = 0;
-            
-            allVisitors = allVisitors.filter(v => {
-                const dateStr = (v['Date '] || v['Date'] || v.Date || '').trim();
-                if (!dateStr) return true;
-                
-                const vDate = new Date(dateStr.split('/').reverse().join('-'));
-                const daysDiff = Math.floor((today - vDate) / (1000 * 60 * 60 * 24));
-                
-                if (daysDiff > 30) {
-                    archivedCount++;
-                    return false;
-                }
-                return true;
-            });
-            
-            console.log(`Auto-archived ${archivedCount} records (30+ days old)`);
-        }
-
-        function updateDashboard() {
-            const currentIn = allVisitors.filter(v => v.Status === 'IN').length;
-            const today = new Date().toLocaleDateString('en-GB');
-            const todayCount = allVisitors.filter(v => {
-                const vDate = (v['Date '] || v['Date'] || v.Date || '').trim();
-                return vDate === today;
-            }).length;
-            
-            document.getElementById('currentCount').textContent = currentIn;
-            document.getElementById('todayCount').textContent = todayCount;
-            document.getElementById('totalCount').textContent = allVisitors.length;
-            
-            const today2 = new Date();
-            const oldCount = allVisitors.filter(v => {
-                const dateStr = (v['Date '] || v['Date'] || v.Date || '').trim();
-                if (!dateStr) return false;
-                const vDate = new Date(dateStr.split('/').reverse().join('-'));
-                const daysDiff = Math.floor((today2 - vDate) / (1000 * 60 * 60 * 24));
-                return daysDiff > 30;
-            }).length;
-            
-            document.getElementById('archivedCount').textContent = oldCount;
-        }
-
-        function displayCurrentVisitors() {
-            const current = allVisitors.filter(v => v.Status === 'IN');
-            const listDiv = document.getElementById('currentVisitorsList');
-        
-            if (current.length === 0) {
-                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No visitors currently checked in</p>';
-                return;
-            }
-        
-            listDiv.innerHTML = current.map(v => {
-                const date = (v['Date '] || v['Date'] || v.Date || 'N/A').trim();
-                const time = v[' Check-In Time'] || v['Check-In Time'] || '';
-                let displayTime = time;
-                if (time && time.includes('T')) {
-                    displayTime = new Date(time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                }
-                
-                return `
-                    <div class="visitor-item">
-                        <div class="visitor-info">
-                            <h3>${v['Full Name']}</h3>
-                            <div class="visitor-details">
-                                <p><strong>Company:</strong> ${v.Company}</p>
-                                <p><strong>Phone:</strong> ${v.Phone}</p>
-                                <p><strong>Visiting:</strong> ${v['Host Name']}</p>
-                                <p><strong>Check-In:</strong> ${date} ${displayTime}</p>
-                            </div>
-                        </div>
-                        <div class="action-buttons">
-                            <button onclick="checkoutVisitor('${v['Visitor ID']}')" class="btn btn-secondary">Check Out</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function displayHistory(filter) {
-            let filtered = allVisitors;
-            const today = new Date();
-            const todayStr = today.toLocaleDateString('en-GB');
-        
-            if (filter === 'today') {
-                filtered = allVisitors.filter(v => {
-                    const vDate = (v['Date '] || v['Date'] || v.Date || '').trim();
-                    return vDate === todayStr;
-                });
-            } else if (filter === 'week') {
-                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                filtered = allVisitors.filter(v => {
-                    const dateStr = (v['Date '] || v['Date'] || v.Date || '').trim();
-                    if (!dateStr) return false;
-                    const vDate = new Date(dateStr.split('/').reverse().join('-'));
-                    return vDate >= weekAgo;
-                });
-            } else if (filter === 'month') {
-                const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-                filtered = allVisitors.filter(v => {
-                    const dateStr = (v['Date '] || v['Date'] || v.Date || '').trim();
-                    if (!dateStr) return false;
-                    const vDate = new Date(dateStr.split('/').reverse().join('-'));
-                    return vDate >= monthAgo;
-                });
-            }
-        
-            const listDiv = document.getElementById('historyList');
-            const sorted = [...filtered].reverse();
-        
-            if (sorted.length === 0) {
-                listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No records found</p>';
-                return;
-            }
-        
-            listDiv.innerHTML = sorted.map(v => {
-                const date = (v['Date '] || v['Date'] || v.Date || 'N/A').trim();
-                const checkInTime = v[' Check-In Time'] || v['Check-In Time'] || '';
-                const checkOutTime = v[' Check-Out Time'] || v['Check-Out Time'] || '';
-                
-                let displayCheckIn = checkInTime;
-                if (checkInTime && checkInTime.includes('T')) {
-                    displayCheckIn = new Date(checkInTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                }
-                
-                let displayCheckOut = checkOutTime;
-                if (checkOutTime && checkOutTime.includes('T')) {
-                    displayCheckOut = new Date(checkOutTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                }
-                
-                return `
-                    <div class="visitor-item ${v.Status === 'OUT' ? 'checked-out' : ''}">
-                        <div class="visitor-info">
-                            <h3>${v['Full Name']} (${v['Visitor ID']})</h3>
-                            <div class="visitor-details">
-                                <p><strong>Company:</strong> ${v.Company}</p>
-                                <p><strong>Check-In:</strong> ${date} ${displayCheckIn}</p>
-                                ${displayCheckOut ? `<p><strong>Check-Out:</strong> ${displayCheckOut}</p>` : ''}
-                                <p><strong>Status:</strong> ${v.Status}</p>
-                            </div>
-                        </div>
-                        <div class="action-buttons">
-                            <button onclick="deleteVisitor('${v['Visitor ID']}')" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;">🗑️ Delete</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function deleteVisitor(visitorId) {
-            const visitor = allVisitors.find(v => v['Visitor ID'] === visitorId);
-            if (!visitor) return;
-            
-            if (!confirm(`⚠️ PERMANENTLY DELETE this visitor?\n\nName: ${visitor['Full Name']}\nCompany: ${visitor.Company}\n\nThis cannot be undone!`)) return;
-            
-            try {
-                await fetch(`${WEB_APP_URL}?action=deleteVisitor&visitorId=${visitorId}`);
-                await loadAllStaffData();
-            } catch (error) {
-                console.error('Delete error:', error);
-                alert('❌ Delete failed');
-            }
-        }
-
-        async function viewArchived() {
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=getArchivedVisitors`);
-                const data = await response.json();
-                
-                if (!data.success) {
-                    alert('Unable to load archived records');
-                    return;
-                }
-                
-                archivedVisitors = data.visitors;
-                const listDiv = document.getElementById('historyList');
-                
-                if (archivedVisitors.length === 0) {
-                    listDiv.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No archived records</p>';
-                    return;
-                }
-                
-                listDiv.innerHTML = '<div style="background: var(--warning); color: var(--primary); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: bold;">📦 ARCHIVED RECORDS (30+ days old)</div>' + 
-                    archivedVisitors.reverse().map(v => {
-                        const date = (v['Date '] || v['Date'] || v.Date || 'N/A').trim();
-                        const checkInTime = v[' Check-In Time'] || v['Check-In Time'] || '';
-                        
-                        let displayCheckIn = checkInTime;
-                        if (checkInTime && checkInTime.includes('T')) {
-                            displayCheckIn = new Date(checkInTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                        }
-                        
-                        return `
-                            <div class="visitor-item archived">
-                                <div class="visitor-info">
-                                    <h3>${v['Full Name']} (${v['Visitor ID']})</h3>
-                                    <div class="visitor-details">
-                                        <p><strong>Company:</strong> ${v.Company}</p>
-                                        <p><strong>Check-In:</strong> ${date} ${displayCheckIn}</p>
-                                        <p><strong>Status:</strong> ARCHIVED</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('') + 
-                    '<button onclick="displayHistory(\'all\')" class="btn btn-block" style="margin-top: 1rem;">← Back to Active Records</button>';
-            } catch (error) {
-                console.error('Load archived error:', error);
-                alert('Failed to load archived records');
-            }
-        }
-
-        function switchStaffTab(tabName) {
-            document.querySelectorAll('#staffPanel .tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('#staffPanel .nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-
-            if (tabName === 'current') displayCurrentVisitors();
-            else if (tabName === 'history') displayHistory('all');
-        }
-
-        function filterHistory(period) { displayHistory(period); }
-
-        async function refreshStaffData() {
-            await loadAllStaffData();
-        }
-
-        function checkEndOfDay() {
-            const current = allVisitors.filter(v => v.Status === 'IN');
-            
-            if (current.length === 0) {
-                alert('✅ All visitors have checked out!');
-                return;
-            }
-            
-            const modal = `
-                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; overflow-y: auto; padding: 2rem;" onclick="if(event.target === this) closeEndOfDay()">
-                    <div style="background: var(--card-bg); border: 2px solid var(--warning); border-radius: 12px; padding: 2rem; max-width: 900px; margin: 0 auto;" onclick="event.stopPropagation()">
-                        <h2 style="color: var(--warning); margin-bottom: 1rem; text-align: center; font-family: 'JetBrains Mono', monospace;">📊 End of Day Report</h2>
-                        <p style="color: var(--text); text-align: center; margin-bottom: 1.5rem;">⚠️ <strong>${current.length} visitor(s)</strong> still checked in</p>
-                        <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
-                            <button onclick="selectAllEndOfDay()" class="btn btn-secondary">Select All</button>
-                            <button onclick="deselectAllEndOfDay()" class="btn btn-secondary">Deselect All</button>
-                        </div>
-                        <div id="endOfDayList" style="max-height: 400px; overflow-y: auto; margin-bottom: 1.5rem;">
-                            ${current.map((v, index) => {
-                                const date = (v['Date '] || v['Date'] || v.Date || 'N/A').trim();
-                                const time = v[' Check-In Time'] || v['Check-In Time'] || '';
-                                let displayTime = time;
-                                if (time && time.includes('T')) {
-                                    displayTime = new Date(time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                                }
-                                return `
-                                    <div style="background: var(--secondary); border: 1px solid var(--border); border-left: 4px solid var(--warning); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem;">
-                                        <input type="checkbox" id="eod_${index}" data-visitor-id="${v['Visitor ID']}" class="eod-checkbox" style="width: 20px; height: 20px; cursor: pointer;">
-                                        <label for="eod_${index}" style="flex: 1; cursor: pointer; margin: 0;">
-                                            <div style="font-weight: bold; font-size: 1rem; margin-bottom: 0.25rem;">${v['Full Name']}</div>
-                                            <div style="font-size: 0.85rem; color: var(--text-dim);">${v.Company} • Check-In: ${date} ${displayTime}</div>
-                                        </label>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <button onclick="checkoutSelectedEOD()" class="btn" style="flex: 1;">✓ Check Out Selected</button>
-                            <button onclick="checkoutAllEOD()" class="btn btn-danger" style="flex: 1;">✓ Check Out All</button>
-                            <button onclick="closeEndOfDay()" class="btn btn-secondary" style="flex: 1;">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', `<div id="endOfDayModal">${modal}</div>`);
-        }
-        
-        function selectAllEndOfDay() {
-            document.querySelectorAll('.eod-checkbox').forEach(cb => cb.checked = true);
-        }
-        
-        function deselectAllEndOfDay() {
-            document.querySelectorAll('.eod-checkbox').forEach(cb => cb.checked = false);
-        }
-        
-        async function checkoutSelectedEOD() {
-            const checkboxes = document.querySelectorAll('.eod-checkbox:checked');
-            if (checkboxes.length === 0) { alert('⚠️ No visitors selected'); return; }
-            if (!confirm(`Check out ${checkboxes.length} selected visitor(s)?`)) return;
-            
-            const visitorIds = Array.from(checkboxes).map(cb => cb.getAttribute('data-visitor-id'));
-            const checkoutTime = new Date().toLocaleTimeString('en-US', { hour12: false });
-            
-            for (const visitorId of visitorIds) {
-                try {
-                    await fetch(`${WEB_APP_URL}?action=checkout&visitorId=${visitorId}&checkoutTime=${checkoutTime}`);
-                } catch (error) {
-                    console.error('Checkout error:', error);
-                }
-            }
-            
-            closeEndOfDay();
-            await loadAllStaffData();
-        }
-        
-        async function checkoutAllEOD() {
-            const current = allVisitors.filter(v => v.Status === 'IN');
-            if (!confirm(`⚠️ Check out ALL ${current.length} visitors?`)) return;
-            
-            const checkoutTime = new Date().toLocaleTimeString('en-US', { hour12: false });
-            
-            for (const visitor of current) {
-                try {
-                    await fetch(`${WEB_APP_URL}?action=checkout&visitorId=${visitor['Visitor ID']}&checkoutTime=${checkoutTime}`);
-                } catch (error) {
-                    console.error('Checkout error:', error);
-                }
-            }
-            
-            closeEndOfDay();
-            await loadAllStaffData();
-        }
-        
-        function closeEndOfDay() {
-            const modal = document.getElementById('endOfDayModal');
-            if (modal) modal.remove();
-        }
-
-        function exportData(period) {
-            let data = allVisitors;
-            const today = new Date().toLocaleDateString('en-GB');
-            
-            if (period === 'today') {
-                data = allVisitors.filter(v => {
-                    const vDate = (v['Date '] || v['Date'] || v.Date || '').trim();
-                    return vDate === today;
-                });
-            }
-
-            const csv = [
-                ['Date', 'Check-In Time', 'Full Name', 'Visitor ID', 'Phone', 'Email', 'Company', 'Host Name', 'Purpose', 'Status'],
-                ...data.map(v => [
-                    (v['Date '] || v['Date'] || v.Date || '').trim(),
-                    v['Check-In Time'] || v[' Check-In Time'] || '',
-                    v['Full Name'],
-                    v['Visitor ID'],
-                    v.Phone,
-                    v.Email,
-                    v.Company,
-                    v['Host Name'],
-                    v.Purpose,
-                    v.Status
-                ])
-            ].map(row => row.join(',')).join('\n');
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `PPC-visitors-${period}-${today.replace(/\//g, '-')}.csv`;
-            a.click();
-        }
-
-        function displayStaffTable() {
-            const tbody = document.getElementById('staffTableBody');
-            tbody.innerHTML = staffList.map(s => `
-                <tr>
-                    <td>${s.Name}</td>
-                    <td>${s.Phone || '-'}</td>
-                    <td>${s.Email || '-'}</td>
-                    <td>
-                        <button onclick="editStaff('${s.Name}')" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Edit</button>
-                        <button onclick="deleteStaff('${s.Name}')" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.8rem; margin-left: 0.5rem;">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function displayPurposesList() {
-            const listDiv = document.getElementById('purposeList');
-            listDiv.innerHTML = `
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                    ${purposesList.map(p => `
-                        <span style="background: var(--secondary); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 0.5rem;">
-                            ${p}
-                            <button onclick="deletePurpose('${p}')" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem;">×</button>
-                        </span>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        async function addPurpose() {
-            const input = document.getElementById('newPurpose');
-            const purpose = input.value.trim();
-            
-            if (!purpose) {
-                alert('Please enter a purpose name');
-                return;
-            }
-
-            if (purposesList.includes(purpose)) {
-                alert('This purpose already exists');
-                return;
-            }
-
-            purposesList.push(purpose);
-            
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=updatePurposes&data=${encodeURIComponent(JSON.stringify(purposesList))}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    input.value = '';
-                    displayPurposesList();
-                }
-            } catch (error) {
-                console.error('Add purpose error:', error);
-                alert('Failed to add purpose');
-            }
-        }
-
-        async function deletePurpose(purpose) {
-            if (!confirm(`Delete purpose: ${purpose}?`)) return;
-            purposesList = purposesList.filter(p => p !== purpose);
-            
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=updatePurposes&data=${encodeURIComponent(JSON.stringify(purposesList))}`);
-                const data = await response.json();
-                if (data.success) displayPurposesList();
-            } catch (error) {
-                console.error('Delete purpose error:', error);
-                alert('Failed to delete purpose');
-            }
-        }
-
-        function showAddStaffForm() {
-            const name = prompt('Enter staff name:');
-            if (!name) return;
-            const phone = prompt('Enter phone number (optional):');
-            const email = prompt('Enter email (optional):');
-            staffList.push({ Name: name, Phone: phone || '', Email: email || '' });
-            updateStaffList();
-        }
-
-        function editStaff(name) {
-            const staff = staffList.find(s => s.Name === name);
-            if (!staff) return;
-            const newPhone = prompt('Enter phone number:', staff.Phone);
-            const newEmail = prompt('Enter email:', staff.Email);
-            staff.Phone = newPhone || '';
-            staff.Email = newEmail || '';
-            updateStaffList();
-        }
-
-        async function deleteStaff(name) {
-            if (!confirm(`Delete staff member: ${name}?`)) return;
-            staffList = staffList.filter(s => s.Name !== name);
-            updateStaffList();
-        }
-
-        async function updateStaffList() {
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=updateStaff&data=${encodeURIComponent(JSON.stringify(staffList))}`);
-                const data = await response.json();
-                if (data.success) displayStaffTable();
-            } catch (error) {
-                console.error('Update staff error:', error);
-                alert('Failed to update staff list');
-            }
-        }
-
-        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const current = document.getElementById('currentPassword').value;
-            const newPass = document.getElementById('newPassword').value;
-            const confirm = document.getElementById('confirmPassword').value;
-
-            if (current !== cloudPassword) {
-                alert('❌ Current password is incorrect');
-                return;
-            }
-            if (newPass !== confirm) {
-                alert('❌ New passwords do not match');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=updatePassword&password=${encodeURIComponent(newPass)}`);
-                const data = await response.json();
-                if (data.success) {
-                    cloudPassword = newPass;
-                    document.getElementById('passwordForm').reset();
-                    alert('✅ Password changed!');
-                }
-            } catch (error) {
-                console.error('Password change error:', error);
-                alert('❌ Failed to change password');
-            }
-        });
-
-        // Universal QR Scanner (Staff)
-        let universalStream = null;
-        let universalCanvas = null;
-        let universalContext = null;
-        let universalScanning = false;
-
-        async function startUniversalScanner() {
-            const video = document.getElementById('universalQrVideo');
-            try {
-                universalStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                video.srcObject = universalStream;
-                video.setAttribute('playsinline', true);
-                video.play();
-                
-                document.getElementById('universalQrScanner').style.display = 'block';
-                document.getElementById('startUniversalBtn').style.display = 'none';
-                document.getElementById('stopUniversalBtn').style.display = 'inline-block';
-                
-                universalCanvas = document.createElement('canvas');
-                universalContext = universalCanvas.getContext('2d');
-                universalScanning = true;
-                requestAnimationFrame(scanUniversalQR);
-            } catch (error) {
-                console.error('Camera error:', error);
-                alert('❌ Unable to access camera');
-            }
-        }
-
-        function stopUniversalScanner() {
-            universalScanning = false;
-            if (universalStream) {
-                universalStream.getTracks().forEach(track => track.stop());
-                universalStream = null;
-            }
-            document.getElementById('universalQrVideo').srcObject = null;
-            document.getElementById('universalQrScanner').style.display = 'none';
-            document.getElementById('startUniversalBtn').style.display = 'inline-block';
-            document.getElementById('stopUniversalBtn').style.display = 'none';
-        }
-
-        function scanUniversalQR() {
-            const video = document.getElementById('universalQrVideo');
-            if (!universalScanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
-                if (universalScanning) requestAnimationFrame(scanUniversalQR);
-                return;
-            }
-            
-            universalCanvas.height = video.videoHeight;
-            universalCanvas.width = video.videoWidth;
-            universalContext.drawImage(video, 0, 0, universalCanvas.width, universalCanvas.height);
-            
-            const imageData = universalContext.getImageData(0, 0, universalCanvas.width, universalCanvas.height);
-            const code = jsQR(imageData.data, universalCanvas.width, universalCanvas.height, { inversionAttempts: 'dontInvert' });
-            
-            if (code && code.data) {
-                stopUniversalScanner();
-                universalCheckout(code.data);
-                return;
-            }
-            
-            if (universalScanning) requestAnimationFrame(scanUniversalQR);
-        }
-
-        async function universalCheckout(visitorId) {
-            const visitor = allVisitors.find(v => v['Visitor ID'] === visitorId && v.Status === 'IN');
-            
-            if (!visitor) {
-                document.getElementById('scanResult').innerHTML = `
-                    <div class="visitor-item" style="border-left-color: var(--danger);">
-                        <p style="color: var(--danger);">❌ Visitor not found or already checked out</p>
-                        <p style="color: var(--text-dim); margin-top: 0.5rem;">Visitor ID: ${visitorId}</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            try {
-                const checkoutTime = new Date().toLocaleTimeString('en-US', { hour12: false });
-                await fetch(`${WEB_APP_URL}?action=checkout&visitorId=${visitorId}&checkoutTime=${checkoutTime}`);
-                
-                document.getElementById('scanResult').innerHTML = `
-                    <div class="visitor-item" style="border-left-color: var(--accent);">
-                        <h3 style="color: var(--accent);">✅ Successfully Checked Out</h3>
-                        <div class="visitor-details">
-                            <p><strong>Name:</strong> ${visitor['Full Name']}</p>
-                            <p><strong>Company:</strong> ${visitor.Company}</p>
-                            <p><strong>Time:</strong> ${checkoutTime}</p>
-                        </div>
-                    </div>
-                `;
-                
-                await loadAllStaffData();
-                
-                setTimeout(() => {
-                    document.getElementById('scanResult').innerHTML = '';
-                }, 3000);
-            } catch (error) {
-                console.error('Checkout error:', error);
-                alert('❌ Checkout failed');
-            }
-        }
-    </script>
+</script>
 </body>
 </html>
