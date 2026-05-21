@@ -3,2056 +3,1330 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#003087">
+<meta name="theme-color" content="#C0181A">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="PPC Visitors">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
 <title>PPC Visitor Management</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --navy: #003087;
-    --navy-dark: #001f5c;
-    --navy-light: #0047b8;
-    --gold: #C8A951;
-    --gold-light: #e0c46a;
-    --white: #ffffff;
-    --off-white: #f5f6fa;
-    --gray-100: #e8eaf0;
-    --gray-200: #d0d4e0;
-    --gray-400: #8892a8;
-    --gray-600: #4a5568;
-    --gray-800: #1a2035;
-    --green: #00875a;
-    --green-light: #e3f9f0;
-    --red: #c0392b;
-    --red-light: #fdecea;
-    --orange: #e07b00;
-    --orange-light: #fff3e0;
-    --shadow-sm: 0 1px 4px rgba(0,48,135,0.10);
-    --shadow-md: 0 4px 16px rgba(0,48,135,0.13);
-    --shadow-lg: 0 8px 32px rgba(0,48,135,0.18);
-    --radius: 12px;
-    --radius-sm: 8px;
-    --radius-lg: 20px;
-    --font: 'IBM Plex Sans', sans-serif;
-    --font-mono: 'IBM Plex Mono', monospace;
-  }
+/* ─── BRAND COLOURS (from logo) ─────────────────────────────
+   Primary Red  : #C0181A
+   Deep Red     : #8B0000
+   Black        : #111111
+   Off-white    : #F8F5F0
+   Mid-grey     : #6B6B6B
+   Light border : #E5E0D8
+──────────────────────────────────────────────────────────── */
+:root{
+  --red:       #C0181A;
+  --red-dark:  #8B0000;
+  --red-light: #FDECEA;
+  --red-mid:   #E8D0D0;
+  --black:     #111111;
+  --charcoal:  #2A2A2A;
+  --off-white: #F8F5F0;
+  --cream:     #F2EDE6;
+  --border:    #E5E0D8;
+  --mid:       #6B6B6B;
+  --light:     #9E9E9E;
+  --green:     #1B7A3E;
+  --green-bg:  #E8F5EE;
+  --shadow:    0 2px 12px rgba(17,17,17,.08);
+  --shadow-lg: 0 8px 32px rgba(17,17,17,.14);
+  --r:         10px;
+  --r-sm:      6px;
+  --r-lg:      16px;
+  --font:      'DM Sans', sans-serif;
+  --font-head: 'Playfair Display', serif;
+  --font-mono: 'DM Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--off-white);color:var(--black);font-size:15px}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+/* ── SCREENS ── */
+.screen{display:none;height:100dvh;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
 
-  body {
-    font-family: var(--font);
-    background: var(--off-white);
-    color: var(--gray-800);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* ══════════════════════════════════════════════
+   ROLE SELECTION
+══════════════════════════════════════════════ */
+#s-role{
+  background:var(--black);
+  align-items:center;justify-content:center;
+  padding:32px 24px;
+  position:relative;overflow:hidden;
+}
+#s-role::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 20%,rgba(192,24,26,.18) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%,rgba(192,24,26,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+/* subtle circle pattern */
+#s-role::after{
+  content:'';position:absolute;
+  width:600px;height:600px;
+  border-radius:50%;
+  border:1px solid rgba(192,24,26,.1);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
 
-  /* ========== SCREENS ========== */
-  .screen { display: none; min-height: 100vh; flex-direction: column; }
-  .screen.active { display: flex; }
+.role-hero{text-align:center;margin-bottom:48px;position:relative;z-index:1;animation:fadeDown .7s ease both}
+/* ── PPC LOGO REPLICA ── */
+.logo-seal{
+  width:96px;height:96px;border-radius:50%;
+  background:white;
+  border:3px solid var(--red);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  box-shadow:0 0 0 6px rgba(192,24,26,.15), var(--shadow-lg);
+  position:relative;
+}
+.logo-seal::before{
+  content:'';position:absolute;inset:5px;
+  border-radius:50%;border:1.5px solid var(--red);
+  opacity:.4;
+}
+.logo-text-mark{
+  font-family:var(--font-head);
+  font-size:26px;font-weight:800;
+  color:var(--black);
+  letter-spacing:-1px;
+  line-height:1;
+  text-align:center;
+}
+.logo-text-mark .big-p{font-size:30px;color:var(--red)}
+.role-hero h1{font-family:var(--font-head);font-size:26px;color:white;font-weight:700;letter-spacing:.3px}
+.role-hero p{font-size:12px;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
 
-  /* ========== ROLE SELECTION ========== */
-  #screen-role {
-    background: linear-gradient(160deg, var(--navy-dark) 0%, var(--navy) 50%, var(--navy-light) 100%);
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    position: relative;
-    overflow: hidden;
-  }
-  #screen-role::before {
-    content: '';
-    position: absolute;
-    top: -100px; right: -100px;
-    width: 400px; height: 400px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200,169,81,0.15) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  #screen-role::after {
-    content: '';
-    position: absolute;
-    bottom: -80px; left: -80px;
-    width: 300px; height: 300px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200,169,81,0.10) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .role-logo {
-    text-align: center;
-    margin-bottom: 40px;
-    animation: fadeInDown 0.6s ease;
-  }
-  .role-logo-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 80px; height: 80px;
-    background: var(--gold);
-    border-radius: 20px;
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--navy-dark);
-    letter-spacing: -1px;
-    margin-bottom: 12px;
-    box-shadow: 0 8px 24px rgba(200,169,81,0.4);
-  }
-  .role-logo h1 {
-    color: white;
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-  .role-logo p {
-    color: rgba(255,255,255,0.6);
-    font-size: 13px;
-    margin-top: 4px;
-    font-weight: 300;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .role-cards {
-    width: 100%;
-    max-width: 360px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    animation: fadeInUp 0.6s ease 0.2s both;
-  }
-  .role-card {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  .role-card:hover, .role-card:active {
-    background: rgba(255,255,255,0.15);
-    border-color: var(--gold);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  }
-  .role-card-icon {
-    width: 52px; height: 52px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    flex-shrink: 0;
-  }
-  .role-card-icon.reception { background: rgba(200,169,81,0.2); border: 1px solid rgba(200,169,81,0.4); }
-  .role-card-icon.staff { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-  .role-card-text h3 { color: white; font-size: 17px; font-weight: 600; margin-bottom: 3px; }
-  .role-card-text p { color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 300; }
-  .role-card-arrow { margin-left: auto; color: rgba(255,255,255,0.3); font-size: 18px; flex-shrink: 0; }
+.role-cards{width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1;animation:fadeUp .7s .15s ease both}
+.role-card{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--r-lg);
+  padding:20px 20px 20px 16px;
+  cursor:pointer;
+  display:flex;align-items:center;gap:16px;
+  transition:all .25s;
+  backdrop-filter:blur(8px);
+}
+.role-card:hover,.role-card:active{
+  background:rgba(192,24,26,.15);
+  border-color:rgba(192,24,26,.5);
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(192,24,26,.2);
+}
+.role-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.role-icon.rec{background:rgba(192,24,26,.2);border:1px solid rgba(192,24,26,.35)}
+.role-icon.staff{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.role-text h3{color:white;font-size:16px;font-weight:600}
+.role-text p{color:rgba(255,255,255,.5);font-size:12px;margin-top:2px}
+.role-arrow{margin-left:auto;color:rgba(255,255,255,.25);font-size:20px;flex-shrink:0}
 
-  /* ========== TOP BAR ========== */
-  .top-bar {
-    background: var(--navy);
-    color: white;
-    padding: 0 16px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow-md);
-    flex-shrink: 0;
-  }
-  .top-bar-back {
-    width: 36px; height: 36px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-    color: white;
-    font-size: 20px;
-    flex-shrink: 0;
-  }
-  .top-bar-back:hover { background: rgba(255,255,255,0.1); }
-  .top-bar-title { font-size: 17px; font-weight: 600; flex: 1; }
-  .top-bar-subtitle { font-size: 11px; color: var(--gold-light); font-weight: 300; letter-spacing: 0.5px; margin-top: 1px; }
-  .top-bar-badge {
-    background: var(--gold);
-    color: var(--navy-dark);
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-  }
+/* ══════════════════════════════════════════════
+   PASSWORD
+══════════════════════════════════════════════ */
+#s-pass{background:var(--black);align-items:center;justify-content:center;padding:32px}
+.pass-box{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;
+  padding:36px 28px;
+  width:100%;max-width:340px;
+  text-align:center;backdrop-filter:blur(8px);
+}
+.pass-box .seal-sm{
+  width:64px;height:64px;border-radius:50%;
+  background:white;border:2px solid var(--red);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:28px;
+}
+.pass-box h2{color:white;font-size:20px;font-weight:600;margin-bottom:6px}
+.pass-box p{color:rgba(255,255,255,.45);font-size:13px;margin-bottom:24px}
+.pass-input{
+  width:100%;padding:13px;
+  background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(255,255,255,.15);
+  border-radius:var(--r-sm);
+  color:white;font-size:18px;font-family:var(--font-mono);
+  text-align:center;letter-spacing:4px;outline:none;
+  transition:border-color .2s;margin-bottom:14px;
+}
+.pass-input::placeholder{letter-spacing:0;font-family:var(--font);font-size:14px;color:rgba(255,255,255,.3)}
+.pass-input:focus{border-color:var(--red)}
+.pass-err{color:#FF8080;font-size:13px;margin-top:10px;display:none}
 
-  /* ========== BOTTOM NAV ========== */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: white;
-    border-top: 1px solid var(--gray-100);
-    display: flex;
-    z-index: 100;
-    box-shadow: 0 -4px 16px rgba(0,48,135,0.08);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .nav-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 4px 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    background: none;
-    position: relative;
-    gap: 3px;
-  }
-  .nav-btn .nav-icon { font-size: 20px; transition: transform 0.2s; }
-  .nav-btn .nav-label { font-size: 10px; font-weight: 500; color: var(--gray-400); font-family: var(--font); transition: color 0.2s; }
-  .nav-btn.active .nav-label { color: var(--navy); }
-  .nav-btn.active .nav-icon { transform: translateY(-1px); }
-  .nav-btn.active::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 20%; right: 20%;
-    height: 2px;
-    background: var(--navy);
-    border-radius: 0 0 4px 4px;
-  }
+/* ══════════════════════════════════════════════
+   TOPBAR
+══════════════════════════════════════════════ */
+.topbar{
+  background:var(--black);color:white;
+  height:54px;padding:0 14px;
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;position:relative;z-index:10;
+}
+.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--red)}
+.tb-back{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;font-size:18px;flex-shrink:0}
+.tb-back:hover{background:rgba(255,255,255,.1)}
+.tb-logo{
+  width:30px;height:30px;border-radius:50%;background:white;
+  border:1.5px solid var(--red);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.tb-logo span{font-family:var(--font-head);font-size:9px;font-weight:800;color:var(--black);letter-spacing:-.5px}
+.tb-title{font-size:16px;font-weight:600;flex:1}
+.tb-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:1px;letter-spacing:.5px}
+.tb-badge{
+  background:var(--red);color:white;
+  font-size:10px;font-weight:600;
+  padding:3px 8px;border-radius:20px;
+  letter-spacing:.5px;flex-shrink:0;
+}
 
-  /* ========== CONTENT AREA ========== */
-  .content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    padding-bottom: calc(72px + env(safe-area-inset-bottom));
-  }
-  .content-fullpad { padding: 0; }
+/* ══════════════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════════════ */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:white;border-top:1px solid var(--border);
+  display:flex;z-index:100;
+  box-shadow:0 -4px 20px rgba(17,17,17,.07);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nb{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:9px 4px 7px;cursor:pointer;
+  border:none;background:none;position:relative;gap:2px;
+  transition:all .2s;
+}
+.nb .ni{font-size:19px;transition:transform .2s}
+.nb .nl{font-size:10px;font-weight:500;color:var(--light);font-family:var(--font);transition:color .2s}
+.nb.on .nl{color:var(--red)}
+.nb.on .ni{transform:translateY(-1px)}
+.nb.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--red);border-radius:0 0 4px 4px}
 
-  /* ========== CARDS ========== */
-  .card {
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    padding: 16px;
-    margin-bottom: 12px;
-    border: 1px solid var(--gray-100);
-  }
-  .card-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 12px;
-  }
+/* ══════════════════════════════════════════════
+   CONTENT SCROLL AREA
+══════════════════════════════════════════════ */
+.content{
+  flex:1;overflow-y:auto;padding:16px;
+  padding-bottom:calc(68px + env(safe-area-inset-bottom));
+  -ms-overflow-style:none;scrollbar-width:none;
+}
+.content::-webkit-scrollbar{display:none}
 
-  /* ========== FORMS ========== */
-  .form-group { margin-bottom: 14px; }
-  .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-600); margin-bottom: 6px; }
-  .form-label span.req { color: var(--red); margin-left: 2px; }
-  .form-input, .form-select {
-    width: 100%;
-    padding: 11px 14px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    font-size: 15px;
-    font-family: var(--font);
-    color: var(--gray-800);
-    background: white;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    -webkit-appearance: none;
-    appearance: none;
-    outline: none;
-  }
-  .form-input:focus, .form-select:focus {
-    border-color: var(--navy);
-    box-shadow: 0 0 0 3px rgba(0,48,135,0.1);
-  }
-  .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238892a8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+/* ══════════════════════════════════════════════
+   CARDS
+══════════════════════════════════════════════ */
+.card{
+  background:white;border-radius:var(--r);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  padding:16px;margin-bottom:12px;
+}
+.card-title{
+  font-size:11px;font-weight:600;color:var(--mid);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:14px;display:flex;align-items:center;gap:6px;
+}
+.card-title::before{content:'';width:3px;height:12px;background:var(--red);border-radius:2px}
 
-  /* ========== BUTTONS ========== */
-  .btn {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 13px 20px;
-    border-radius: var(--radius-sm);
-    font-size: 15px;
-    font-weight: 600;
-    font-family: var(--font);
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    width: 100%;
-    letter-spacing: 0.2px;
-  }
-  .btn:active { transform: scale(0.98); }
-  .btn-primary { background: var(--navy); color: white; box-shadow: var(--shadow-sm); }
-  .btn-primary:hover { background: var(--navy-light); }
-  .btn-secondary { background: var(--gray-100); color: var(--gray-800); }
-  .btn-secondary:hover { background: var(--gray-200); }
-  .btn-gold { background: var(--gold); color: var(--navy-dark); }
-  .btn-gold:hover { background: var(--gold-light); }
-  .btn-danger { background: var(--red); color: white; }
-  .btn-danger:hover { background: #a93226; }
-  .btn-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
-  .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 6px; width: auto; }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+/* ══════════════════════════════════════════════
+   FORMS
+══════════════════════════════════════════════ */
+.fg{margin-bottom:14px}
+.lbl{display:block;font-size:12px;font-weight:600;color:var(--charcoal);margin-bottom:5px;letter-spacing:.2px}
+.lbl .req{color:var(--red);margin-left:2px}
+.inp,.sel{
+  width:100%;padding:11px 13px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-size:15px;font-family:var(--font);color:var(--black);
+  background:white;outline:none;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;appearance:none;
+}
+.inp:focus,.sel:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(192,24,26,.08)}
+.sel{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;
+}
 
-  /* ========== STATS ========== */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .stat-card {
-    background: white;
-    border-radius: var(--radius);
-    padding: 16px;
-    border: 1px solid var(--gray-100);
-    box-shadow: var(--shadow-sm);
-  }
-  .stat-card.full { grid-column: 1 / -1; }
-  .stat-number {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--navy);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .stat-label { font-size: 12px; color: var(--gray-400); margin-top: 4px; font-weight: 500; }
-  .stat-sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+/* ══════════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════════ */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 18px;border-radius:var(--r-sm);
+  font-size:15px;font-weight:600;font-family:var(--font);
+  cursor:pointer;border:none;width:100%;
+  transition:all .2s;letter-spacing:.1px;
+}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-red{background:var(--red);color:white;box-shadow:0 2px 8px rgba(192,24,26,.25)}
+.btn-red:hover{background:var(--red-dark)}
+.btn-black{background:var(--black);color:white}
+.btn-black:hover{background:var(--charcoal)}
+.btn-ghost{background:var(--off-white);color:var(--charcoal);border:1.5px solid var(--border)}
+.btn-ghost:hover{background:var(--cream)}
+.btn-outline{background:transparent;color:var(--red);border:1.5px solid var(--red)}
+.btn-outline:hover{background:var(--red-light)}
+.btn-danger{background:#C0181A;color:white}
+.btn-sm{padding:7px 13px;font-size:13px;border-radius:6px;width:auto}
+.row{display:flex;gap:8px}.row .btn{flex:1}
 
-  /* ========== VISITOR CARDS ========== */
-  .visitor-card {
-    background: white;
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 8px;
-    border: 1px solid var(--gray-100);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .visitor-avatar {
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--navy), var(--navy-light));
-    display: flex; align-items: center; justify-content: center;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-  .visitor-info { flex: 1; min-width: 0; }
-  .visitor-name { font-size: 15px; font-weight: 600; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .visitor-detail { font-size: 13px; color: var(--gray-400); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .visitor-badge {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    letter-spacing: 0.3px;
-  }
-  .badge-in { background: var(--green-light); color: var(--green); }
-  .badge-out { background: var(--gray-100); color: var(--gray-400); }
-  .badge-gold { background: rgba(200,169,81,0.15); color: var(--gold); border: 1px solid rgba(200,169,81,0.3); }
+/* ══════════════════════════════════════════════
+   STATS GRID
+══════════════════════════════════════════════ */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{
+  background:white;border-radius:var(--r);
+  border:1px solid var(--border);padding:16px 14px;
+  box-shadow:var(--shadow);
+}
+.stat.full{grid-column:1/-1}
+.stat-n{font-size:34px;font-weight:700;color:var(--black);line-height:1;font-family:var(--font-head)}
+.stat-l{font-size:11px;color:var(--mid);margin-top:4px;font-weight:500;letter-spacing:.3px;text-transform:uppercase}
+.stat-sub{font-size:11px;color:var(--light);margin-top:2px}
+/* accent line on stat */
+.stat{position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);opacity:.15}
+.stat.full::after{opacity:.25}
 
-  /* ========== SEARCH ========== */
-  .search-box {
-    position: relative;
-    margin-bottom: 12px;
-  }
-  .search-box input {
-    width: 100%;
-    padding: 11px 14px 11px 40px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    font-size: 15px;
-    font-family: var(--font);
-    background: white;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .search-box input:focus {
-    border-color: var(--navy);
-    box-shadow: 0 0 0 3px rgba(0,48,135,0.1);
-  }
-  .search-icon {
-    position: absolute;
-    left: 12px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 18px;
-    color: var(--gray-400);
-    pointer-events: none;
-  }
-  .search-clear {
-    position: absolute;
-    right: 10px; top: 50%;
-    transform: translateY(-50%);
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: var(--gray-200);
-    border: none;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: var(--gray-600);
-  }
-  .search-clear.visible { display: flex; }
+/* ══════════════════════════════════════════════
+   VISITOR CARDS
+══════════════════════════════════════════════ */
+.vc{
+  background:white;border-radius:var(--r);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  padding:13px 14px;margin-bottom:8px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.av{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--black);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:14px;font-weight:700;flex-shrink:0;
+  border:2px solid var(--border);
+}
+.av.in{background:var(--green)}
+.vi{flex:1;min-width:0}
+.vn{font-size:15px;font-weight:600;color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vd{font-size:12px;color:var(--mid);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt{font-size:10px;color:var(--light);margin-top:3px}
 
-  /* ========== ALERTS ========== */
-  .alert {
-    padding: 12px 14px;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    line-height: 1.4;
-  }
-  .alert-success { background: var(--green-light); color: var(--green); border: 1px solid rgba(0,135,90,0.2); }
-  .alert-error { background: var(--red-light); color: var(--red); border: 1px solid rgba(192,57,43,0.2); }
-  .alert-info { background: rgba(0,48,135,0.06); color: var(--navy); border: 1px solid rgba(0,48,135,0.15); }
-  .alert-warning { background: var(--orange-light); color: var(--orange); border: 1px solid rgba(224,123,0,0.2); }
+.chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;letter-spacing:.3px}
+.chip-in{background:var(--green-bg);color:var(--green)}
+.chip-out{background:var(--cream);color:var(--mid)}
+.chip-red{background:var(--red-light);color:var(--red)}
 
-  /* ========== EMPTY STATE ========== */
-  .empty-state {
-    text-align: center;
-    padding: 48px 24px;
-  }
-  .empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
-  .empty-state h3 { font-size: 17px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
-  .empty-state p { font-size: 14px; color: var(--gray-400); line-height: 1.5; }
+/* ══════════════════════════════════════════════
+   SEARCH
+══════════════════════════════════════════════ */
+.sb{position:relative;margin-bottom:12px}
+.sb input{
+  width:100%;padding:11px 13px 11px 38px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-size:15px;font-family:var(--font);background:white;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.sb input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(192,24,26,.08)}
+.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--light);pointer-events:none}
+.sc{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--border);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:12px;color:var(--mid)}
+.sc.show{display:flex}
 
-  /* ========== BADGE / QR ========== */
-  .visitor-badge-card {
-    background: white;
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    text-align: center;
-    border: 2px solid var(--gold);
-    box-shadow: var(--shadow-lg);
-    margin: 12px 0;
-  }
-  .badge-header {
-    background: var(--navy);
-    color: white;
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    margin-bottom: 16px;
-  }
-  .badge-header h2 { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-  .badge-visitor-name { font-size: 24px; font-weight: 700; color: var(--navy); margin: 12px 0 4px; }
-  .badge-details { font-size: 14px; color: var(--gray-600); line-height: 1.7; }
-  .badge-qr {
-    background: var(--off-white);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    margin: 16px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .badge-token {
-    font-family: var(--font-mono);
-    font-size: 20px;
-    font-weight: 500;
-    color: var(--navy);
-    letter-spacing: 3px;
-    background: var(--off-white);
-    padding: 12px 20px;
-    border-radius: var(--radius-sm);
-    border: 1px dashed var(--gray-200);
-    margin: 12px 0;
-    display: block;
-  }
+/* ══════════════════════════════════════════════
+   ALERTS
+══════════════════════════════════════════════ */
+.alert{padding:11px 13px;border-radius:var(--r-sm);font-size:13px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.a-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(27,122,62,.15)}
+.a-err{background:var(--red-light);color:var(--red);border:1px solid rgba(192,24,26,.15)}
+.a-info{background:var(--cream);color:var(--charcoal);border:1px solid var(--border)}
+.a-warn{background:#FFF3E0;color:#E65100;border:1px solid rgba(230,81,0,.15)}
 
-  /* ========== SCANNER ========== */
-  #qr-video-container {
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: black;
-    margin-bottom: 12px;
-    position: relative;
-    aspect-ratio: 1;
-  }
-  #qr-video { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .scanner-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-  .scanner-frame {
-    width: 60%; aspect-ratio: 1;
-    border: 3px solid var(--gold);
-    border-radius: 12px;
-    box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
-    position: relative;
-  }
-  .scanner-frame::before, .scanner-frame::after {
-    content: '';
-    position: absolute;
-    top: -3px; left: -3px;
-    width: 20px; height: 20px;
-    border-top: 4px solid white;
-    border-left: 4px solid white;
-    border-radius: 2px;
-  }
-  .scanner-line {
-    position: absolute;
-    left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    animation: scanLine 2s ease-in-out infinite;
-  }
-  @keyframes scanLine { 0%,100% { top: 10%; } 50% { top: 85%; } }
+/* ══════════════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════════════ */
+.empty{text-align:center;padding:40px 24px}
+.empty-icon{font-size:44px;margin-bottom:12px;opacity:.4}
+.empty h3{font-size:16px;font-weight:600;color:var(--mid);margin-bottom:5px}
+.empty p{font-size:13px;color:var(--light);line-height:1.5}
 
-  /* ========== PASSWORD SCREEN ========== */
-  #screen-password {
-    background: linear-gradient(160deg, var(--navy-dark), var(--navy));
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .password-box {
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: var(--radius-lg);
-    padding: 32px 24px;
-    width: 100%;
-    max-width: 340px;
-    backdrop-filter: blur(10px);
-    text-align: center;
-  }
-  .password-box h2 { color: white; font-size: 20px; font-weight: 600; margin-bottom: 6px; }
-  .password-box p { color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 24px; }
-  .password-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1.5px solid rgba(255,255,255,0.2);
-    border-radius: var(--radius-sm);
-    font-size: 16px;
-    font-family: var(--font);
-    background: rgba(255,255,255,0.08);
-    color: white;
-    outline: none;
-    text-align: center;
-    letter-spacing: 3px;
-    margin-bottom: 16px;
-    transition: border-color 0.2s;
-  }
-  .password-input::placeholder { letter-spacing: 0; color: rgba(255,255,255,0.3); }
-  .password-input:focus { border-color: var(--gold); }
-  .password-error { color: #ff7b7b; font-size: 13px; margin-top: 10px; display: none; }
+/* ══════════════════════════════════════════════
+   VISITOR BADGE / PASS
+══════════════════════════════════════════════ */
+.pass-card{
+  background:white;border-radius:var(--r-lg);
+  border:2px solid var(--red);
+  box-shadow:var(--shadow-lg);
+  overflow:hidden;margin:4px 0 14px;
+}
+.pass-head{
+  background:var(--black);padding:14px 16px;
+  display:flex;align-items:center;gap:10px;
+}
+.pass-head-logo{
+  width:36px;height:36px;border-radius:50%;
+  background:white;border:1.5px solid var(--red);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.pass-head-logo span{font-family:var(--font-head);font-size:8px;font-weight:800;color:var(--black);letter-spacing:-.5px;line-height:1;text-align:center}
+.pass-head-text{color:white}
+.pass-head-text h2{font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+.pass-head-text p{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:.5px;margin-top:1px}
+.pass-body{padding:16px}
+.pass-name{font-family:var(--font-head);font-size:26px;font-weight:700;color:var(--black);margin-bottom:8px;line-height:1.1}
+.pass-details{font-size:13px;color:var(--mid);line-height:1.8}
+.pass-details strong{color:var(--black);font-weight:600}
+.pass-divider{height:1px;background:var(--border);margin:14px 0}
+.pass-token-area{text-align:center;padding:4px 0 8px}
+.pass-token-label{font-size:10px;color:var(--light);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.pass-token{
+  font-family:var(--font-mono);font-size:28px;font-weight:500;
+  color:var(--red);letter-spacing:6px;
+  background:var(--off-white);padding:12px 20px;
+  border-radius:var(--r-sm);border:1px dashed var(--border);
+  display:inline-block;
+}
+.pass-note{font-size:11px;color:var(--light);margin-top:8px}
+.pass-footer{
+  background:var(--red);color:white;
+  font-size:10px;font-weight:600;letter-spacing:1px;
+  text-align:center;padding:8px;
+  text-transform:uppercase;
+}
 
-  /* ========== SECTION HEADER ========== */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .section-header h2 { font-size: 15px; font-weight: 600; color: var(--gray-800); }
-  .section-count { font-size: 12px; color: var(--gray-400); background: var(--gray-100); padding: 2px 8px; border-radius: 20px; }
+/* ══════════════════════════════════════════════
+   QR SCANNER
+══════════════════════════════════════════════ */
+.qr-wrap{border-radius:var(--r);overflow:hidden;background:#000;margin-bottom:12px;position:relative;aspect-ratio:1}
+.qr-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.qr-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.qr-frame{
+  width:62%;aspect-ratio:1;border:2px solid var(--red);
+  border-radius:10px;
+  box-shadow:0 0 0 2000px rgba(0,0,0,.55);
+  position:relative;
+}
+.qr-frame::before,.qr-frame::after{
+  content:'';position:absolute;top:-2px;left:-2px;
+  width:18px;height:18px;
+  border-top:3px solid white;border-left:3px solid white;border-radius:2px;
+}
+.qr-frame::after{top:auto;left:auto;bottom:-2px;right:-2px;border-top:none;border-left:none;border-bottom:3px solid white;border-right:3px solid white}
+.qr-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:scan 1.8s ease-in-out infinite}
+@keyframes scan{0%,100%{top:8%}50%{top:88%}}
 
-  /* ========== DIVIDER ========== */
-  .divider { height: 1px; background: var(--gray-100); margin: 16px 0; }
+/* ══════════════════════════════════════════════
+   SECTION HEADER
+══════════════════════════════════════════════ */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-hd h2{font-size:15px;font-weight:600}
+.sec-cnt{font-size:11px;color:var(--mid);background:var(--cream);padding:2px 9px;border-radius:20px;font-weight:500}
 
-  /* ========== TOAST ========== */
-  .toast {
-    position: fixed;
-    bottom: 80px; left: 16px; right: 16px;
-    background: var(--gray-800);
-    color: white;
-    padding: 12px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 500;
-    z-index: 9999;
-    transform: translateY(100px);
-    opacity: 0;
-    transition: all 0.3s ease;
-    text-align: center;
-    box-shadow: var(--shadow-lg);
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.success { background: var(--green); }
-  .toast.error { background: var(--red); }
+/* ══════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════ */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:none;align-items:flex-end}
+.ov.on{display:flex}
+.modal{
+  background:white;border-radius:16px 16px 0 0;
+  width:100%;max-height:88dvh;overflow-y:auto;
+  padding:20px 20px 32px;animation:slideUp .28s ease;
+}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--mid);margin-bottom:20px}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-drag{width:40px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 16px}
 
-  /* ========== LOADING ========== */
-  .loading {
-    display: inline-flex;
-    gap: 4px;
-    align-items: center;
-  }
-  .loading span {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    animation: loadBounce 0.9s ease infinite;
-  }
-  .loading span:nth-child(2) { animation-delay: 0.15s; }
-  .loading span:nth-child(3) { animation-delay: 0.3s; }
-  @keyframes loadBounce { 0%,60%,100% { transform: translateY(0); opacity:0.6; } 30% { transform: translateY(-5px); opacity:1; } }
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:76px;left:16px;right:16px;
+  background:var(--black);color:white;
+  padding:12px 16px;border-radius:var(--r-sm);
+  font-size:14px;font-weight:500;
+  z-index:9999;text-align:center;
+  transform:translateY(120px);opacity:0;
+  transition:all .3s ease;box-shadow:var(--shadow-lg);
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{background:var(--green)}
+.toast.err{background:var(--red)}
 
-  /* ========== MODAL ========== */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 9000;
-    display: none;
-    align-items: flex-end;
-  }
-  .modal-overlay.active { display: flex; }
-  .modal {
-    background: white;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    width: 100%;
-    max-height: 85vh;
-    overflow-y: auto;
-    padding: 24px;
-    animation: slideUp 0.3s ease;
-  }
-  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-  .modal-subtitle { font-size: 14px; color: var(--gray-400); margin-bottom: 20px; }
-  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+/* ══════════════════════════════════════════════
+   MANAGEMENT ITEMS
+══════════════════════════════════════════════ */
+.mi{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.mi:last-child{border-bottom:none}
+.mi-name{font-size:14px;font-weight:500}
+.mi-sub{font-size:11px;color:var(--light);margin-top:1px}
 
-  /* ========== MANAGEMENT ========== */
-  .mgmt-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--gray-100);
-  }
-  .mgmt-item:last-child { border-bottom: none; }
-  .mgmt-item-text { font-size: 15px; color: var(--gray-800); }
-  .mgmt-item-sub { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
+/* ══════════════════════════════════════════════
+   DIVIDER
+══════════════════════════════════════════════ */
+.div{height:1px;background:var(--border);margin:14px 0}
 
-  /* ========== ANIMATIONS ========== */
-  @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+/* ══════════════════════════════════════════════
+   LOADING DOTS
+══════════════════════════════════════════════ */
+.dots{display:inline-flex;gap:4px;align-items:center}
+.dots span{width:6px;height:6px;border-radius:50%;background:currentColor;animation:dot .9s ease infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
 
-  .animate-in { animation: fadeIn 0.3s ease; }
+/* ══════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════ */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.ani{animation:fadeIn .3s ease}
 
-  /* ========== UTILITY ========== */
-  .hidden { display: none !important; }
-  .text-center { text-align: center; }
-  .mt-8 { margin-top: 8px; }
-  .mt-12 { margin-top: 12px; }
-  .mt-16 { margin-top: 16px; }
-  .gap-8 { display: flex; flex-direction: column; gap: 8px; }
-  .row { display: flex; gap: 8px; }
-  .row .btn { flex: 1; }
-
-  /* scroll fix */
-  .content::-webkit-scrollbar { display: none; }
-  .content { -ms-overflow-style: none; scrollbar-width: none; }
+/* ══════════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════════ */
+.hidden{display:none!important}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
 </style>
 </head>
 <body>
 
-<!-- ================================================
-     SCREEN: ROLE SELECTION
-================================================ -->
-<div id="screen-role" class="screen active">
-  <div class="role-logo">
-    <div class="role-logo-mark">PPC</div>
+<!-- ╔══════════════════════════════════════════════╗
+     ║  ROLE SELECTION                              ║
+     ╚══════════════════════════════════════════════╝ -->
+<div id="s-role" class="screen active">
+  <div class="role-hero">
+    <div class="logo-seal">
+      <div class="logo-text-mark"><span class="big-p">P</span>PC</div>
+    </div>
     <h1>Visitor Management</h1>
-    <p>System v3.0</p>
+    <p>Plastic Powder Coating Co. L.L.C — Dubai</p>
   </div>
+
   <div class="role-cards">
     <div class="role-card" onclick="goReception()">
-      <div class="role-card-icon reception">👥</div>
-      <div class="role-card-text">
+      <div class="role-icon rec">👥</div>
+      <div class="role-text">
         <h3>Reception</h3>
         <p>Register &amp; check-in visitors</p>
       </div>
-      <div class="role-card-arrow">›</div>
+      <div class="role-arrow">›</div>
     </div>
     <div class="role-card" onclick="goStaffLogin()">
-      <div class="role-card-icon staff">🔒</div>
-      <div class="role-card-text">
+      <div class="role-icon staff">🔒</div>
+      <div class="role-text">
         <h3>Staff Portal</h3>
-        <p>Dashboard, reports &amp; management</p>
+        <p>Dashboard, history &amp; management</p>
       </div>
-      <div class="role-card-arrow">›</div>
+      <div class="role-arrow">›</div>
     </div>
   </div>
 </div>
 
-<!-- ================================================
-     SCREEN: STAFF PASSWORD
-================================================ -->
-<div id="screen-password" class="screen">
-  <div class="password-box">
-    <div style="font-size:40px;margin-bottom:16px">🔐</div>
+<!-- ╔══════════════════════════════════════════════╗
+     ║  PASSWORD                                    ║
+     ╚══════════════════════════════════════════════╝ -->
+<div id="s-pass" class="screen">
+  <div class="pass-box">
+    <div class="seal-sm">🔐</div>
     <h2>Staff Access</h2>
-    <p>Enter the staff password to continue</p>
-    <input type="password" class="password-input" id="passwordInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPassword()">
-    <button class="btn btn-gold" onclick="checkPassword()">Unlock Portal</button>
-    <p class="password-error" id="passwordError">❌ Incorrect password. Try again.</p>
-    <button class="btn btn-secondary mt-12" onclick="showScreen('screen-role')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);margin-top:12px">← Back</button>
+    <p>Enter your staff password</p>
+    <input type="password" class="pass-input" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="btn btn-red" onclick="checkPw()">Unlock Portal</button>
+    <p class="pass-err" id="pwErr">❌ Incorrect password. Try again.</p>
+    <button class="btn btn-ghost mt12" onclick="show('s-role')" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);margin-top:10px">← Back</button>
   </div>
 </div>
 
-<!-- ================================================
-     SCREEN: RECEPTION
-================================================ -->
-<div id="screen-reception" class="screen">
-  <div class="top-bar">
-    <div class="top-bar-back" onclick="showScreen('screen-role')">←</div>
-    <div style="flex:1">
-      <div class="top-bar-title">Reception</div>
+<!-- ╔══════════════════════════════════════════════╗
+     ║  RECEPTION                                   ║
+     ╚══════════════════════════════════════════════╝ -->
+<div id="s-rec" class="screen">
+  <div class="topbar">
+    <div class="tb-back" onclick="show('s-role')">←</div>
+    <div class="tb-logo"><span>PPC</span></div>
+    <div style="flex:1;margin-left:8px">
+      <div class="tb-title">Reception</div>
     </div>
-    <div class="top-bar-badge">NO LOGIN</div>
+    <div class="tb-badge">NO LOGIN</div>
   </div>
 
-  <!-- Bottom Nav: Reception -->
-  <div class="bottom-nav" id="reception-nav">
-    <button class="nav-btn active" onclick="recTab('register')" data-tab="register">
-      <span class="nav-icon">📝</span>
-      <span class="nav-label">Register</span>
-    </button>
-    <button class="nav-btn" onclick="recTab('checkin')" data-tab="checkin">
-      <span class="nav-icon">⚡</span>
-      <span class="nav-label">Quick In</span>
-    </button>
-    <button class="nav-btn" onclick="recTab('checkout')" data-tab="checkout">
-      <span class="nav-icon">🚪</span>
-      <span class="nav-label">Check Out</span>
-    </button>
+  <div class="bnav" id="rec-nav">
+    <button class="nb on" data-t="register" onclick="recTab('register')"><span class="ni">📝</span><span class="nl">Register</span></button>
+    <button class="nb" data-t="checkin" onclick="recTab('checkin')"><span class="ni">⚡</span><span class="nl">Quick In</span></button>
+    <button class="nb" data-t="checkout" onclick="recTab('checkout')"><span class="ni">🚪</span><span class="nl">Check Out</span></button>
   </div>
 
-  <div class="content" id="reception-content">
-
-    <!-- TAB: REGISTER -->
-    <div id="rec-tab-register" class="animate-in">
-      <div id="registerResult"></div>
-
+  <div class="content">
+    <!-- ── REGISTER TAB ── -->
+    <div id="rt-register" class="ani">
+      <div id="reg-result"></div>
       <div class="card">
         <div class="card-title">New Visitor Registration</div>
-
-        <div class="form-group">
-          <label class="form-label">Visitor Name <span class="req">*</span></label>
-          <input type="text" class="form-input" id="visitorName" placeholder="Full name">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Phone Number</label>
-          <input type="tel" class="form-input" id="visitorPhone" placeholder="+971 50 000 0000">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Company / Organisation</label>
-          <input type="text" class="form-input" id="visitorCompany" placeholder="Company name (optional)">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Purpose of Visit <span class="req">*</span></label>
-          <select class="form-select" id="visitPurpose">
-            <option value="">Select purpose...</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Host / Meeting With <span class="req">*</span></label>
-          <select class="form-select" id="visitHost">
-            <option value="">Select host...</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Additional Notes</label>
-          <input type="text" class="form-input" id="visitNotes" placeholder="Any extra info (optional)">
-        </div>
-
-        <button class="btn btn-primary" id="registerBtn" onclick="registerVisitor()">
-          <span>✓</span> Register &amp; Print Badge
-        </button>
+        <div class="fg"><label class="lbl">Visitor Name <span class="req">*</span></label><input type="text" class="inp" id="rName" placeholder="Full name"></div>
+        <div class="fg"><label class="lbl">Phone Number</label><input type="tel" class="inp" id="rPhone" placeholder="+971 50 000 0000"></div>
+        <div class="fg"><label class="lbl">Company / Organisation</label><input type="text" class="inp" id="rCompany" placeholder="Company (optional)"></div>
+        <div class="fg"><label class="lbl">Purpose of Visit <span class="req">*</span></label>
+          <select class="sel" id="rPurpose"><option value="">Select purpose…</option></select></div>
+        <div class="fg"><label class="lbl">Host / Meeting With <span class="req">*</span></label>
+          <select class="sel" id="rHost"><option value="">Select host…</option></select></div>
+        <div class="fg"><label class="lbl">Additional Notes</label><input type="text" class="inp" id="rNotes" placeholder="Any extra info (optional)"></div>
+        <button class="btn btn-red" id="regBtn" onclick="doRegister()"><span>✓</span> Register &amp; Generate Pass</button>
       </div>
     </div>
 
-    <!-- TAB: QUICK CHECK-IN -->
-    <div id="rec-tab-checkin" class="hidden animate-in">
-      <div id="checkinResult"></div>
-
+    <!-- ── QUICK CHECK-IN TAB ── -->
+    <div id="rt-checkin" class="hidden ani">
       <div class="card">
         <div class="card-title">Quick Check-In</div>
-        <p style="font-size:13px;color:var(--gray-400);margin-bottom:14px">Search by name to check in a returning visitor</p>
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="checkinSearch" placeholder="Type visitor name..." oninput="searchCheckin(this.value)">
-          <button class="search-clear" id="checkinClear" onclick="clearCheckin()">✕</button>
+        <p style="font-size:13px;color:var(--mid);margin-bottom:12px">Search a returning visitor by name</p>
+        <div class="sb">
+          <span class="si">🔍</span>
+          <input type="text" id="ciSearch" placeholder="Type visitor name…" oninput="searchCI(this.value)">
+          <button class="sc" id="ciClear" onclick="clearCI()">✕</button>
         </div>
-        <div id="checkinList"></div>
+        <div id="ci-list"></div>
       </div>
-
-      <div id="checkinBadgeSection" class="hidden">
-        <div class="visitor-badge-card" id="checkinBadge"></div>
-        <button class="btn btn-outline mt-12" onclick="checkinAnother()">+ Check In Another Visitor</button>
+      <div id="ci-pass-section" class="hidden">
+        <div id="ci-pass"></div>
+        <button class="btn btn-outline mt12" onclick="ciAnother()">+ Check In Another Visitor</button>
       </div>
     </div>
 
-    <!-- TAB: CHECKOUT -->
-    <div id="rec-tab-checkout" class="hidden animate-in">
+    <!-- ── CHECK OUT TAB ── -->
+    <div id="rt-checkout" class="hidden ani">
       <div class="card">
         <div class="card-title">Check Out Visitor</div>
-        <div class="alert alert-info">
-          <span>ℹ️</span>
-          <span>Search by name or scan QR badge to check out a visitor</span>
+        <div class="alert a-info" style="margin-bottom:14px">ℹ️ Search by name or scan QR badge</div>
+        <div class="sb">
+          <span class="si">🔍</span>
+          <input type="text" id="coSearch" placeholder="Search visitor name…" oninput="searchCO(this.value)">
+          <button class="sc" id="coClear" onclick="clearCO()">✕</button>
         </div>
-
-        <!-- Search checkout -->
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="checkoutSearch" placeholder="Search visitor name..." oninput="searchCheckout(this.value)">
-          <button class="search-clear" id="checkoutClear" onclick="clearCheckout()">✕</button>
+        <div id="co-list"></div>
+        <div class="div"></div>
+        <button class="btn btn-outline" onclick="toggleCoScanner()"><span>📷</span> Scan QR Badge</button>
+        <div id="co-scanner" class="hidden mt12">
+          <div class="qr-wrap"><video id="qrv1" playsinline muted></video><div class="qr-overlay"><div class="qr-frame"><div class="qr-line"></div></div></div></div>
+          <button class="btn btn-ghost" onclick="stopScan('qrv1');document.getElementById('co-scanner').classList.add('hidden')">Stop Scanner</button>
         </div>
-        <div id="checkoutList">
-          <!-- Empty by default — FIX #3 applied -->
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- QR Scan -->
-        <button class="btn btn-outline" onclick="toggleCheckoutScanner()">
-          <span>📷</span> Scan QR Badge
-        </button>
-        <div id="checkoutScannerArea" class="hidden mt-12">
-          <div id="qr-video-container">
-            <video id="qr-video" playsinline muted></video>
-            <div class="scanner-overlay">
-              <div class="scanner-frame">
-                <div class="scanner-line"></div>
-              </div>
-            </div>
-          </div>
-          <button class="btn btn-secondary" onclick="stopScanner()">Stop Scanner</button>
-        </div>
-
-        <div id="checkoutResult" class="mt-12"></div>
+        <div id="co-result" class="mt12"></div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ================================================
-     SCREEN: STAFF PORTAL
-================================================ -->
-<div id="screen-staff" class="screen">
-  <div class="top-bar">
-    <div class="top-bar-back" onclick="staffLogout()">←</div>
-    <div style="flex:1">
-      <div class="top-bar-title">Staff Portal</div>
-      <div class="top-bar-subtitle">SECURED ACCESS</div>
+<!-- ╔══════════════════════════════════════════════╗
+     ║  STAFF PORTAL                                ║
+     ╚══════════════════════════════════════════════╝ -->
+<div id="s-staff" class="screen">
+  <div class="topbar">
+    <div class="tb-back" onclick="staffLogout()">←</div>
+    <div class="tb-logo"><span>PPC</span></div>
+    <div style="flex:1;margin-left:8px">
+      <div class="tb-title">Staff Portal</div>
+      <div class="tb-sub">SECURED</div>
     </div>
-    <div style="font-size:20px">🔒</div>
+    <div style="font-size:18px">🔒</div>
   </div>
 
-  <!-- Bottom Nav: Staff -->
-  <div class="bottom-nav" id="staff-nav">
-    <button class="nav-btn active" onclick="staffTab('dashboard')" data-tab="dashboard">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label">Dashboard</span>
-    </button>
-    <button class="nav-btn" onclick="staffTab('current')" data-tab="current">
-      <span class="nav-icon">👁️</span>
-      <span class="nav-label">Current</span>
-    </button>
-    <button class="nav-btn" onclick="staffTab('history')" data-tab="history">
-      <span class="nav-icon">📋</span>
-      <span class="nav-label">History</span>
-    </button>
-    <button class="nav-btn" onclick="staffTab('scanner')" data-tab="scanner">
-      <span class="nav-icon">📷</span>
-      <span class="nav-label">Scanner</span>
-    </button>
-    <button class="nav-btn" onclick="staffTab('manage')" data-tab="manage">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label">Manage</span>
-    </button>
+  <div class="bnav" id="staff-nav">
+    <button class="nb on" data-t="dash" onclick="staffTab('dash')"><span class="ni">📊</span><span class="nl">Dashboard</span></button>
+    <button class="nb" data-t="now" onclick="staffTab('now')"><span class="ni">👁️</span><span class="nl">Current</span></button>
+    <button class="nb" data-t="history" onclick="staffTab('history')"><span class="ni">📋</span><span class="nl">History</span></button>
+    <button class="nb" data-t="scan" onclick="staffTab('scan')"><span class="ni">📷</span><span class="nl">Scanner</span></button>
+    <button class="nb" data-t="manage" onclick="staffTab('manage')"><span class="ni">⚙️</span><span class="nl">Manage</span></button>
   </div>
 
-  <div class="content" id="staff-content">
+  <div class="content">
 
-    <!-- TAB: DASHBOARD -->
-    <div id="staff-tab-dashboard" class="animate-in">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number" id="stat-today">—</div>
-          <div class="stat-label">Today's Visitors</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="stat-inside">—</div>
-          <div class="stat-label">Currently Inside</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="stat-week">—</div>
-          <div class="stat-label">This Week</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="stat-month">—</div>
-          <div class="stat-label">This Month</div>
-        </div>
-        <div class="stat-card full">
-          <div class="stat-number" id="stat-total">—</div>
-          <div class="stat-label">All Time Total</div>
-          <div class="stat-sub" id="stat-archived"></div>
-        </div>
+    <!-- DASHBOARD -->
+    <div id="st-dash" class="ani">
+      <div class="stats">
+        <div class="stat"><div class="stat-n" id="s-today">—</div><div class="stat-l">Today</div></div>
+        <div class="stat"><div class="stat-n" id="s-inside">—</div><div class="stat-l">Inside Now</div></div>
+        <div class="stat"><div class="stat-n" id="s-week">—</div><div class="stat-l">This Week</div></div>
+        <div class="stat"><div class="stat-n" id="s-month">—</div><div class="stat-l">This Month</div></div>
+        <div class="stat full"><div class="stat-n" id="s-total">—</div><div class="stat-l">All Time Total</div><div class="stat-sub" id="s-arch"></div></div>
       </div>
-
       <div class="card">
         <div class="card-title">Currently Inside</div>
-        <div id="dashboard-current"></div>
+        <div id="dash-now"></div>
       </div>
     </div>
 
-    <!-- TAB: CURRENT VISITORS -->
-    <div id="staff-tab-current" class="hidden animate-in">
-      <div class="section-header">
-        <h2>Visitors Inside</h2>
-        <span class="section-count" id="current-count">0</span>
-      </div>
-      <button class="btn btn-secondary mt-8" onclick="loadCurrentVisitors()" style="margin-bottom:12px">
-        🔄 Refresh
-      </button>
-      <div id="current-visitors-list"></div>
+    <!-- CURRENT VISITORS -->
+    <div id="st-now" class="hidden ani">
+      <div class="sec-hd"><h2>Visitors Inside</h2><span class="sec-cnt" id="now-cnt">0</span></div>
+      <button class="btn btn-ghost mt8" style="margin-bottom:12px" onclick="loadNow()">🔄 Refresh</button>
+      <div id="now-list"></div>
     </div>
 
-    <!-- TAB: HISTORY -->
-    <div id="staff-tab-history" class="hidden animate-in">
-      <div class="section-header">
-        <h2>Visit History</h2>
-        <span class="section-count" id="history-count">0</span>
+    <!-- HISTORY -->
+    <div id="st-history" class="hidden ani">
+      <div class="sec-hd"><h2>Visit History</h2><span class="sec-cnt" id="hist-cnt">0</span></div>
+      <div class="sb">
+        <span class="si">🔍</span>
+        <input type="text" id="histSearch" placeholder="Search name or host…" oninput="filterHist(this.value)">
+        <button class="sc" id="histClear" onclick="clearHistSearch()">✕</button>
       </div>
-
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="historySearch" placeholder="Search visitor or host..." oninput="filterHistory(this.value)">
-        <button class="search-clear" id="historyClear" onclick="clearHistorySearch()">✕</button>
-      </div>
-
-      <div id="history-list"></div>
+      <div id="hist-list"></div>
     </div>
 
-    <!-- TAB: SCANNER (Universal Checkout) -->
-    <div id="staff-tab-scanner" class="hidden animate-in">
+    <!-- SCANNER -->
+    <div id="st-scan" class="hidden ani">
       <div class="card">
         <div class="card-title">Universal Checkout Scanner</div>
-        <p style="font-size:13px;color:var(--gray-400);margin-bottom:14px">Scan visitor QR badge to check them out</p>
-        <div id="qr-staff-container">
-          <div id="qr-staff-video-container" class="hidden">
-            <div id="qr-video-container2" style="border-radius:var(--radius);overflow:hidden;background:black;margin-bottom:12px;position:relative;aspect-ratio:1;">
-              <video id="qr-video2" playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;"></video>
-              <div class="scanner-overlay">
-                <div class="scanner-frame"><div class="scanner-line"></div></div>
-              </div>
-            </div>
-            <button class="btn btn-secondary" onclick="stopStaffScanner()">Stop Scanner</button>
-          </div>
-          <button class="btn btn-primary" id="startStaffScanBtn" onclick="startStaffScanner()">
-            <span>📷</span> Start Scanner
-          </button>
+        <p style="font-size:13px;color:var(--mid);margin-bottom:14px">Scan visitor QR badge to check out</p>
+        <div id="scan-vid-wrap" class="hidden">
+          <div class="qr-wrap"><video id="qrv2" playsinline muted></video><div class="qr-overlay"><div class="qr-frame"><div class="qr-line"></div></div></div></div>
+          <button class="btn btn-ghost" onclick="stopStaffScan()">Stop Scanner</button>
         </div>
-        <div id="staff-scan-result" class="mt-12"></div>
+        <button class="btn btn-black" id="startScanBtn" onclick="startStaffScan()"><span>📷</span> Start Scanner</button>
+        <div id="scan-result" class="mt12"></div>
       </div>
-
-      <!-- Manual checkout search -->
-      <div class="card mt-12">
+      <div class="card mt12">
         <div class="card-title">Manual Checkout Search</div>
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="staffCheckoutSearch" placeholder="Search visitor name..." oninput="searchStaffCheckout(this.value)">
-          <button class="search-clear" id="staffCheckoutClear" onclick="clearStaffCheckout()">✕</button>
+        <div class="sb">
+          <span class="si">🔍</span>
+          <input type="text" id="scanSearch" placeholder="Search visitor…" oninput="searchStaffCO(this.value)">
+          <button class="sc" id="scanClear" onclick="clearScanSearch()">✕</button>
         </div>
-        <div id="staff-checkout-list"></div>
+        <div id="scan-co-list"></div>
       </div>
     </div>
 
-    <!-- TAB: MANAGE -->
-    <div id="staff-tab-manage" class="hidden animate-in">
-      <!-- Staff Management -->
+    <!-- MANAGE -->
+    <div id="st-manage" class="hidden ani">
       <div class="card">
-        <div class="section-header" style="margin-bottom:8px">
+        <div class="sec-hd" style="margin-bottom:8px">
           <div class="card-title" style="margin:0">Staff / Hosts</div>
-          <button class="btn btn-sm btn-primary" onclick="openAddStaffModal()">+ Add</button>
+          <button class="btn btn-sm btn-red" onclick="openModal('m-staff')">+ Add</button>
         </div>
-        <div id="staff-list-mgmt"></div>
+        <div id="mg-staff"></div>
       </div>
-
-      <!-- Purposes Management -->
       <div class="card">
-        <div class="section-header" style="margin-bottom:8px">
+        <div class="sec-hd" style="margin-bottom:8px">
           <div class="card-title" style="margin:0">Visit Purposes</div>
-          <button class="btn btn-sm btn-primary" onclick="openAddPurposeModal()">+ Add</button>
+          <button class="btn btn-sm btn-red" onclick="openModal('m-purpose')">+ Add</button>
         </div>
-        <div id="purpose-list-mgmt"></div>
+        <div id="mg-purpose"></div>
       </div>
-
-      <!-- Danger Zone -->
-      <div class="card" style="border-color:var(--red-light)">
-        <div class="card-title" style="color:var(--red)">⚠️ Data Management</div>
-        <button class="btn btn-secondary" style="margin-bottom:8px" onclick="exportData()">
-          📤 Export All Data (CSV)
-        </button>
-        <p style="font-size:12px;color:var(--gray-400);margin-top:8px">
-          Delete individual records from History tab. All data stored in Google Sheets.
-        </p>
+      <div class="card" style="border-color:var(--red-mid)">
+        <div class="card-title" style="color:var(--red)">⚠️ Data</div>
+        <button class="btn btn-ghost" onclick="exportCSV()">📤 Export All Data (CSV)</button>
+        <p style="font-size:11px;color:var(--light);margin-top:8px">Delete individual records in the History tab.</p>
       </div>
     </div>
 
-  </div>
+  </div><!-- /content -->
 </div>
 
-<!-- ================================================
-     MODALS
-================================================ -->
-<div class="modal-overlay" id="modal-add-staff">
+<!-- ╔══════════════════════════════════════════════╗
+     ║  MODALS                                      ║
+     ╚══════════════════════════════════════════════╝ -->
+<div class="ov" id="m-staff">
   <div class="modal">
+    <div class="modal-drag"></div>
     <div class="modal-title">Add Staff Member</div>
-    <div class="modal-subtitle">This person can be selected as a host</div>
-    <div class="form-group">
-      <label class="form-label">Full Name <span class="req">*</span></label>
-      <input type="text" class="form-input" id="newStaffName" placeholder="e.g. Ahmed Al Mansoori">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Department / Role</label>
-      <input type="text" class="form-input" id="newStaffDept" placeholder="e.g. Operations">
-    </div>
-    <div class="row mt-16">
-      <button class="btn btn-secondary" onclick="closeModal('modal-add-staff')">Cancel</button>
-      <button class="btn btn-primary" onclick="addStaff()">Add Staff</button>
+    <div class="modal-sub">This person will appear in the host dropdown</div>
+    <div class="fg"><label class="lbl">Full Name <span class="req">*</span></label><input type="text" class="inp" id="nStaffName" placeholder="e.g. Ahmed Al Mansoori"></div>
+    <div class="fg"><label class="lbl">Department / Role</label><input type="text" class="inp" id="nStaffDept" placeholder="e.g. Operations"></div>
+    <div class="row mt16">
+      <button class="btn btn-ghost" onclick="closeModal('m-staff')">Cancel</button>
+      <button class="btn btn-red" onclick="addStaff()">Add Staff</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-add-purpose">
+<div class="ov" id="m-purpose">
   <div class="modal">
+    <div class="modal-drag"></div>
     <div class="modal-title">Add Visit Purpose</div>
-    <div class="modal-subtitle">Add a new reason visitors can select</div>
-    <div class="form-group">
-      <label class="form-label">Purpose Name <span class="req">*</span></label>
-      <input type="text" class="form-input" id="newPurposeName" placeholder="e.g. Client Meeting">
-    </div>
-    <div class="row mt-16">
-      <button class="btn btn-secondary" onclick="closeModal('modal-add-purpose')">Cancel</button>
-      <button class="btn btn-primary" onclick="addPurpose()">Add Purpose</button>
+    <div class="modal-sub">Add a reason visitors can select</div>
+    <div class="fg"><label class="lbl">Purpose Name <span class="req">*</span></label><input type="text" class="inp" id="nPurpose" placeholder="e.g. Client Meeting"></div>
+    <div class="row mt16">
+      <button class="btn btn-ghost" onclick="closeModal('m-purpose')">Cancel</button>
+      <button class="btn btn-red" onclick="addPurpose()">Add Purpose</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-delete-confirm">
-  <div class="modal">
-    <div style="font-size:40px;text-align:center;margin-bottom:12px">🗑️</div>
-    <div class="modal-title text-center">Delete Visit Record?</div>
-    <div class="modal-subtitle text-center" id="delete-confirm-text">This action cannot be undone.</div>
-    <div class="row mt-16">
-      <button class="btn btn-secondary" onclick="closeModal('modal-delete-confirm')">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmDelete()">Yes, Delete</button>
+<div class="ov" id="m-del">
+  <div class="modal" style="text-align:center">
+    <div class="modal-drag"></div>
+    <div style="font-size:40px;margin-bottom:12px">🗑️</div>
+    <div class="modal-title">Delete Record?</div>
+    <div class="modal-sub" id="del-text">This cannot be undone.</div>
+    <div class="row mt16">
+      <button class="btn btn-ghost" onclick="closeModal('m-del')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDel()">Yes, Delete</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- ================================================
-     SCRIPTS
-================================================ -->
+<!-- ╔══════════════════════════════════════════════╗
+     ║  JAVASCRIPT                                  ║
+     ╚══════════════════════════════════════════════╝ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script>
+// ─── CONFIG ───────────────────────────────────────────────
+const API = 'https://script.google.com/macros/s/AKfycbwC4oUm3holztMyeFmPbfofAyLvZDg4bHrIsWgHHsfhpAwovC32eCOuva7fqEI-vKgo2Q/exec';
+const PW  = 'DXB@ppc2026';
 
-// ============================================================
-// CONFIG
-// ============================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwC4oUm3holztMyeFmPbfofAyLvZDg4bHrIsWgHHsfhpAwovC32eCOuva7fqEI-vKgo2Q/exec';
-const STAFF_PASSWORD = 'DXB@ppc2026';
+// ─── STATE ─────────────────────────────────────────────────
+let histAll = [], scanStreams = {}, delRowId = null;
 
-// ============================================================
-// STATE
-// ============================================================
-let allVisitors = [];
-let staffList = [];
-let purposeList = [];
-let currentScanStream = null;
-let currentScanInterval = null;
-let deleteRowId = null;
-let historyData = [];
-
-// ============================================================
-// SCREEN NAVIGATION
-// ============================================================
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+// ─── SCREEN NAV ────────────────────────────────────────────
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
 }
-
-function goReception() {
-  showScreen('screen-reception');
+function goReception(){
+  show('s-rec');
   recTab('register');
-  loadFormData();
+  loadConfig();
 }
-
-function goStaffLogin() {
-  showScreen('screen-password');
-  document.getElementById('passwordInput').value = '';
-  document.getElementById('passwordError').style.display = 'none';
-  setTimeout(() => document.getElementById('passwordInput').focus(), 300);
+function goStaffLogin(){
+  show('s-pass');
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwErr').style.display='none';
+  setTimeout(()=>document.getElementById('pwInput').focus(),300);
 }
-
-function checkPassword() {
-  const val = document.getElementById('passwordInput').value;
-  if (val === STAFF_PASSWORD) {
-    showScreen('screen-staff');
-    staffTab('dashboard');
-    loadDashboard();
+function checkPw(){
+  if(document.getElementById('pwInput').value===PW){
+    show('s-staff');
+    staffTab('dash');
+    loadDash();
   } else {
-    document.getElementById('passwordError').style.display = 'block';
-    document.getElementById('passwordInput').value = '';
-    document.getElementById('passwordInput').focus();
+    document.getElementById('pwErr').style.display='block';
+    document.getElementById('pwInput').value='';
+  }
+}
+function staffLogout(){ stopAllScan(); show('s-role'); }
+
+// ─── TAB SWITCHING ─────────────────────────────────────────
+function recTab(t){
+  ['register','checkin','checkout'].forEach(x=>{
+    document.getElementById('rt-'+x).classList.toggle('hidden',x!==t);
+  });
+  document.querySelectorAll('#rec-nav .nb').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  if(t==='checkout'){ clearCO(); stopScan('qrv1'); document.getElementById('co-scanner').classList.add('hidden'); document.getElementById('co-result').innerHTML=''; }
+  if(t!=='checkin'){ stopScan('qrv1'); }
+}
+function staffTab(t){
+  ['dash','now','history','scan','manage'].forEach(x=>{
+    const el=document.getElementById('st-'+x); if(el) el.classList.toggle('hidden',x!==t);
+  });
+  document.querySelectorAll('#staff-nav .nb').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  if(t==='dash')    loadDash();
+  if(t==='now')     loadNow();
+  if(t==='history') loadHist();
+  if(t==='manage')  loadManage();
+  if(t!=='scan')    stopStaffScan();
+}
+
+// ─── API HELPERS ───────────────────────────────────────────
+async function apiGet(p){
+  const r=await fetch(API+'?'+new URLSearchParams(p));
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+async function apiPost(body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+
+// ─── LOAD CONFIG (staff + purposes) ────────────────────────
+async function loadConfig(){
+  try{
+    const d=await apiGet({action:'getConfig'});
+    // Purposes
+    const ps=document.getElementById('rPurpose');
+    ps.innerHTML='<option value="">Select purpose…</option>';
+    (d.purposes||[]).forEach(p=>ps.innerHTML+=`<option value="${esc(p)}">${esc(p)}</option>`);
+    // Hosts
+    const hs=document.getElementById('rHost');
+    hs.innerHTML='<option value="">Select host…</option>';
+    (d.staff||[]).forEach(s=>hs.innerHTML+=`<option value="${esc(s.name)}">${esc(s.name)}${s.dept?' – '+s.dept:''}</option>`);
+  }catch(e){
+    // Fallback defaults
+    const ps=document.getElementById('rPurpose');
+    ps.innerHTML='<option value="">Select purpose…</option>';
+    ['Client Meeting','Interview','Delivery','Personal','Government','Maintenance','Other']
+      .forEach(p=>ps.innerHTML+=`<option value="${p}">${p}</option>`);
+    const hs=document.getElementById('rHost');
+    hs.innerHTML='<option value="">Select host…</option><option value="Management">Management</option>';
   }
 }
 
-function staffLogout() {
-  stopAllScanners();
-  showScreen('screen-role');
-}
+// ─── REGISTER VISITOR ──────────────────────────────────────
+async function doRegister(){
+  const name=g('rName').trim(), phone=g('rPhone').trim(),
+        company=g('rCompany').trim(), purpose=gv('rPurpose'),
+        host=gv('rHost'), notes=g('rNotes').trim();
 
-// ============================================================
-// TAB SWITCHING
-// ============================================================
-function recTab(tab) {
-  const tabs = ['register', 'checkin', 'checkout'];
-  tabs.forEach(t => {
-    document.getElementById('rec-tab-' + t).classList.toggle('hidden', t !== tab);
-  });
-  document.querySelectorAll('#reception-nav .nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tab);
-  });
+  if(!name){  toast('Please enter visitor name','err'); return; }
+  if(!purpose){toast('Please select a purpose','err'); return; }
+  if(!host){  toast('Please select a host','err'); return; }
 
-  // FIX #3: Reset checkout list when switching TO checkout tab
-  if (tab === 'checkout') {
-    document.getElementById('checkoutSearch').value = '';
-    document.getElementById('checkoutList').innerHTML = '';
-    document.getElementById('checkoutClear').classList.remove('visible');
-    document.getElementById('checkoutResult').innerHTML = '';
-    stopScanner();
-  }
-  // FIX #4: Clear checkin when switching away
-  if (tab !== 'checkin') {
-    stopScanner();
-  }
-}
+  const btn=document.getElementById('regBtn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="dots"><span></span><span></span><span></span></span> Registering…';
 
-function staffTab(tab) {
-  const tabs = ['dashboard', 'current', 'history', 'scanner'];
-  tabs.forEach(t => {
-    const el = document.getElementById('staff-tab-' + t);
-    if (el) el.classList.toggle('hidden', t !== tab);
-  });
-  document.getElementById('staff-tab-manage').classList.toggle('hidden', tab !== 'manage');
-  document.querySelectorAll('#staff-nav .nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tab);
-  });
+  const token=mkToken(name);
 
-  if (tab === 'dashboard') loadDashboard();
-  if (tab === 'current') loadCurrentVisitors();
-  if (tab === 'history') loadHistory();
-  if (tab === 'manage') loadManagement();
-  if (tab !== 'scanner') stopStaffScanner();
-}
-
-// ============================================================
-// API HELPER
-// ============================================================
-async function apiCall(params) {
-  const url = APPS_SCRIPT_URL + '?' + new URLSearchParams(params);
-  const resp = await fetch(url);
-  return resp.json();
-}
-
-async function apiPost(payload) {
-  const resp = await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  return resp.json();
-}
-
-// ============================================================
-// LOAD FORM DATA (Staff + Purposes)
-// ============================================================
-async function loadFormData() {
-  try {
-    const data = await apiCall({ action: 'getConfig' });
-    if (data.staff) {
-      staffList = data.staff;
-      const hostSel = document.getElementById('visitHost');
-      hostSel.innerHTML = '<option value="">Select host...</option>';
-      data.staff.forEach(s => {
-        hostSel.innerHTML += `<option value="${s.name}">${s.name}${s.dept ? ' – ' + s.dept : ''}</option>`;
-      });
-    }
-    if (data.purposes) {
-      purposeList = data.purposes;
-      const purposeSel = document.getElementById('visitPurpose');
-      purposeSel.innerHTML = '<option value="">Select purpose...</option>';
-      data.purposes.forEach(p => {
-        purposeSel.innerHTML += `<option value="${p}">${p}</option>`;
-      });
-    }
-  } catch(e) {
-    // Use defaults if API fails
-    const defaultPurposes = ['Client Meeting','Interview','Delivery','Personal','Government','Maintenance','Other'];
-    const purposeSel = document.getElementById('visitPurpose');
-    purposeSel.innerHTML = '<option value="">Select purpose...</option>';
-    defaultPurposes.forEach(p => purposeSel.innerHTML += `<option value="${p}">${p}</option>`);
-  }
-}
-
-// ============================================================
-// REGISTER VISITOR
-// ============================================================
-async function registerVisitor() {
-  const name = document.getElementById('visitorName').value.trim();
-  const phone = document.getElementById('visitorPhone').value.trim();
-  const company = document.getElementById('visitorCompany').value.trim();
-  const purpose = document.getElementById('visitPurpose').value;
-  const host = document.getElementById('visitHost').value;
-  const notes = document.getElementById('visitNotes').value.trim();
-
-  if (!name) { showToast('Please enter visitor name', 'error'); return; }
-  if (!purpose) { showToast('Please select a purpose', 'error'); return; }
-  if (!host) { showToast('Please select a host', 'error'); return; }
-
-  const btn = document.getElementById('registerBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading"><span></span><span></span><span></span></span> Registering...';
-
-  try {
-    const token = generateToken(name);
-    const payload = {
-      action: 'register',
-      name, phone, company, purpose, host, notes,
-      token,
-      timestamp: new Date().toISOString()
-    };
-
-    const result = await apiPost(payload);
-
-    if (result.success) {
-      showRegistrationBadge({ name, phone, company, purpose, host, token });
-      clearRegistrationForm();
+  try{
+    const res=await apiPost({
+      action:'register', name, phone, company, purpose, host, notes, token,
+      timestamp:new Date().toISOString()
+    });
+    if(res.success){
+      showPass({name,phone,company,purpose,host,token});
+      clearRegForm();
+    } else if(res.duplicate){
+      document.getElementById('reg-result').innerHTML=
+        `<div class="alert a-warn">⚠️ ${esc(res.message)} The badge is shown below anyway.</div>`;
+      showPass({name,phone,company,purpose,host,token});
+      clearRegForm();
     } else {
-      document.getElementById('registerResult').innerHTML =
-        `<div class="alert alert-error">❌ ${result.message || 'Registration failed. Please try again.'}</div>`;
+      document.getElementById('reg-result').innerHTML=
+        `<div class="alert a-err">❌ ${esc(res.message||'Registration failed. Please try again.')}</div>`;
     }
-  } catch(e) {
-    document.getElementById('registerResult').innerHTML =
-      `<div class="alert alert-error">❌ Network error. Please check your connection and try again.</div>`;
+  }catch(e){
+    document.getElementById('reg-result').innerHTML=
+      `<div class="alert a-err">❌ Could not reach server. Check connection and try again.<br><small>${e.message}</small></div>`;
   }
-
-  btn.disabled = false;
-  btn.innerHTML = '<span>✓</span> Register &amp; Print Badge';
+  btn.disabled=false;
+  btn.innerHTML='<span>✓</span> Register &amp; Generate Pass';
 }
 
-function generateToken(name) {
-  const initials = name.replace(/[^a-zA-Z ]/g, '').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0,3);
-  const num = String(Math.floor(1000 + Math.random() * 9000));
-  return initials + num;
+function showPass(v){
+  const now=new Date();
+  const time=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const date=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('reg-result').innerHTML=`
+    <div class="alert a-ok">✅ ${esc(v.name)} registered successfully!</div>
+    ${buildPass(v,time,date)}
+    <button class="btn btn-ghost" onclick="clearPass()">← Register Another Visitor</button>`;
+  document.getElementById('reg-result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function buildPass(v,time,date){
+  return `<div class="pass-card">
+    <div class="pass-head">
+      <div class="pass-head-logo"><span>PPC</span></div>
+      <div class="pass-head-text"><h2>Visitor Pass</h2><p>Plastic Powder Coating Co. L.L.C</p></div>
+    </div>
+    <div class="pass-body">
+      <div class="pass-name">${esc(v.name)}</div>
+      <div class="pass-details">
+        ${v.company?`<strong>${esc(v.company)}</strong><br>`:''}
+        <strong>Meeting:</strong> ${esc(v.host)}<br>
+        <strong>Purpose:</strong> ${esc(v.purpose)}<br>
+        <strong>Time:</strong> ${time} · ${date}
+      </div>
+      <div class="pass-divider"></div>
+      <div class="pass-token-area">
+        <div class="pass-token-label">Visitor Token — Show on Exit</div>
+        <div class="pass-token">${esc(v.token)}</div>
+        <div class="pass-note">Present this token to reception when leaving</div>
+      </div>
+    </div>
+    <div class="pass-footer">PPC Dubai — Authorised Visitor</div>
+  </div>`;
+}
+function clearPass(){ document.getElementById('reg-result').innerHTML=''; }
+function clearRegForm(){
+  ['rName','rPhone','rCompany','rNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rPurpose').value='';
+  document.getElementById('rHost').value='';
 }
 
-function showRegistrationBadge(visitor) {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-  const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+// ─── QUICK CHECK-IN ────────────────────────────────────────
+async function searchCI(q){
+  document.getElementById('ciClear').classList.toggle('show',q.length>0);
+  if(q.length<2){ document.getElementById('ci-list').innerHTML=''; return; }
+  document.getElementById('ci-list').innerHTML=loadingHTML();
+  try{
+    const d=await apiGet({action:'search',query:q.trim(),status:'checkedout'});
+    renderCI(d.visitors||[],q.trim());
+  }catch(e){
+    document.getElementById('ci-list').innerHTML=`<div class="alert a-err">Search failed. ${e.message}</div>`;
+  }
+}
+function renderCI(visitors,q){
+  const f=visitors.filter(v=>v.name&&v.name.toLowerCase().startsWith(q.toLowerCase()));
+  if(!f.length){
+    document.getElementById('ci-list').innerHTML=`<div class="empty"><div class="empty-icon">👤</div><h3>No Match</h3><p>No previous visitor named "${esc(q)}".<br>Use Register tab for new visitors.</p></div>`;
+    return;
+  }
+  document.getElementById('ci-list').innerHTML=f.map(v=>`
+    <div class="vc" style="cursor:pointer" onclick="doCI('${esc(v.id||v.row)}','${esc(v.name)}','${esc(v.host||'')}','${esc(v.purpose||'')}')">
+      <div class="av">${initials(v.name)}</div>
+      <div class="vi">
+        <div class="vn">${esc(v.name)}</div>
+        <div class="vd">${esc(v.company||'')} ${v.host?'· '+v.host:''}</div>
+        <div class="vt">Last visit: ${fdate(v.lastVisit||v.checkoutTime)}</div>
+      </div>
+      <span class="chip chip-red">TAP TO CHECK IN</span>
+    </div>`).join('');
+}
+async function doCI(id,name,host,purpose){
+  toast('Checking in '+name+'…');
+  try{
+    const res=await apiPost({action:'checkin',visitorId:id,name,host,purpose,timestamp:new Date().toISOString()});
+    if(res.success){
+      const token=res.token||mkToken(name);
+      const now=new Date();
+      document.getElementById('ciSearch').value='';
+      document.getElementById('ci-list').innerHTML='';
+      document.getElementById('ciClear').classList.remove('show');
+      document.getElementById('ci-pass-section').classList.remove('hidden');
+      document.getElementById('ci-pass').innerHTML=
+        buildPass({name,host,purpose,company:'',token},
+          now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
+          now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))+
+        `<div class="alert a-ok" style="margin-top:8px">✅ ${esc(name)} checked in successfully!</div>`;
+    } else { toast(res.message||'Check-in failed','err'); }
+  }catch(e){ toast('Network error. Try again.','err'); }
+}
+function ciAnother(){
+  document.getElementById('ci-pass-section').classList.add('hidden');
+  document.getElementById('ci-pass').innerHTML='';
+  document.getElementById('ciSearch').value='';
+  document.getElementById('ci-list').innerHTML='';
+  document.getElementById('ciClear').classList.remove('show');
+}
+function clearCI(){
+  document.getElementById('ciSearch').value='';
+  document.getElementById('ci-list').innerHTML='';
+  document.getElementById('ciClear').classList.remove('show');
+}
 
-  document.getElementById('registerResult').innerHTML = `
-    <div class="alert alert-success">✅ Visitor registered successfully!</div>
-    <div class="visitor-badge-card">
-      <div class="badge-header">
-        <h2>PPC — VISITOR PASS</h2>
+// ─── CHECKOUT ──────────────────────────────────────────────
+async function searchCO(q){
+  document.getElementById('coClear').classList.toggle('show',q.length>0);
+  if(q.length<2){ document.getElementById('co-list').innerHTML=''; return; }
+  document.getElementById('co-list').innerHTML=loadingHTML();
+  try{
+    const d=await apiGet({action:'search',query:q.trim(),status:'inside'});
+    renderCO(d.visitors||[],q.trim(),'co-list','recCO');
+  }catch(e){
+    document.getElementById('co-list').innerHTML=`<div class="alert a-err">Search failed. ${e.message}</div>`;
+  }
+}
+function renderCO(visitors,q,listId,fn){
+  const f=visitors.filter(v=>v.name&&v.name.toLowerCase().startsWith(q.toLowerCase()));
+  if(!f.length){
+    document.getElementById(listId).innerHTML=`<div class="empty"><div class="empty-icon">✅</div><h3>No Match</h3><p>No visitor named "${esc(q)}" currently inside.</p></div>`;
+    return;
+  }
+  document.getElementById(listId).innerHTML=f.map(v=>`
+    <div class="vc" style="cursor:pointer" onclick="${fn}('${esc(v.id||v.row)}','${esc(v.name)}')">
+      <div class="av in">${initials(v.name)}</div>
+      <div class="vi">
+        <div class="vn">${esc(v.name)}</div>
+        <div class="vd">Host: ${esc(v.host||'—')} · ${esc(v.purpose||'—')}</div>
+        <div class="vt">In: ${ftime(v.checkInTime)}</div>
       </div>
-      <div class="badge-visitor-name">${escHtml(visitor.name)}</div>
-      <div class="badge-details">
-        ${visitor.company ? `<strong>${escHtml(visitor.company)}</strong><br>` : ''}
-        Meeting: ${escHtml(visitor.host)}<br>
-        Purpose: ${escHtml(visitor.purpose)}<br>
-        ${timeStr} · ${dateStr}
-      </div>
-      <div class="badge-qr">
-        <div>
-          <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px">Visitor Token</div>
-          <code class="badge-token">${visitor.token}</code>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Show this to reception on exit</div>
+      <span class="chip chip-in">CHECK OUT</span>
+    </div>`).join('');
+}
+async function recCO(id,name){
+  if(!confirm('Check out '+name+'?')) return;
+  try{
+    const res=await apiPost({action:'checkout',visitorId:id,timestamp:new Date().toISOString()});
+    if(res.success){
+      toast(name+' checked out ✓','ok');
+      clearCO();
+      document.getElementById('co-result').innerHTML=
+        `<div class="alert a-ok">✅ ${esc(name)} checked out at ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}.</div>`;
+    } else { toast(res.message||'Checkout failed','err'); }
+  }catch(e){ toast('Network error.','err'); }
+}
+function clearCO(){
+  document.getElementById('coSearch').value='';
+  document.getElementById('co-list').innerHTML='';
+  document.getElementById('coClear').classList.remove('show');
+}
+function toggleCoScanner(){
+  const el=document.getElementById('co-scanner');
+  if(el.classList.contains('hidden')){
+    el.classList.remove('hidden');
+    startScan('qrv1',token=>handleQRCO(token,'co-result'));
+  } else { el.classList.add('hidden'); stopScan('qrv1'); }
+}
+async function handleQRCO(token,resultId){
+  stopScan('qrv1');
+  document.getElementById('co-scanner').classList.add('hidden');
+  document.getElementById(resultId).innerHTML=loadingHTML('Looking up token…');
+  try{
+    const d=await apiGet({action:'lookupToken',token});
+    if(d.visitor){
+      const v=d.visitor;
+      document.getElementById(resultId).innerHTML=`
+        <div class="vc">
+          <div class="av in">${initials(v.name)}</div>
+          <div class="vi"><div class="vn">${esc(v.name)}</div><div class="vd">Host: ${esc(v.host||'—')}</div><div class="vt">In: ${ftime(v.checkInTime)}</div></div>
+          <span class="chip chip-in">INSIDE</span>
         </div>
-      </div>
-    </div>
-    <button class="btn btn-secondary" onclick="clearRegistrationBadge()">← Register Another Visitor</button>
-  `;
-  document.getElementById('registerResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function clearRegistrationBadge() {
-  document.getElementById('registerResult').innerHTML = '';
-}
-
-function clearRegistrationForm() {
-  document.getElementById('visitorName').value = '';
-  document.getElementById('visitorPhone').value = '';
-  document.getElementById('visitorCompany').value = '';
-  document.getElementById('visitPurpose').value = '';
-  document.getElementById('visitHost').value = '';
-  document.getElementById('visitNotes').value = '';
-}
-
-// ============================================================
-// QUICK CHECK-IN (FIX #1: startsWith, FIX #4: clear after)
-// ============================================================
-async function searchCheckin(query) {
-  const clearBtn = document.getElementById('checkinClear');
-  clearBtn.classList.toggle('visible', query.length > 0);
-
-  if (query.length < 2) {
-    document.getElementById('checkinList').innerHTML = '';
-    return;
-  }
-
-  document.getElementById('checkinList').innerHTML = `
-    <div class="empty-state" style="padding:24px">
-      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
-    </div>`;
-
-  try {
-    const data = await apiCall({ action: 'search', query: query.trim(), status: 'checkedout' });
-    renderCheckinResults(data.visitors || [], query.trim());
-  } catch(e) {
-    document.getElementById('checkinList').innerHTML = `<div class="alert alert-error">Search failed. Check connection.</div>`;
-  }
-}
-
-function renderCheckinResults(visitors, query) {
-  // FIX #1: Filter client-side with startsWith for accuracy
-  const filtered = visitors.filter(v =>
-    v.name && v.name.toLowerCase().startsWith(query.toLowerCase())
-  );
-
-  if (filtered.length === 0) {
-    document.getElementById('checkinList').innerHTML = `
-      <div class="empty-state" style="padding:24px">
-        <div class="empty-state-icon">👤</div>
-        <h3>No Match Found</h3>
-        <p>No previous visitor named "${escHtml(query)}"<br>Use Register tab for new visitors</p>
-      </div>`;
-    return;
-  }
-
-  document.getElementById('checkinList').innerHTML = filtered.map(v => `
-    <div class="visitor-card" style="cursor:pointer" onclick="doCheckin('${v.id || v.row}', '${escHtml(v.name)}', '${escHtml(v.host || '')}', '${escHtml(v.purpose || '')}')">
-      <div class="visitor-avatar">${getInitials(v.name)}</div>
-      <div class="visitor-info">
-        <div class="visitor-name">${escHtml(v.name)}</div>
-        <div class="visitor-detail">${escHtml(v.company || '')} ${v.host ? '· Host: ' + v.host : ''}</div>
-        <div class="visitor-detail" style="margin-top:2px;font-size:11px;color:var(--gray-400)">Last visit: ${formatDate(v.lastVisit || v.checkoutTime)}</div>
-      </div>
-      <div class="visitor-badge badge-gold">TAP TO CHECK IN</div>
-    </div>
-  `).join('');
-}
-
-async function doCheckin(id, name, host, purpose) {
-  showToast('Checking in ' + name + '...', '');
-  try {
-    const result = await apiPost({ action: 'checkin', visitorId: id, name, host, purpose, timestamp: new Date().toISOString() });
-    if (result.success) {
-      const token = result.token || generateToken(name);
-      showCheckinBadge(name, host, purpose, token);
+        <button class="btn btn-red mt8" onclick="recCO('${esc(v.id||v.row)}','${esc(v.name)}')">🚪 Check Out ${esc(v.name)}</button>`;
     } else {
-      showToast(result.message || 'Check-in failed', 'error');
+      document.getElementById(resultId).innerHTML=`<div class="alert a-err">❌ Token not found or visitor already checked out.</div>`;
     }
-  } catch(e) {
-    showToast('Network error. Please try again.', 'error');
+  }catch(e){ document.getElementById(resultId).innerHTML=`<div class="alert a-err">Network error.</div>`; }
+}
+
+// ─── DASHBOARD ─────────────────────────────────────────────
+async function loadDash(){
+  document.getElementById('s-today').innerHTML='<span class="dots"><span></span><span></span><span></span></span>';
+  try{
+    const d=await apiGet({action:'getStats'});
+    document.getElementById('s-today').textContent=d.today??'0';
+    document.getElementById('s-inside').textContent=d.inside??'0';
+    document.getElementById('s-week').textContent=d.week??'0';
+    document.getElementById('s-month').textContent=d.month??'0';
+    document.getElementById('s-total').textContent=d.total??'0';
+    if(d.archived) document.getElementById('s-arch').textContent=d.archived+' archived (30+ days)';
+    const cv=d.currentVisitors||[];
+    document.getElementById('dash-now').innerHTML=cv.length
+      ? cv.map(v=>`<div class="vc"><div class="av in">${initials(v.name)}</div><div class="vi"><div class="vn">${esc(v.name)}</div><div class="vd">${esc(v.host||'')} · ${esc(v.purpose||'')}</div><div class="vt">In: ${ftime(v.checkInTime)}</div></div><span class="chip chip-in">IN</span></div>`).join('')
+      : `<div class="empty"><div class="empty-icon">🏢</div><h3>No Visitors Inside</h3><p>All clear!</p></div>`;
+  }catch(e){
+    document.getElementById('s-today').textContent='—';
+    showAlert('dash-now','a-err','Could not load data. Check Apps Script deployment.');
   }
 }
 
-function showCheckinBadge(name, host, purpose, token) {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-  const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-
-  // FIX #4: Clear the search area first
-  document.getElementById('checkinSearch').value = '';
-  document.getElementById('checkinList').innerHTML = '';
-  document.getElementById('checkinClear').classList.remove('visible');
-
-  document.getElementById('checkinBadgeSection').classList.remove('hidden');
-  document.getElementById('checkinBadge').innerHTML = `
-    <div class="badge-header"><h2>PPC — VISITOR PASS</h2></div>
-    <div class="badge-visitor-name">${escHtml(name)}</div>
-    <div class="badge-details">
-      Meeting: ${escHtml(host)}<br>
-      ${timeStr} · ${dateStr}
-    </div>
-    <div class="badge-qr">
-      <div>
-        <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px">Visitor Token</div>
-        <code class="badge-token">${token}</code>
-        <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Show this to reception on exit</div>
-      </div>
-    </div>
-    <div class="alert alert-success" style="text-align:left">✅ ${escHtml(name)} checked in successfully!</div>
-  `;
-  document.getElementById('checkinBadgeSection').scrollIntoView({ behavior: 'smooth' });
+// ─── CURRENT VISITORS ──────────────────────────────────────
+async function loadNow(){
+  document.getElementById('now-list').innerHTML=loadingHTML();
+  try{
+    const d=await apiGet({action:'getCurrentVisitors'});
+    const v=(d.visitors||[]).reverse();
+    document.getElementById('now-cnt').textContent=v.length;
+    document.getElementById('now-list').innerHTML=v.length
+      ? v.map(x=>`<div class="vc"><div class="av in">${initials(x.name)}</div><div class="vi"><div class="vn">${esc(x.name)}</div><div class="vd">Host: ${esc(x.host||'—')} · ${esc(x.purpose||'—')}</div><div class="vd">${esc(x.company||'')}</div><div class="vt">In: ${ftime(x.checkInTime)}</div></div><button class="btn btn-sm btn-ghost" onclick="staffCO('${esc(x.id||x.row)}','${esc(x.name)}')">Check Out</button></div>`).join('')
+      : `<div class="empty"><div class="empty-icon">✅</div><h3>No Visitors Inside</h3></div>`;
+  }catch(e){ document.getElementById('now-list').innerHTML=`<div class="alert a-err">Failed to load. ${e.message}</div>`; }
+}
+async function staffCO(id,name){
+  if(!confirm('Check out '+name+'?')) return;
+  try{
+    const r=await apiPost({action:'checkout',visitorId:id,timestamp:new Date().toISOString()});
+    r.success ? (toast(name+' checked out ✓','ok'), loadNow()) : toast(r.message||'Failed','err');
+  }catch(e){ toast('Network error','err'); }
 }
 
-// FIX #4: "Check In Another" clears everything
-function checkinAnother() {
-  document.getElementById('checkinBadgeSection').classList.add('hidden');
-  document.getElementById('checkinBadge').innerHTML = '';
-  document.getElementById('checkinSearch').value = '';
-  document.getElementById('checkinList').innerHTML = '';
-  document.getElementById('checkinClear').classList.remove('visible');
-  document.getElementById('checkinResult').innerHTML = '';
-  document.getElementById('checkinSearch').focus();
+// ─── HISTORY ───────────────────────────────────────────────
+async function loadHist(){
+  document.getElementById('hist-list').innerHTML=loadingHTML();
+  try{
+    const d=await apiGet({action:'getHistory'});
+    histAll=(d.visitors||[]).reverse();
+    document.getElementById('hist-cnt').textContent=histAll.length;
+    renderHist(histAll);
+  }catch(e){ document.getElementById('hist-list').innerHTML=`<div class="alert a-err">Failed to load.</div>`; }
+}
+function renderHist(v){
+  document.getElementById('hist-list').innerHTML=v.length
+    ? v.map(x=>`<div class="vc"><div class="av">${initials(x.name)}</div><div class="vi"><div class="vn">${esc(x.name)}</div><div class="vd">${esc(x.host||'—')} · ${esc(x.purpose||'—')}</div><div class="vt">${fdate(x.checkInTime)} → ${ftime(x.checkoutTime)||'Still inside'}</div></div><button class="btn btn-sm btn-danger" onclick="openDel('${esc(x.id||x.row)}','${esc(x.name)}')">🗑️</button></div>`).join('')
+    : `<div class="empty"><div class="empty-icon">📋</div><h3>No History</h3></div>`;
+}
+function filterHist(q){
+  document.getElementById('histClear').classList.toggle('show',q.length>0);
+  if(!q){ document.getElementById('hist-cnt').textContent=histAll.length; renderHist(histAll); return; }
+  const f=histAll.filter(v=>(v.name&&v.name.toLowerCase().startsWith(q.toLowerCase()))||(v.host&&v.host.toLowerCase().startsWith(q.toLowerCase())));
+  document.getElementById('hist-cnt').textContent=f.length;
+  renderHist(f);
+}
+function clearHistSearch(){
+  document.getElementById('histSearch').value='';
+  document.getElementById('histClear').classList.remove('show');
+  document.getElementById('hist-cnt').textContent=histAll.length;
+  renderHist(histAll);
 }
 
-function clearCheckin() {
-  document.getElementById('checkinSearch').value = '';
-  document.getElementById('checkinList').innerHTML = '';
-  document.getElementById('checkinClear').classList.remove('visible');
+// ─── STAFF SCANNER ─────────────────────────────────────────
+function startStaffScan(){
+  document.getElementById('scan-vid-wrap').classList.remove('hidden');
+  document.getElementById('startScanBtn').classList.add('hidden');
+  startScan('qrv2',token=>handleQRCO(token,'scan-result').then(()=>{ document.getElementById('scan-vid-wrap').classList.add('hidden'); document.getElementById('startScanBtn').classList.remove('hidden'); }));
+}
+function stopStaffScan(){
+  stopScan('qrv2');
+  document.getElementById('scan-vid-wrap').classList.add('hidden');
+  document.getElementById('startScanBtn').classList.remove('hidden');
+}
+async function searchStaffCO(q){
+  document.getElementById('scanClear').classList.toggle('show',q.length>0);
+  if(q.length<2){ document.getElementById('scan-co-list').innerHTML=''; return; }
+  document.getElementById('scan-co-list').innerHTML=loadingHTML();
+  try{
+    const d=await apiGet({action:'search',query:q.trim(),status:'inside'});
+    renderCO(d.visitors||[],q.trim(),'scan-co-list','staffCO');
+  }catch(e){ document.getElementById('scan-co-list').innerHTML=`<div class="alert a-err">Search failed.</div>`; }
+}
+function clearScanSearch(){
+  document.getElementById('scanSearch').value='';
+  document.getElementById('scan-co-list').innerHTML='';
+  document.getElementById('scanClear').classList.remove('show');
 }
 
-// ============================================================
-// CHECKOUT (FIX #3: Empty by default, search to populate)
-// ============================================================
-async function searchCheckout(query) {
-  const clearBtn = document.getElementById('checkoutClear');
-  clearBtn.classList.toggle('visible', query.length > 0);
-
-  // FIX #3: Show empty state if no query
-  if (query.length < 2) {
-    document.getElementById('checkoutList').innerHTML = '';
-    return;
-  }
-
-  document.getElementById('checkoutList').innerHTML = `
-    <div class="empty-state" style="padding:24px">
-      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
-    </div>`;
-
-  try {
-    const data = await apiCall({ action: 'search', query: query.trim(), status: 'inside' });
-    renderCheckoutResults(data.visitors || [], query.trim(), 'checkoutList', 'doCheckout');
-  } catch(e) {
-    document.getElementById('checkoutList').innerHTML = `<div class="alert alert-error">Search failed. Check connection.</div>`;
-  }
+// ─── MANAGEMENT ────────────────────────────────────────────
+async function loadManage(){
+  try{
+    const d=await apiGet({action:'getConfig'});
+    const sl=d.staff||[], pl=d.purposes||[];
+    document.getElementById('mg-staff').innerHTML=sl.length
+      ? sl.map((s,i)=>`<div class="mi"><div><div class="mi-name">${esc(s.name)}</div>${s.dept?`<div class="mi-sub">${esc(s.dept)}</div>`:''}</div><button class="btn btn-sm btn-danger" onclick="delStaff(${i})">Remove</button></div>`).join('')
+      : '<p style="font-size:13px;color:var(--light);padding:10px 0">No staff added yet</p>';
+    document.getElementById('mg-purpose').innerHTML=pl.length
+      ? pl.map((p,i)=>`<div class="mi"><div class="mi-name">${esc(p)}</div><button class="btn btn-sm btn-danger" onclick="delPurpose(${i})">Remove</button></div>`).join('')
+      : '<p style="font-size:13px;color:var(--light);padding:10px 0">No purposes added yet</p>';
+  }catch(e){ toast('Failed to load settings','err'); }
+}
+function openModal(id){ document.getElementById(id).classList.add('on'); }
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+async function addStaff(){
+  const name=document.getElementById('nStaffName').value.trim();
+  const dept=document.getElementById('nStaffDept').value.trim();
+  if(!name){ toast('Enter a name','err'); return; }
+  try{
+    const r=await apiPost({action:'addStaff',name,dept});
+    if(r.success){ toast(name+' added ✓','ok'); closeModal('m-staff'); document.getElementById('nStaffName').value=''; document.getElementById('nStaffDept').value=''; loadManage(); }
+    else toast(r.message||'Failed','err');
+  }catch(e){ toast('Network error','err'); }
+}
+async function addPurpose(){
+  const p=document.getElementById('nPurpose').value.trim();
+  if(!p){ toast('Enter a purpose','err'); return; }
+  try{
+    const r=await apiPost({action:'addPurpose',purpose:p});
+    if(r.success){ toast(p+' added ✓','ok'); closeModal('m-purpose'); document.getElementById('nPurpose').value=''; loadManage(); }
+    else toast(r.message||'Failed','err');
+  }catch(e){ toast('Network error','err'); }
+}
+async function delStaff(i){
+  if(!confirm('Remove this staff member?')) return;
+  try{
+    const r=await apiPost({action:'deleteStaff',index:i});
+    r.success ? (toast('Removed ✓','ok'), loadManage()) : toast(r.message||'Failed','err');
+  }catch(e){ toast('Network error','err'); }
+}
+async function delPurpose(i){
+  if(!confirm('Remove this purpose?')) return;
+  try{
+    const r=await apiPost({action:'deletePurpose',index:i});
+    r.success ? (toast('Removed ✓','ok'), loadManage()) : toast(r.message||'Failed','err');
+  }catch(e){ toast('Network error','err'); }
 }
 
-function renderCheckoutResults(visitors, query, listId, checkoutFn) {
-  // FIX #1: startsWith filter
-  const filtered = visitors.filter(v =>
-    v.name && v.name.toLowerCase().startsWith(query.toLowerCase())
-  );
-
-  if (filtered.length === 0) {
-    document.getElementById(listId).innerHTML = `
-      <div class="empty-state" style="padding:24px">
-        <div class="empty-state-icon">✅</div>
-        <h3>No Match Found</h3>
-        <p>No visitor named "${escHtml(query)}" currently inside</p>
-      </div>`;
-    return;
-  }
-
-  document.getElementById(listId).innerHTML = filtered.map(v => `
-    <div class="visitor-card" style="cursor:pointer" onclick="${checkoutFn}('${v.id || v.row}', '${escHtml(v.name)}')">
-      <div class="visitor-avatar">${getInitials(v.name)}</div>
-      <div class="visitor-info">
-        <div class="visitor-name">${escHtml(v.name)}</div>
-        <div class="visitor-detail">Host: ${escHtml(v.host || '—')} · ${escHtml(v.purpose || '—')}</div>
-        <div class="visitor-detail" style="font-size:11px;color:var(--gray-400)">In: ${formatTime(v.checkInTime)}</div>
-      </div>
-      <div class="visitor-badge badge-in">CHECK OUT</div>
-    </div>
-  `).join('');
+// ─── DELETE RECORD ─────────────────────────────────────────
+function openDel(rowId,name){
+  delRowId=rowId;
+  document.getElementById('del-text').textContent=`Delete visit record for "${name}"? This cannot be undone.`;
+  openModal('m-del');
+}
+async function confirmDel(){
+  closeModal('m-del');
+  if(!delRowId) return;
+  try{
+    const r=await apiPost({action:'deleteVisit',rowId:delRowId});
+    r.success ? (toast('Deleted ✓','ok'), loadHist()) : toast(r.message||'Failed','err');
+  }catch(e){ toast('Network error','err'); }
 }
 
-async function doCheckout(id, name) {
-  if (!confirm(`Check out ${name}?`)) return;
-  showToast('Checking out ' + name + '...');
-  try {
-    const result = await apiPost({ action: 'checkout', visitorId: id, timestamp: new Date().toISOString() });
-    if (result.success) {
-      showToast(name + ' checked out ✓', 'success');
-      document.getElementById('checkoutSearch').value = '';
-      document.getElementById('checkoutList').innerHTML = '';
-      document.getElementById('checkoutClear').classList.remove('visible');
-      document.getElementById('checkoutResult').innerHTML = `
-        <div class="alert alert-success">✅ ${escHtml(name)} has been checked out at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.</div>`;
-    } else {
-      showToast(result.message || 'Checkout failed', 'error');
-    }
-  } catch(e) {
-    showToast('Network error. Please try again.', 'error');
-  }
-}
-
-function clearCheckout() {
-  document.getElementById('checkoutSearch').value = '';
-  document.getElementById('checkoutList').innerHTML = '';
-  document.getElementById('checkoutClear').classList.remove('visible');
-}
-
-// ============================================================
-// QR SCANNER (Reception)
-// ============================================================
-function toggleCheckoutScanner() {
-  const area = document.getElementById('checkoutScannerArea');
-  if (area.classList.contains('hidden')) {
-    area.classList.remove('hidden');
-    startScanner('qr-video', (token) => handleCheckoutQR(token));
-  } else {
-    area.classList.add('hidden');
-    stopScanner();
-  }
-}
-
-async function handleCheckoutQR(token) {
-  stopScanner();
-  document.getElementById('checkoutScannerArea').classList.add('hidden');
-  document.getElementById('checkoutResult').innerHTML = `
-    <div class="empty-state" style="padding:24px">
-      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
-      <p style="margin-top:12px;color:var(--gray-400)">Looking up token ${token}...</p>
-    </div>`;
-  try {
-    const data = await apiCall({ action: 'lookupToken', token });
-    if (data.visitor) {
-      const v = data.visitor;
-      document.getElementById('checkoutResult').innerHTML = `
-        <div class="visitor-card">
-          <div class="visitor-avatar">${getInitials(v.name)}</div>
-          <div class="visitor-info">
-            <div class="visitor-name">${escHtml(v.name)}</div>
-            <div class="visitor-detail">Host: ${escHtml(v.host || '—')}</div>
-            <div class="visitor-detail">In: ${formatTime(v.checkInTime)}</div>
-          </div>
-          <span class="visitor-badge badge-in">INSIDE</span>
-        </div>
-        <button class="btn btn-primary" onclick="doCheckout('${v.id || v.row}', '${escHtml(v.name)}')">
-          🚪 Check Out ${escHtml(v.name)}
-        </button>`;
-    } else {
-      document.getElementById('checkoutResult').innerHTML = `
-        <div class="alert alert-error">❌ Token not found or visitor already checked out.</div>`;
-    }
-  } catch(e) {
-    document.getElementById('checkoutResult').innerHTML = `<div class="alert alert-error">Network error.</div>`;
-  }
-}
-
-// ============================================================
-// STAFF: DASHBOARD
-// ============================================================
-async function loadDashboard() {
-  document.getElementById('stat-today').innerHTML = '<span class="loading"><span></span><span></span><span></span></span>';
-
-  try {
-    const data = await apiCall({ action: 'getStats' });
-    document.getElementById('stat-today').textContent = data.today ?? '—';
-    document.getElementById('stat-inside').textContent = data.inside ?? '—';
-    document.getElementById('stat-week').textContent = data.week ?? '—';
-    document.getElementById('stat-month').textContent = data.month ?? '—';
-    document.getElementById('stat-total').textContent = data.total ?? '—';
-    if (data.archived) {
-      document.getElementById('stat-archived').textContent = data.archived + ' archived (30+ days)';
-    }
-
-    if (data.currentVisitors && data.currentVisitors.length > 0) {
-      document.getElementById('dashboard-current').innerHTML = data.currentVisitors.map(v => `
-        <div class="visitor-card">
-          <div class="visitor-avatar">${getInitials(v.name)}</div>
-          <div class="visitor-info">
-            <div class="visitor-name">${escHtml(v.name)}</div>
-            <div class="visitor-detail">${escHtml(v.host || '')} · ${escHtml(v.purpose || '')}</div>
-            <div class="visitor-detail" style="font-size:11px;color:var(--gray-400)">In: ${formatTime(v.checkInTime)}</div>
-          </div>
-          <span class="visitor-badge badge-in">IN</span>
-        </div>
-      `).join('');
-    } else {
-      document.getElementById('dashboard-current').innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">🏢</div>
-          <h3>No Visitors Inside</h3>
-          <p>All clear!</p>
-        </div>`;
-    }
-  } catch(e) {
-    document.getElementById('stat-today').textContent = '—';
-    showToast('Could not load dashboard data', 'error');
-  }
-}
-
-// ============================================================
-// STAFF: CURRENT VISITORS
-// ============================================================
-async function loadCurrentVisitors() {
-  document.getElementById('current-visitors-list').innerHTML = `
-    <div class="empty-state" style="padding:32px">
-      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
-    </div>`;
-
-  try {
-    const data = await apiCall({ action: 'getCurrentVisitors' });
-    const visitors = (data.visitors || []).reverse(); // FIX #5: newest first
-    document.getElementById('current-count').textContent = visitors.length;
-
-    if (visitors.length === 0) {
-      document.getElementById('current-visitors-list').innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">✅</div>
-          <h3>No Visitors Inside</h3>
-          <p>Currently no visitors checked in</p>
-        </div>`;
-      return;
-    }
-
-    document.getElementById('current-visitors-list').innerHTML = visitors.map(v => `
-      <div class="visitor-card">
-        <div class="visitor-avatar">${getInitials(v.name)}</div>
-        <div class="visitor-info">
-          <div class="visitor-name">${escHtml(v.name)}</div>
-          <div class="visitor-detail">Host: ${escHtml(v.host || '—')} · ${escHtml(v.purpose || '—')}</div>
-          <div class="visitor-detail">${escHtml(v.company || '')}</div>
-          <div class="visitor-detail" style="font-size:11px;color:var(--gray-400)">In: ${formatTime(v.checkInTime)}</div>
-        </div>
-        <button class="btn btn-sm btn-secondary" onclick="staffCheckoutDirect('${v.id || v.row}','${escHtml(v.name)}')">Out</button>
-      </div>
-    `).join('');
-  } catch(e) {
-    document.getElementById('current-visitors-list').innerHTML = `<div class="alert alert-error">Failed to load visitors.</div>`;
-  }
-}
-
-async function staffCheckoutDirect(id, name) {
-  if (!confirm(`Check out ${name}?`)) return;
-  try {
-    const result = await apiPost({ action: 'checkout', visitorId: id, timestamp: new Date().toISOString() });
-    if (result.success) {
-      showToast(name + ' checked out ✓', 'success');
-      loadCurrentVisitors();
-    } else {
-      showToast(result.message || 'Failed', 'error');
-    }
-  } catch(e) {
-    showToast('Network error', 'error');
-  }
-}
-
-// ============================================================
-// STAFF: HISTORY
-// ============================================================
-async function loadHistory() {
-  document.getElementById('history-list').innerHTML = `
-    <div class="empty-state" style="padding:32px">
-      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
-    </div>`;
-
-  try {
-    const data = await apiCall({ action: 'getHistory' });
-    historyData = (data.visitors || []).reverse(); // FIX #5: newest first
-    document.getElementById('history-count').textContent = historyData.length;
-    renderHistory(historyData);
-  } catch(e) {
-    document.getElementById('history-list').innerHTML = `<div class="alert alert-error">Failed to load history.</div>`;
-  }
-}
-
-function renderHistory(visitors) {
-  if (visitors.length === 0) {
-    document.getElementById('history-list').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">📋</div>
-        <h3>No History</h3>
-        <p>No visits recorded yet</p>
-      </div>`;
-    return;
-  }
-
-  document.getElementById('history-list').innerHTML = visitors.map(v => `
-    <div class="visitor-card">
-      <div class="visitor-avatar" style="background:var(--gray-200);color:var(--gray-600)">${getInitials(v.name)}</div>
-      <div class="visitor-info">
-        <div class="visitor-name">${escHtml(v.name)}</div>
-        <div class="visitor-detail">${escHtml(v.host || '—')} · ${escHtml(v.purpose || '—')}</div>
-        <div class="visitor-detail" style="font-size:11px;color:var(--gray-400)">${formatDate(v.checkInTime)} — ${formatTime(v.checkoutTime)}</div>
-      </div>
-      <button class="btn btn-sm btn-danger" onclick="openDeleteModal('${v.id || v.row}','${escHtml(v.name)}')">🗑️</button>
-    </div>
-  `).join('');
-}
-
-function filterHistory(query) {
-  const clearBtn = document.getElementById('historyClear');
-  clearBtn.classList.toggle('visible', query.length > 0);
-
-  if (!query) { renderHistory(historyData); return; }
-  const filtered = historyData.filter(v =>
-    v.name && v.name.toLowerCase().startsWith(query.toLowerCase()) ||
-    v.host && v.host.toLowerCase().startsWith(query.toLowerCase())
-  );
-  document.getElementById('history-count').textContent = filtered.length;
-  renderHistory(filtered);
-}
-
-function clearHistorySearch() {
-  document.getElementById('historySearch').value = '';
-  document.getElementById('historyClear').classList.remove('visible');
-  document.getElementById('history-count').textContent = historyData.length;
-  renderHistory(historyData);
-}
-
-// ============================================================
-// STAFF SCANNER
-// ============================================================
-function startStaffScanner() {
-  document.getElementById('qr-staff-video-container').classList.remove('hidden');
-  document.getElementById('startStaffScanBtn').classList.add('hidden');
-  startScanner('qr-video2', async (token) => {
-    stopStaffScanner();
-    document.getElementById('staff-scan-result').innerHTML = `
-      <div class="empty-state" style="padding:24px">
-        <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
-      </div>`;
-    try {
-      const data = await apiCall({ action: 'lookupToken', token });
-      if (data.visitor) {
-        const v = data.visitor;
-        document.getElementById('staff-scan-result').innerHTML = `
-          <div class="visitor-card">
-            <div class="visitor-avatar">${getInitials(v.name)}</div>
-            <div class="visitor-info">
-              <div class="visitor-name">${escHtml(v.name)}</div>
-              <div class="visitor-detail">Host: ${escHtml(v.host || '—')}</div>
-            </div>
-            <span class="visitor-badge badge-in">INSIDE</span>
-          </div>
-          <button class="btn btn-primary" onclick="staffCheckoutDirect('${v.id || v.row}','${escHtml(v.name)}')">
-            🚪 Check Out ${escHtml(v.name)}
-          </button>`;
-      } else {
-        document.getElementById('staff-scan-result').innerHTML = `<div class="alert alert-error">Token not found.</div>`;
-      }
-    } catch(e) {
-      document.getElementById('staff-scan-result').innerHTML = `<div class="alert alert-error">Network error.</div>`;
-    }
-  });
-}
-
-function stopStaffScanner() {
-  stopScanner('qr-video2');
-  const vc = document.getElementById('qr-staff-video-container');
-  if (vc) vc.classList.add('hidden');
-  const btn = document.getElementById('startStaffScanBtn');
-  if (btn) btn.classList.remove('hidden');
-}
-
-// ============================================================
-// STAFF CHECKOUT SEARCH
-// ============================================================
-async function searchStaffCheckout(query) {
-  const clearBtn = document.getElementById('staffCheckoutClear');
-  clearBtn.classList.toggle('visible', query.length > 0);
-
-  if (query.length < 2) {
-    document.getElementById('staff-checkout-list').innerHTML = '';
-    return;
-  }
-
-  document.getElementById('staff-checkout-list').innerHTML = `
-    <div class="empty-state" style="padding:24px">
-      <div class="loading" style="color:var(--navy)"><span></span><span></span><span></span></div>
-    </div>`;
-
-  try {
-    const data = await apiCall({ action: 'search', query: query.trim(), status: 'inside' });
-    renderCheckoutResults(data.visitors || [], query.trim(), 'staff-checkout-list', 'staffCheckoutDirect');
-  } catch(e) {
-    document.getElementById('staff-checkout-list').innerHTML = `<div class="alert alert-error">Search failed.</div>`;
-  }
-}
-
-function clearStaffCheckout() {
-  document.getElementById('staffCheckoutSearch').value = '';
-  document.getElementById('staff-checkout-list').innerHTML = '';
-  document.getElementById('staffCheckoutClear').classList.remove('visible');
-}
-
-// ============================================================
-// MANAGEMENT
-// ============================================================
-async function loadManagement() {
-  try {
-    const data = await apiCall({ action: 'getConfig' });
-    staffList = data.staff || [];
-    purposeList = data.purposes || [];
-
-    document.getElementById('staff-list-mgmt').innerHTML = staffList.length === 0
-      ? '<p style="font-size:14px;color:var(--gray-400);padding:12px 0">No staff added yet</p>'
-      : staffList.map((s, i) => `
-          <div class="mgmt-item">
-            <div>
-              <div class="mgmt-item-text">${escHtml(s.name)}</div>
-              ${s.dept ? `<div class="mgmt-item-sub">${escHtml(s.dept)}</div>` : ''}
-            </div>
-            <button class="btn btn-sm btn-danger" onclick="deleteStaff(${i})">Remove</button>
-          </div>`).join('');
-
-    document.getElementById('purpose-list-mgmt').innerHTML = purposeList.length === 0
-      ? '<p style="font-size:14px;color:var(--gray-400);padding:12px 0">No purposes added yet</p>'
-      : purposeList.map((p, i) => `
-          <div class="mgmt-item">
-            <div class="mgmt-item-text">${escHtml(p)}</div>
-            <button class="btn btn-sm btn-danger" onclick="deletePurpose(${i})">Remove</button>
-          </div>`).join('');
-  } catch(e) {
-    showToast('Failed to load settings', 'error');
-  }
-}
-
-function openAddStaffModal() { document.getElementById('modal-add-staff').classList.add('active'); document.getElementById('newStaffName').focus(); }
-function openAddPurposeModal() { document.getElementById('modal-add-purpose').classList.add('active'); document.getElementById('newPurposeName').focus(); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-async function addStaff() {
-  const name = document.getElementById('newStaffName').value.trim();
-  const dept = document.getElementById('newStaffDept').value.trim();
-  if (!name) { showToast('Enter a name', 'error'); return; }
-
-  try {
-    const result = await apiPost({ action: 'addStaff', name, dept });
-    if (result.success) {
-      showToast(name + ' added ✓', 'success');
-      closeModal('modal-add-staff');
-      document.getElementById('newStaffName').value = '';
-      document.getElementById('newStaffDept').value = '';
-      loadManagement();
-    } else { showToast(result.message || 'Failed', 'error'); }
-  } catch(e) { showToast('Network error', 'error'); }
-}
-
-async function addPurpose() {
-  const name = document.getElementById('newPurposeName').value.trim();
-  if (!name) { showToast('Enter a purpose', 'error'); return; }
-  try {
-    const result = await apiPost({ action: 'addPurpose', purpose: name });
-    if (result.success) {
-      showToast(name + ' added ✓', 'success');
-      closeModal('modal-add-purpose');
-      document.getElementById('newPurposeName').value = '';
-      loadManagement();
-    } else { showToast(result.message || 'Failed', 'error'); }
-  } catch(e) { showToast('Network error', 'error'); }
-}
-
-async function deleteStaff(index) {
-  if (!confirm('Remove this staff member?')) return;
-  try {
-    const result = await apiPost({ action: 'deleteStaff', index });
-    if (result.success) { showToast('Removed ✓', 'success'); loadManagement(); }
-    else { showToast(result.message || 'Failed', 'error'); }
-  } catch(e) { showToast('Network error', 'error'); }
-}
-
-async function deletePurpose(index) {
-  if (!confirm('Remove this purpose?')) return;
-  try {
-    const result = await apiPost({ action: 'deletePurpose', index });
-    if (result.success) { showToast('Removed ✓', 'success'); loadManagement(); }
-    else { showToast(result.message || 'Failed', 'error'); }
-  } catch(e) { showToast('Network error', 'error'); }
-}
-
-// ============================================================
-// DELETE VISIT RECORD
-// ============================================================
-function openDeleteModal(rowId, name) {
-  deleteRowId = rowId;
-  document.getElementById('delete-confirm-text').textContent = `Delete visit record for "${name}"? This cannot be undone.`;
-  document.getElementById('modal-delete-confirm').classList.add('active');
-}
-
-async function confirmDelete() {
-  closeModal('modal-delete-confirm');
-  if (!deleteRowId) return;
-  try {
-    const result = await apiPost({ action: 'deleteVisit', rowId: deleteRowId });
-    if (result.success) {
-      showToast('Record deleted ✓', 'success');
-      loadHistory();
-    } else { showToast(result.message || 'Delete failed', 'error'); }
-  } catch(e) { showToast('Network error', 'error'); }
-}
-
-// ============================================================
-// EXPORT
-// ============================================================
-async function exportData() {
-  showToast('Preparing export...');
-  try {
-    const data = await apiCall({ action: 'getAll' });
-    const visitors = data.visitors || [];
-    const headers = ['Name', 'Company', 'Phone', 'Purpose', 'Host', 'Check In', 'Check Out', 'Token', 'Notes'];
-    const rows = visitors.map(v => [
-      v.name, v.company, v.phone, v.purpose, v.host,
-      v.checkInTime, v.checkoutTime, v.token, v.notes
-    ].map(f => `"${(f || '').toString().replace(/"/g, '""')}"`));
-
-    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'PPC_Visitors_' + new Date().toISOString().slice(0,10) + '.csv';
+// ─── EXPORT ────────────────────────────────────────────────
+async function exportCSV(){
+  toast('Preparing export…');
+  try{
+    const d=await apiGet({action:'getAll'});
+    const hdr=['Name','Company','Phone','Purpose','Host','Check In','Check Out','Token','Notes'];
+    const rows=(d.visitors||[]).map(v=>[v.name,v.company,v.phone,v.purpose,v.host,v.checkInTime,v.checkoutTime,v.token,v.notes].map(f=>`"${String(f||'').replace(/"/g,'""')}"`));
+    const csv=[hdr.join(','),...rows.map(r=>r.join(','))].join('\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download='PPC_Visitors_'+new Date().toISOString().slice(0,10)+'.csv';
     a.click();
-    showToast('Export ready ✓', 'success');
-  } catch(e) {
-    showToast('Export failed', 'error');
-  }
+    toast('Export ready ✓','ok');
+  }catch(e){ toast('Export failed','err'); }
 }
 
-// ============================================================
-// QR SCANNER ENGINE
-// ============================================================
-let scanStreams = {};
-
-async function startScanner(videoId, callback) {
-  const video = document.getElementById(videoId);
-  if (!video) return;
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    scanStreams[videoId] = { stream, interval: null };
-    video.srcObject = stream;
-    video.play();
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    const interval = setInterval(() => {
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvas.height = video.videoHeight;
-        canvas.width = video.videoWidth;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
-        if (code && code.data) {
-          clearInterval(interval);
-          callback(code.data);
-        }
+// ─── QR SCANNER ENGINE ─────────────────────────────────────
+async function startScan(videoId,cb){
+  const video=document.getElementById(videoId);
+  if(!video) return;
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    scanStreams[videoId]={stream};
+    video.srcObject=stream; video.play();
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d');
+    const interval=setInterval(()=>{
+      if(video.readyState===video.HAVE_ENOUGH_DATA){
+        canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+        ctx.drawImage(video,0,0);
+        const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+        const code=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
+        if(code&&code.data){ clearInterval(interval); scanStreams[videoId].interval=null; cb(code.data); }
       }
-    }, 300);
-    scanStreams[videoId].interval = interval;
-  } catch(e) {
-    showToast('Camera access denied. Please allow camera permission.', 'error');
-  }
+    },250);
+    scanStreams[videoId].interval=interval;
+  }catch(e){ toast('Camera access denied. Enable camera permission.','err'); }
+}
+function stopScan(id){
+  if(!scanStreams[id]) return;
+  if(scanStreams[id].interval) clearInterval(scanStreams[id].interval);
+  if(scanStreams[id].stream) scanStreams[id].stream.getTracks().forEach(t=>t.stop());
+  const v=document.getElementById(id);
+  if(v) v.srcObject=null;
+  delete scanStreams[id];
+}
+function stopAllScan(){ ['qrv1','qrv2'].forEach(stopScan); }
+
+// ─── TOAST ─────────────────────────────────────────────────
+let toastT;
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show'+(type?' '+type:'');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>el.className='toast',3200);
 }
 
-function stopScanner(videoId) {
-  if (videoId) {
-    if (scanStreams[videoId]) {
-      clearInterval(scanStreams[videoId].interval);
-      if (scanStreams[videoId].stream) {
-        scanStreams[videoId].stream.getTracks().forEach(t => t.stop());
-      }
-      delete scanStreams[videoId];
-    }
-    const video = document.getElementById(videoId);
-    if (video) { video.srcObject = null; }
-  } else {
-    // Stop all
-    stopScanner('qr-video');
-    stopScanner('qr-video2');
-  }
-}
+// ─── HELPERS ───────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function g(id){ return document.getElementById(id).value; }
+function gv(id){ return document.getElementById(id).value; }
+function initials(n){ return String(n||'').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?'; }
+function mkToken(name){ const i=name.replace(/[^a-zA-Z ]/g,'').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,3); return i+(Math.floor(1000+Math.random()*9000)); }
+function ftime(ts){ if(!ts) return '—'; try{ return new Date(ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ts; } }
+function fdate(ts){ if(!ts) return '—'; try{ return new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){ return ts; } }
+function loadingHTML(msg=''){ return `<div class="empty" style="padding:28px"><div class="dots" style="color:var(--red)"><span></span><span></span><span></span></div>${msg?`<p style="margin-top:10px;color:var(--mid);font-size:13px">${msg}</p>`:''}</div>`; }
+function showAlert(id,cls,msg){ document.getElementById(id).innerHTML=`<div class="alert ${cls}">${msg}</div>`; }
 
-function stopAllScanners() { stopScanner(); }
+// ─── MODAL CLOSE ON BACKDROP ───────────────────────────────
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on')}));
 
-// ============================================================
-// TOAST
-// ============================================================
-let toastTimer;
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
-}
-
-// ============================================================
-// HELPERS
-// ============================================================
-function escHtml(str) {
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-function getInitials(name) {
-  return String(name || '').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0,2) || '?';
-}
-
-function formatTime(ts) {
-  if (!ts) return '—';
-  try {
-    return new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-  } catch(e) { return ts; }
-}
-
-function formatDate(ts) {
-  if (!ts) return '—';
-  try {
-    return new Date(ts).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch(e) { return ts; }
-}
-
-// Close modals on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.classList.remove('active');
-  });
-});
-
-// Service Worker registration
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js').catch(() => {});
-}
-
+// ─── SERVICE WORKER ────────────────────────────────────────
+if('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(()=>{});
 </script>
 </body>
 </html>
