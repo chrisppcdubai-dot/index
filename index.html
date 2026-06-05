@@ -1,1332 +1,1252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#C0181A">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="PPC Visitors">
-<link rel="manifest" href="manifest.json">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PPC Visitor Management</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
-/* ─── BRAND COLOURS (from logo) ─────────────────────────────
-   Primary Red  : #C0181A
-   Deep Red     : #8B0000
-   Black        : #111111
-   Off-white    : #F8F5F0
-   Mid-grey     : #6B6B6B
-   Light border : #E5E0D8
-──────────────────────────────────────────────────────────── */
 :root{
-  --red:       #C0181A;
-  --red-dark:  #8B0000;
-  --red-light: #FDECEA;
-  --red-mid:   #E8D0D0;
-  --black:     #111111;
-  --charcoal:  #2A2A2A;
-  --off-white: #F8F5F0;
-  --cream:     #F2EDE6;
-  --border:    #E5E0D8;
-  --mid:       #6B6B6B;
-  --light:     #9E9E9E;
-  --green:     #1B7A3E;
-  --green-bg:  #E8F5EE;
-  --shadow:    0 2px 12px rgba(17,17,17,.08);
-  --shadow-lg: 0 8px 32px rgba(17,17,17,.14);
-  --r:         10px;
-  --r-sm:      6px;
-  --r-lg:      16px;
-  --font:      'DM Sans', sans-serif;
-  --font-head: 'Playfair Display', serif;
-  --font-mono: 'DM Mono', monospace;
+  --bg:#0a0a0a;
+  --bg2:#111111;
+  --bg3:#1a1a1a;
+  --bg4:#222222;
+  --green:#00e676;
+  --green2:#00c853;
+  --red:#ff4444;
+  --orange:#ffaa00;
+  --blue:#2979ff;
+  --text:#f0f0f0;
+  --text2:#aaaaaa;
+  --text3:#666666;
+  --border:#2a2a2a;
+  --border2:#333333;
+  --card-radius:14px;
+  --radius:8px;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
-body{font-family:var(--font);background:var(--off-white);color:var(--black);font-size:15px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-decoration:none}
+button{font-family:var(--font);cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:var(--font);outline:none}
 
 /* ── SCREENS ── */
-.screen{display:none;height:100dvh;flex-direction:column;overflow:hidden}
-.screen.active{display:flex}
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
 
-/* ══════════════════════════════════════════════
-   ROLE SELECTION
-══════════════════════════════════════════════ */
-#s-role{
-  background:var(--black);
-  align-items:center;justify-content:center;
-  padding:32px 24px;
-  position:relative;overflow:hidden;
-}
-#s-role::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 60% 50% at 30% 20%,rgba(192,24,26,.18) 0%,transparent 70%),
-    radial-gradient(ellipse 50% 40% at 80% 80%,rgba(192,24,26,.12) 0%,transparent 70%);
-  pointer-events:none;
-}
-/* subtle circle pattern */
-#s-role::after{
-  content:'';position:absolute;
-  width:600px;height:600px;
-  border-radius:50%;
-  border:1px solid rgba(192,24,26,.1);
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  pointer-events:none;
-}
+/* ── ROLE SELECT ── */
+#screen-role{align-items:center;justify-content:center;background:var(--bg);padding:24px}
+.role-wrap{width:100%;max-width:520px;text-align:center}
+.role-logo{width:64px;height:64px;background:var(--green);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+.role-title{font-size:26px;font-weight:600;color:var(--text);letter-spacing:-0.5px}
+.role-sub{font-size:14px;color:var(--text2);margin-top:6px;margin-bottom:40px}
+.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.role-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--card-radius);padding:32px 20px;cursor:pointer;transition:all .2s;text-align:center}
+.role-card:hover{border-color:var(--green);background:var(--bg3);transform:translateY(-2px)}
+.role-card .rc-icon{font-size:36px;margin-bottom:12px}
+.role-card .rc-label{font-size:16px;font-weight:600;color:var(--text)}
+.role-card .rc-sub{font-size:12px;color:var(--text2);margin-top:4px}
 
-.role-hero{text-align:center;margin-bottom:48px;position:relative;z-index:1;animation:fadeDown .7s ease both}
-/* ── PPC LOGO REPLICA ── */
-.logo-seal{
-  width:96px;height:96px;border-radius:50%;
-  background:white;
-  border:3px solid var(--red);
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 20px;
-  box-shadow:0 0 0 6px rgba(192,24,26,.15), var(--shadow-lg);
-  position:relative;
-}
-.logo-seal::before{
-  content:'';position:absolute;inset:5px;
-  border-radius:50%;border:1.5px solid var(--red);
-  opacity:.4;
-}
-.logo-text-mark{
-  font-family:var(--font-head);
-  font-size:26px;font-weight:800;
-  color:var(--black);
-  letter-spacing:-1px;
-  line-height:1;
-  text-align:center;
-}
-.logo-text-mark .big-p{font-size:30px;color:var(--red)}
-.role-hero h1{font-family:var(--font-head);font-size:26px;color:white;font-weight:700;letter-spacing:.3px}
-.role-hero p{font-size:12px;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+/* ── TOP BAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-logo{width:30px;height:30px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#000;font-weight:700}
+.topbar-title{font-size:14px;font-weight:600;color:var(--text)}
+.topbar-sub{font-size:11px;color:var(--text2)}
+.btn-back{background:transparent;border:1px solid var(--border2);color:var(--text2);border-radius:6px;padding:6px 14px;font-size:13px;transition:all .15s}
+.btn-back:hover{border-color:var(--green);color:var(--green)}
 
-.role-cards{width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1;animation:fadeUp .7s .15s ease both}
-.role-card{
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:var(--r-lg);
-  padding:20px 20px 20px 16px;
-  cursor:pointer;
-  display:flex;align-items:center;gap:16px;
-  transition:all .25s;
-  backdrop-filter:blur(8px);
-}
-.role-card:hover,.role-card:active{
-  background:rgba(192,24,26,.15);
-  border-color:rgba(192,24,26,.5);
-  transform:translateY(-2px);
-  box-shadow:0 8px 24px rgba(192,24,26,.2);
-}
-.role-icon{
-  width:48px;height:48px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;flex-shrink:0;
-}
-.role-icon.rec{background:rgba(192,24,26,.2);border:1px solid rgba(192,24,26,.35)}
-.role-icon.staff{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
-.role-text h3{color:white;font-size:16px;font-weight:600}
-.role-text p{color:rgba(255,255,255,.5);font-size:12px;margin-top:2px}
-.role-arrow{margin-left:auto;color:rgba(255,255,255,.25);font-size:20px;flex-shrink:0}
+/* ── TABS ── */
+.tabs{display:flex;overflow-x:auto;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;gap:0;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-size:13px;font-weight:500;padding:14px 16px;white-space:nowrap;cursor:pointer;transition:all .15s}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-btn:hover:not(.active){color:var(--text)}
 
-/* ══════════════════════════════════════════════
-   PASSWORD
-══════════════════════════════════════════════ */
-#s-pass{background:var(--black);align-items:center;justify-content:center;padding:32px}
-.pass-box{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:20px;
-  padding:36px 28px;
-  width:100%;max-width:340px;
-  text-align:center;backdrop-filter:blur(8px);
-}
-.pass-box .seal-sm{
-  width:64px;height:64px;border-radius:50%;
-  background:white;border:2px solid var(--red);
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 20px;font-size:28px;
-}
-.pass-box h2{color:white;font-size:20px;font-weight:600;margin-bottom:6px}
-.pass-box p{color:rgba(255,255,255,.45);font-size:13px;margin-bottom:24px}
-.pass-input{
-  width:100%;padding:13px;
-  background:rgba(255,255,255,.07);
-  border:1.5px solid rgba(255,255,255,.15);
-  border-radius:var(--r-sm);
-  color:white;font-size:18px;font-family:var(--font-mono);
-  text-align:center;letter-spacing:4px;outline:none;
-  transition:border-color .2s;margin-bottom:14px;
-}
-.pass-input::placeholder{letter-spacing:0;font-family:var(--font);font-size:14px;color:rgba(255,255,255,.3)}
-.pass-input:focus{border-color:var(--red)}
-.pass-err{color:#FF8080;font-size:13px;margin-top:10px;display:none}
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:20px;max-width:680px;width:100%;margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
-/* ══════════════════════════════════════════════
-   TOPBAR
-══════════════════════════════════════════════ */
-.topbar{
-  background:var(--black);color:white;
-  height:54px;padding:0 14px;
-  display:flex;align-items:center;gap:10px;
-  flex-shrink:0;position:relative;z-index:10;
-}
-.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--red)}
-.tb-back{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;font-size:18px;flex-shrink:0}
-.tb-back:hover{background:rgba(255,255,255,.1)}
-.tb-logo{
-  width:30px;height:30px;border-radius:50%;background:white;
-  border:1.5px solid var(--red);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.tb-logo span{font-family:var(--font-head);font-size:9px;font-weight:800;color:var(--black);letter-spacing:-.5px}
-.tb-title{font-size:16px;font-weight:600;flex:1}
-.tb-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:1px;letter-spacing:.5px}
-.tb-badge{
-  background:var(--red);color:white;
-  font-size:10px;font-weight:600;
-  padding:3px 8px;border-radius:20px;
-  letter-spacing:.5px;flex-shrink:0;
-}
+/* ── FORM ── */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;padding:11px 14px;transition:border .15s}
+.form-input:focus{border-color:var(--green)}
+.form-input::placeholder{color:var(--text3)}
+select.form-input option{background:var(--bg3)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}}
 
-/* ══════════════════════════════════════════════
-   BOTTOM NAV
-══════════════════════════════════════════════ */
-.bnav{
-  position:fixed;bottom:0;left:0;right:0;
-  background:white;border-top:1px solid var(--border);
-  display:flex;z-index:100;
-  box-shadow:0 -4px 20px rgba(17,17,17,.07);
-  padding-bottom:env(safe-area-inset-bottom);
-}
-.nb{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:9px 4px 7px;cursor:pointer;
-  border:none;background:none;position:relative;gap:2px;
-  transition:all .2s;
-}
-.nb .ni{font-size:19px;transition:transform .2s}
-.nb .nl{font-size:10px;font-weight:500;color:var(--light);font-family:var(--font);transition:color .2s}
-.nb.on .nl{color:var(--red)}
-.nb.on .ni{transform:translateY(-1px)}
-.nb.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--red);border-radius:0 0 4px 4px}
+/* ── BUTTONS ── */
+.btn-primary{width:100%;background:var(--green);color:#000;font-size:14px;font-weight:600;padding:13px;border-radius:var(--radius);transition:all .15s;margin-top:4px}
+.btn-primary:hover{background:var(--green2);transform:translateY(-1px)}
+.btn-primary:disabled{background:var(--bg4);color:var(--text3);transform:none;cursor:not-allowed}
+.btn-secondary{background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:13px;padding:9px 16px;border-radius:var(--radius);transition:all .15s}
+.btn-secondary:hover{border-color:var(--green);color:var(--green)}
+.btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);font-size:12px;padding:5px 12px;border-radius:6px;transition:all .15s}
+.btn-danger:hover{background:var(--red);color:#fff}
 
-/* ══════════════════════════════════════════════
-   CONTENT SCROLL AREA
-══════════════════════════════════════════════ */
-.content{
-  flex:1;overflow-y:auto;padding:16px;
-  padding-bottom:calc(68px + env(safe-area-inset-bottom));
-  -ms-overflow-style:none;scrollbar-width:none;
-}
-.content::-webkit-scrollbar{display:none}
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-radius);padding:18px;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
 
-/* ══════════════════════════════════════════════
-   CARDS
-══════════════════════════════════════════════ */
-.card{
-  background:white;border-radius:var(--r);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  padding:16px;margin-bottom:12px;
-}
-.card-title{
-  font-size:11px;font-weight:600;color:var(--mid);
-  text-transform:uppercase;letter-spacing:1px;
-  margin-bottom:14px;display:flex;align-items:center;gap:6px;
-}
-.card-title::before{content:'';width:3px;height:12px;background:var(--red);border-radius:2px}
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-radius);padding:18px}
+.stat-val{font-size:32px;font-weight:600;color:var(--green);font-family:var(--mono)}
+.stat-lbl{font-size:12px;color:var(--text2);margin-top:4px}
 
-/* ══════════════════════════════════════════════
-   FORMS
-══════════════════════════════════════════════ */
-.fg{margin-bottom:14px}
-.lbl{display:block;font-size:12px;font-weight:600;color:var(--charcoal);margin-bottom:5px;letter-spacing:.2px}
-.lbl .req{color:var(--red);margin-left:2px}
-.inp,.sel{
-  width:100%;padding:11px 13px;
-  border:1.5px solid var(--border);border-radius:var(--r-sm);
-  font-size:15px;font-family:var(--font);color:var(--black);
-  background:white;outline:none;transition:border-color .2s,box-shadow .2s;
-  -webkit-appearance:none;appearance:none;
+/* ── VISITOR CARDS ── */
+.visitor-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-radius);padding:16px;margin-bottom:10px;border-left:3px solid var(--green)}
+.visitor-card.out{border-left-color:var(--text3);opacity:.75}
+.visitor-card.archived{border-left-color:var(--orange)}
+.vc-name{font-size:16px;font-weight:600;color:var(--text)}
+.vc-meta{font-size:12px;color:var(--text2);margin-top:3px}
+.vc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.badge-in{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.badge-out{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border2)}
+.badge-arch{background:rgba(255,170,0,.12);color:var(--orange);border:1px solid rgba(255,170,0,.25)}
+
+/* ── LOGIN ── */
+#screen-login{align-items:center;justify-content:center;background:var(--bg);padding:24px;min-height:100vh}
+.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--card-radius);padding:36px 32px;width:100%;max-width:380px}
+.login-title{font-size:20px;font-weight:600;color:var(--text);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:28px}
+
+/* ── BADGE MODAL ── */
+#badge-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
+#badge-modal.open{display:flex}
+.modal-inner{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--card-radius);width:100%;max-width:440px;overflow:hidden}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:15px;font-weight:600}
+.modal-close{background:transparent;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1}
+.modal-body{padding:20px}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap}
+
+/* ── BADGE PRINT ── */
+#badge-print{background:#fff;color:#111;border-radius:10px;padding:18px 20px;font-family:'DM Sans',sans-serif;position:relative;overflow:hidden}
+.badge-header{font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.badge-datetime{font-size:11px;color:#666;margin-bottom:10px}
+.badge-name{font-size:22px;font-weight:700;color:#111;letter-spacing:-.3px;line-height:1.1;margin-bottom:2px}
+.badge-company{font-size:13px;color:#444;margin-bottom:6px}
+.badge-host{font-size:12px;color:#666;margin-bottom:10px}
+.badge-divider{height:1px;background:#e0e0e0;margin-bottom:10px}
+.badge-footer-company{font-size:11px;font-weight:600;color:#333;margin-bottom:10px}
+.badge-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.badge-footer-text{font-size:10px;color:#888;line-height:1.5;max-width:200px}
+.badge-vid{font-size:9px;color:#bbb;margin-top:6px;font-family:monospace}
+#badge-qr canvas,#badge-qr img{display:block}
+
+/* ── QR SCANNER ── */
+.scanner-wrap{position:relative;background:#000;border-radius:var(--radius);overflow:hidden;aspect-ratio:4/3;max-height:280px}
+#scanner-video,#scanner-video2{width:100%;height:100%;object-fit:cover}
+.scanner-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.scanner-box{width:160px;height:160px;border:2px solid var(--green);border-radius:8px;box-shadow:0 0 0 2000px rgba(0,0,0,.45)}
+
+/* ── SECTION HEADING ── */
+.section-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;margin-top:6px}
+
+/* ── NOTICE ── */
+.notice{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text2);text-align:center;margin-bottom:14px}
+.notice.success{border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);color:var(--green)}
+.notice.warn{border-color:rgba(255,170,0,.3);background:rgba(255,170,0,.07);color:var(--orange)}
+.notice.err{border-color:rgba(255,68,68,.3);background:rgba(255,68,68,.07);color:var(--red)}
+
+/* ── MGMT TABLE ── */
+.mgmt-table{width:100%;border-collapse:collapse;font-size:13px}
+.mgmt-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+.mgmt-table td{padding:10px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.mgmt-table tr:last-child td{border-bottom:none}
+
+/* ── PURPOSE CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:13px;color:var(--text)}
+.chip-x{background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer;line-height:1;padding:0}
+.chip-x:hover{color:var(--red)}
+
+/* ── QUICK ACTIONS ── */
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.qa-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text);cursor:pointer;transition:all .15s;text-align:left}
+.qa-btn:hover{border-color:var(--green);color:var(--green)}
+.qa-btn span{display:block;font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ── SEARCH ── */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{padding-left:38px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px}
+
+/* ── EOD MODAL ── */
+#eod-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
+#eod-modal.open{display:flex}
+.eod-inner{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--card-radius);width:100%;max-width:460px;max-height:80vh;overflow-y:auto}
+.eod-visitor-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.eod-visitor-row:last-child{border-bottom:none}
+.eod-check{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── LOADER ── */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,230,118,.2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:18px 0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:440px){
+  .role-cards{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr}
+  .quick-actions{grid-template-columns:1fr}
+  .modal-footer{flex-direction:column}
+  .modal-footer button{width:100%}
 }
-.inp:focus,.sel:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(192,24,26,.08)}
-.sel{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;
-}
-
-/* ══════════════════════════════════════════════
-   BUTTONS
-══════════════════════════════════════════════ */
-.btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:13px 18px;border-radius:var(--r-sm);
-  font-size:15px;font-weight:600;font-family:var(--font);
-  cursor:pointer;border:none;width:100%;
-  transition:all .2s;letter-spacing:.1px;
-}
-.btn:active{transform:scale(.98)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-red{background:var(--red);color:white;box-shadow:0 2px 8px rgba(192,24,26,.25)}
-.btn-red:hover{background:var(--red-dark)}
-.btn-black{background:var(--black);color:white}
-.btn-black:hover{background:var(--charcoal)}
-.btn-ghost{background:var(--off-white);color:var(--charcoal);border:1.5px solid var(--border)}
-.btn-ghost:hover{background:var(--cream)}
-.btn-outline{background:transparent;color:var(--red);border:1.5px solid var(--red)}
-.btn-outline:hover{background:var(--red-light)}
-.btn-danger{background:#C0181A;color:white}
-.btn-sm{padding:7px 13px;font-size:13px;border-radius:6px;width:auto}
-.row{display:flex;gap:8px}.row .btn{flex:1}
-
-/* ══════════════════════════════════════════════
-   STATS GRID
-══════════════════════════════════════════════ */
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.stat{
-  background:white;border-radius:var(--r);
-  border:1px solid var(--border);padding:16px 14px;
-  box-shadow:var(--shadow);
-}
-.stat.full{grid-column:1/-1}
-.stat-n{font-size:34px;font-weight:700;color:var(--black);line-height:1;font-family:var(--font-head)}
-.stat-l{font-size:11px;color:var(--mid);margin-top:4px;font-weight:500;letter-spacing:.3px;text-transform:uppercase}
-.stat-sub{font-size:11px;color:var(--light);margin-top:2px}
-/* accent line on stat */
-.stat{position:relative;overflow:hidden}
-.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);opacity:.15}
-.stat.full::after{opacity:.25}
-
-/* ══════════════════════════════════════════════
-   VISITOR CARDS
-══════════════════════════════════════════════ */
-.vc{
-  background:white;border-radius:var(--r);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  padding:13px 14px;margin-bottom:8px;
-  display:flex;align-items:flex-start;gap:12px;
-}
-.av{
-  width:40px;height:40px;border-radius:50%;
-  background:var(--black);
-  display:flex;align-items:center;justify-content:center;
-  color:white;font-size:14px;font-weight:700;flex-shrink:0;
-  border:2px solid var(--border);
-}
-.av.in{background:var(--green)}
-.vi{flex:1;min-width:0}
-.vn{font-size:15px;font-weight:600;color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vd{font-size:12px;color:var(--mid);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vt{font-size:10px;color:var(--light);margin-top:3px}
-
-.chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;letter-spacing:.3px}
-.chip-in{background:var(--green-bg);color:var(--green)}
-.chip-out{background:var(--cream);color:var(--mid)}
-.chip-red{background:var(--red-light);color:var(--red)}
-
-/* ══════════════════════════════════════════════
-   SEARCH
-══════════════════════════════════════════════ */
-.sb{position:relative;margin-bottom:12px}
-.sb input{
-  width:100%;padding:11px 13px 11px 38px;
-  border:1.5px solid var(--border);border-radius:var(--r-sm);
-  font-size:15px;font-family:var(--font);background:white;outline:none;
-  transition:border-color .2s,box-shadow .2s;
-}
-.sb input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(192,24,26,.08)}
-.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--light);pointer-events:none}
-.sc{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--border);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:12px;color:var(--mid)}
-.sc.show{display:flex}
-
-/* ══════════════════════════════════════════════
-   ALERTS
-══════════════════════════════════════════════ */
-.alert{padding:11px 13px;border-radius:var(--r-sm);font-size:13px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px;line-height:1.4}
-.a-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(27,122,62,.15)}
-.a-err{background:var(--red-light);color:var(--red);border:1px solid rgba(192,24,26,.15)}
-.a-info{background:var(--cream);color:var(--charcoal);border:1px solid var(--border)}
-.a-warn{background:#FFF3E0;color:#E65100;border:1px solid rgba(230,81,0,.15)}
-
-/* ══════════════════════════════════════════════
-   EMPTY STATE
-══════════════════════════════════════════════ */
-.empty{text-align:center;padding:40px 24px}
-.empty-icon{font-size:44px;margin-bottom:12px;opacity:.4}
-.empty h3{font-size:16px;font-weight:600;color:var(--mid);margin-bottom:5px}
-.empty p{font-size:13px;color:var(--light);line-height:1.5}
-
-/* ══════════════════════════════════════════════
-   VISITOR BADGE / PASS
-══════════════════════════════════════════════ */
-.pass-card{
-  background:white;border-radius:var(--r-lg);
-  border:2px solid var(--red);
-  box-shadow:var(--shadow-lg);
-  overflow:hidden;margin:4px 0 14px;
-}
-.pass-head{
-  background:var(--black);padding:14px 16px;
-  display:flex;align-items:center;gap:10px;
-}
-.pass-head-logo{
-  width:36px;height:36px;border-radius:50%;
-  background:white;border:1.5px solid var(--red);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.pass-head-logo span{font-family:var(--font-head);font-size:8px;font-weight:800;color:var(--black);letter-spacing:-.5px;line-height:1;text-align:center}
-.pass-head-text{color:white}
-.pass-head-text h2{font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
-.pass-head-text p{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:.5px;margin-top:1px}
-.pass-body{padding:16px}
-.pass-name{font-family:var(--font-head);font-size:26px;font-weight:700;color:var(--black);margin-bottom:8px;line-height:1.1}
-.pass-details{font-size:13px;color:var(--mid);line-height:1.8}
-.pass-details strong{color:var(--black);font-weight:600}
-.pass-divider{height:1px;background:var(--border);margin:14px 0}
-.pass-token-area{text-align:center;padding:4px 0 8px}
-.pass-token-label{font-size:10px;color:var(--light);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-.pass-token{
-  font-family:var(--font-mono);font-size:28px;font-weight:500;
-  color:var(--red);letter-spacing:6px;
-  background:var(--off-white);padding:12px 20px;
-  border-radius:var(--r-sm);border:1px dashed var(--border);
-  display:inline-block;
-}
-.pass-note{font-size:11px;color:var(--light);margin-top:8px}
-.pass-footer{
-  background:var(--red);color:white;
-  font-size:10px;font-weight:600;letter-spacing:1px;
-  text-align:center;padding:8px;
-  text-transform:uppercase;
-}
-
-/* ══════════════════════════════════════════════
-   QR SCANNER
-══════════════════════════════════════════════ */
-.qr-wrap{border-radius:var(--r);overflow:hidden;background:#000;margin-bottom:12px;position:relative;aspect-ratio:1}
-.qr-wrap video{width:100%;height:100%;object-fit:cover;display:block}
-.qr-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.qr-frame{
-  width:62%;aspect-ratio:1;border:2px solid var(--red);
-  border-radius:10px;
-  box-shadow:0 0 0 2000px rgba(0,0,0,.55);
-  position:relative;
-}
-.qr-frame::before,.qr-frame::after{
-  content:'';position:absolute;top:-2px;left:-2px;
-  width:18px;height:18px;
-  border-top:3px solid white;border-left:3px solid white;border-radius:2px;
-}
-.qr-frame::after{top:auto;left:auto;bottom:-2px;right:-2px;border-top:none;border-left:none;border-bottom:3px solid white;border-right:3px solid white}
-.qr-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:scan 1.8s ease-in-out infinite}
-@keyframes scan{0%,100%{top:8%}50%{top:88%}}
-
-/* ══════════════════════════════════════════════
-   SECTION HEADER
-══════════════════════════════════════════════ */
-.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.sec-hd h2{font-size:15px;font-weight:600}
-.sec-cnt{font-size:11px;color:var(--mid);background:var(--cream);padding:2px 9px;border-radius:20px;font-weight:500}
-
-/* ══════════════════════════════════════════════
-   MODAL
-══════════════════════════════════════════════ */
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:none;align-items:flex-end}
-.ov.on{display:flex}
-.modal{
-  background:white;border-radius:16px 16px 0 0;
-  width:100%;max-height:88dvh;overflow-y:auto;
-  padding:20px 20px 32px;animation:slideUp .28s ease;
-}
-.modal-title{font-size:18px;font-weight:700;margin-bottom:4px}
-.modal-sub{font-size:13px;color:var(--mid);margin-bottom:20px}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-drag{width:40px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 16px}
-
-/* ══════════════════════════════════════════════
-   TOAST
-══════════════════════════════════════════════ */
-.toast{
-  position:fixed;bottom:76px;left:16px;right:16px;
-  background:var(--black);color:white;
-  padding:12px 16px;border-radius:var(--r-sm);
-  font-size:14px;font-weight:500;
-  z-index:9999;text-align:center;
-  transform:translateY(120px);opacity:0;
-  transition:all .3s ease;box-shadow:var(--shadow-lg);
-}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.ok{background:var(--green)}
-.toast.err{background:var(--red)}
-
-/* ══════════════════════════════════════════════
-   MANAGEMENT ITEMS
-══════════════════════════════════════════════ */
-.mi{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
-.mi:last-child{border-bottom:none}
-.mi-name{font-size:14px;font-weight:500}
-.mi-sub{font-size:11px;color:var(--light);margin-top:1px}
-
-/* ══════════════════════════════════════════════
-   DIVIDER
-══════════════════════════════════════════════ */
-.div{height:1px;background:var(--border);margin:14px 0}
-
-/* ══════════════════════════════════════════════
-   LOADING DOTS
-══════════════════════════════════════════════ */
-.dots{display:inline-flex;gap:4px;align-items:center}
-.dots span{width:6px;height:6px;border-radius:50%;background:currentColor;animation:dot .9s ease infinite}
-.dots span:nth-child(2){animation-delay:.15s}
-.dots span:nth-child(3){animation-delay:.3s}
-@keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
-
-/* ══════════════════════════════════════════════
-   ANIMATIONS
-══════════════════════════════════════════════ */
-@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.ani{animation:fadeIn .3s ease}
-
-/* ══════════════════════════════════════════════
-   UTILITY
-══════════════════════════════════════════════ */
-.hidden{display:none!important}
-.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
 </style>
 </head>
 <body>
 
-<!-- ╔══════════════════════════════════════════════╗
-     ║  ROLE SELECTION                              ║
-     ╚══════════════════════════════════════════════╝ -->
-<div id="s-role" class="screen active">
-  <div class="role-hero">
-    <div class="logo-seal">
-      <div class="logo-text-mark"><span class="big-p">P</span>PC</div>
-    </div>
-    <h1>Visitor Management</h1>
-    <p>Plastic Powder Coating Co. L.L.C — Dubai</p>
-  </div>
-
-  <div class="role-cards">
-    <div class="role-card" onclick="goReception()">
-      <div class="role-icon rec">👥</div>
-      <div class="role-text">
-        <h3>Reception</h3>
-        <p>Register &amp; check-in visitors</p>
+<!-- ═══════════════════════════════════════
+     SCREEN: ROLE SELECTION
+════════════════════════════════════════ -->
+<div id="screen-role" class="screen active">
+  <div class="role-wrap">
+    <div class="role-logo">🏭</div>
+    <div class="role-title">PPC Visitor Management</div>
+    <div class="role-sub">Plastic Powder Coating Company LLC · Dubai, UAE</div>
+    <div class="role-cards">
+      <div class="role-card" onclick="goReception()">
+        <div class="rc-icon">👥</div>
+        <div class="rc-label">Reception</div>
+        <div class="rc-sub">Check-in &amp; check-out visitors</div>
       </div>
-      <div class="role-arrow">›</div>
-    </div>
-    <div class="role-card" onclick="goStaffLogin()">
-      <div class="role-icon staff">🔒</div>
-      <div class="role-text">
-        <h3>Staff Portal</h3>
-        <p>Dashboard, history &amp; management</p>
+      <div class="role-card" onclick="goLogin()">
+        <div class="rc-icon">🔒</div>
+        <div class="rc-label">Staff Portal</div>
+        <div class="rc-sub">Dashboard &amp; management</div>
       </div>
-      <div class="role-arrow">›</div>
     </div>
   </div>
 </div>
 
-<!-- ╔══════════════════════════════════════════════╗
-     ║  PASSWORD                                    ║
-     ╚══════════════════════════════════════════════╝ -->
-<div id="s-pass" class="screen">
-  <div class="pass-box">
-    <div class="seal-sm">🔐</div>
-    <h2>Staff Access</h2>
-    <p>Enter your staff password</p>
-    <input type="password" class="pass-input" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()">
-    <button class="btn btn-red" onclick="checkPw()">Unlock Portal</button>
-    <p class="pass-err" id="pwErr">❌ Incorrect password. Try again.</p>
-    <button class="btn btn-ghost mt12" onclick="show('s-role')" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);margin-top:10px">← Back</button>
+<!-- ═══════════════════════════════════════
+     SCREEN: STAFF LOGIN
+════════════════════════════════════════ -->
+<div id="screen-login" class="screen">
+  <div class="login-box">
+    <div class="login-title">Staff Portal</div>
+    <div class="login-sub">Enter your password to continue</div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="login-pw" class="form-input" placeholder="Enter staff password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Login</button>
+    <div style="margin-top:12px;text-align:center">
+      <button class="btn-back" onclick="showScreen('role')">← Back</button>
+    </div>
+    <div id="login-err" class="notice err" style="display:none;margin-top:12px"></div>
   </div>
 </div>
 
-<!-- ╔══════════════════════════════════════════════╗
-     ║  RECEPTION                                   ║
-     ╚══════════════════════════════════════════════╝ -->
-<div id="s-rec" class="screen">
+<!-- ═══════════════════════════════════════
+     SCREEN: RECEPTION
+════════════════════════════════════════ -->
+<div id="screen-reception" class="screen">
   <div class="topbar">
-    <div class="tb-back" onclick="show('s-role')">←</div>
-    <div class="tb-logo"><span>PPC</span></div>
-    <div style="flex:1;margin-left:8px">
-      <div class="tb-title">Reception</div>
+    <div class="topbar-left">
+      <div class="topbar-logo">PPC</div>
+      <div>
+        <div class="topbar-title">Reception</div>
+        <div class="topbar-sub">Visitor check-in &amp; out</div>
+      </div>
     </div>
-    <div class="tb-badge">NO LOGIN</div>
+    <button class="btn-back" onclick="showScreen('role')">← Home</button>
   </div>
-
-  <div class="bnav" id="rec-nav">
-    <button class="nb on" data-t="register" onclick="recTab('register')"><span class="ni">📝</span><span class="nl">Register</span></button>
-    <button class="nb" data-t="checkin" onclick="recTab('checkin')"><span class="ni">⚡</span><span class="nl">Quick In</span></button>
-    <button class="nb" data-t="checkout" onclick="recTab('checkout')"><span class="ni">🚪</span><span class="nl">Check Out</span></button>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="recTab('new',this)">New Visitor</button>
+    <button class="tab-btn" onclick="recTab('quick',this)">Quick Check-In</button>
+    <button class="tab-btn" onclick="recTab('checkout',this)">Check Out</button>
   </div>
-
   <div class="content">
-    <!-- ── REGISTER TAB ── -->
-    <div id="rt-register" class="ani">
-      <div id="reg-result"></div>
+
+    <!-- NEW VISITOR -->
+    <div id="rec-new" class="tab-panel active">
       <div class="card">
-        <div class="card-title">New Visitor Registration</div>
-        <div class="fg"><label class="lbl">Visitor Name <span class="req">*</span></label><input type="text" class="inp" id="rName" placeholder="Full name"></div>
-        <div class="fg"><label class="lbl">Phone Number</label><input type="tel" class="inp" id="rPhone" placeholder="+971 50 000 0000"></div>
-        <div class="fg"><label class="lbl">Company / Organisation</label><input type="text" class="inp" id="rCompany" placeholder="Company (optional)"></div>
-        <div class="fg"><label class="lbl">Purpose of Visit <span class="req">*</span></label>
-          <select class="sel" id="rPurpose"><option value="">Select purpose…</option></select></div>
-        <div class="fg"><label class="lbl">Host / Meeting With <span class="req">*</span></label>
-          <select class="sel" id="rHost"><option value="">Select host…</option></select></div>
-        <div class="fg"><label class="lbl">Additional Notes</label><input type="text" class="inp" id="rNotes" placeholder="Any extra info (optional)"></div>
-        <button class="btn btn-red" id="regBtn" onclick="doRegister()"><span>✓</span> Register &amp; Generate Pass</button>
+        <div class="card-title">Visitor Information</div>
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="v-name" class="form-input" placeholder="e.g. Ahmed Al-Rashid"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Company *</label>
+            <input type="text" id="v-company" class="form-input" placeholder="Visitor's company"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone *</label>
+            <input type="tel" id="v-phone" class="form-input" placeholder="050 123 4567"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email (optional)</label>
+          <input type="email" id="v-email" class="form-input" placeholder="visitor@example.com"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Visiting (Host) *</label>
+            <select id="v-host" class="form-input"><option value="">Loading…</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Purpose *</label>
+            <select id="v-purpose" class="form-input"><option value="">Loading…</option></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vehicle Details (optional)</label>
+          <input type="text" id="v-vehicle" class="form-input" placeholder="DXB-12345"/>
+        </div>
+        <button class="btn-primary" id="submit-btn" onclick="submitVisitor()">Check In &amp; Generate Badge</button>
+        <div id="submit-notice" class="notice" style="display:none;margin-top:12px"></div>
       </div>
     </div>
 
-    <!-- ── QUICK CHECK-IN TAB ── -->
-    <div id="rt-checkin" class="hidden ani">
+    <!-- QUICK CHECK-IN -->
+    <div id="rec-quick" class="tab-panel">
       <div class="card">
-        <div class="card-title">Quick Check-In</div>
-        <p style="font-size:13px;color:var(--mid);margin-bottom:12px">Search a returning visitor by name</p>
-        <div class="sb">
-          <span class="si">🔍</span>
-          <input type="text" id="ciSearch" placeholder="Type visitor name…" oninput="searchCI(this.value)">
-          <button class="sc" id="ciClear" onclick="clearCI()">✕</button>
+        <div class="card-title">Returning Visitor</div>
+        <div class="form-group">
+          <label class="form-label">Search by Name or Phone</label>
+          <input type="text" id="quick-search" class="form-input" placeholder="Enter name or phone number"/>
         </div>
-        <div id="ci-list"></div>
+        <button class="btn-primary" onclick="quickSearch()">Search &amp; Check In</button>
+        <div id="quick-notice" class="notice" style="display:none;margin-top:12px"></div>
       </div>
-      <div id="ci-pass-section" class="hidden">
-        <div id="ci-pass"></div>
-        <button class="btn btn-outline mt12" onclick="ciAnother()">+ Check In Another Visitor</button>
+      <div id="quick-result" style="display:none" class="card">
+        <div class="card-title">Found Visitor</div>
+        <div id="quick-result-content"></div>
+        <button class="btn-primary" style="margin-top:14px" id="quick-badge-btn">Generate Badge</button>
       </div>
     </div>
 
-    <!-- ── CHECK OUT TAB ── -->
-    <div id="rt-checkout" class="hidden ani">
+    <!-- CHECK OUT -->
+    <div id="rec-checkout" class="tab-panel">
       <div class="card">
-        <div class="card-title">Check Out Visitor</div>
-        <div class="alert a-info" style="margin-bottom:14px">ℹ️ Search by name or scan QR badge</div>
-        <div class="sb">
-          <span class="si">🔍</span>
-          <input type="text" id="coSearch" placeholder="Search visitor name…" oninput="searchCO(this.value)">
-          <button class="sc" id="coClear" onclick="clearCO()">✕</button>
+        <div class="card-title">📷 Scan Badge QR Code</div>
+        <div class="scanner-wrap" id="scanner-wrap" style="display:none">
+          <video id="scanner-video" playsinline></video>
+          <div class="scanner-overlay"><div class="scanner-box"></div></div>
+          <canvas id="scanner-canvas" style="display:none"></canvas>
         </div>
-        <div id="co-list"></div>
-        <div class="div"></div>
-        <button class="btn btn-outline" onclick="toggleCoScanner()"><span>📷</span> Scan QR Badge</button>
-        <div id="co-scanner" class="hidden mt12">
-          <div class="qr-wrap"><video id="qrv1" playsinline muted></video><div class="qr-overlay"><div class="qr-frame"><div class="qr-line"></div></div></div></div>
-          <button class="btn btn-ghost" onclick="stopScan('qrv1');document.getElementById('co-scanner').classList.add('hidden')">Stop Scanner</button>
+        <button class="btn-primary" id="scan-btn" onclick="toggleScanner()">📷 Start QR Scanner</button>
+        <div id="scan-notice" class="notice" style="display:none;margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔍 Manual Search</div>
+        <div class="form-group">
+          <label class="form-label">Search by Name, Phone, or Visitor ID</label>
+          <input type="text" id="co-search" class="form-input" placeholder="Enter name, phone, or visitor ID…" oninput="coSearch()"/>
         </div>
-        <div id="co-result" class="mt12"></div>
+        <div id="co-list"><div class="notice">👆 Use QR scanner or search above — results appear here</div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ╔══════════════════════════════════════════════╗
-     ║  STAFF PORTAL                                ║
-     ╚══════════════════════════════════════════════╝ -->
-<div id="s-staff" class="screen">
+<!-- ═══════════════════════════════════════
+     SCREEN: STAFF
+════════════════════════════════════════ -->
+<div id="screen-staff" class="screen">
   <div class="topbar">
-    <div class="tb-back" onclick="staffLogout()">←</div>
-    <div class="tb-logo"><span>PPC</span></div>
-    <div style="flex:1;margin-left:8px">
-      <div class="tb-title">Staff Portal</div>
-      <div class="tb-sub">SECURED</div>
+    <div class="topbar-left">
+      <div class="topbar-logo">PPC</div>
+      <div>
+        <div class="topbar-title">Staff Portal</div>
+        <div class="topbar-sub">Plastic Powder Coating Company LLC</div>
+      </div>
     </div>
-    <div style="font-size:18px">🔒</div>
+    <button class="btn-back" onclick="showScreen('role')">← Home</button>
   </div>
-
-  <div class="bnav" id="staff-nav">
-    <button class="nb on" data-t="dash" onclick="staffTab('dash')"><span class="ni">📊</span><span class="nl">Dashboard</span></button>
-    <button class="nb" data-t="now" onclick="staffTab('now')"><span class="ni">👁️</span><span class="nl">Current</span></button>
-    <button class="nb" data-t="history" onclick="staffTab('history')"><span class="ni">📋</span><span class="nl">History</span></button>
-    <button class="nb" data-t="scan" onclick="staffTab('scan')"><span class="ni">📷</span><span class="nl">Scanner</span></button>
-    <button class="nb" data-t="manage" onclick="staffTab('manage')"><span class="ni">⚙️</span><span class="nl">Manage</span></button>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="staffTab('dashboard',this)">Dashboard</button>
+    <button class="tab-btn" onclick="staffTab('current',this)">Current</button>
+    <button class="tab-btn" onclick="staffTab('history',this)">History</button>
+    <button class="tab-btn" onclick="staffTab('uco',this)">Universal Checkout</button>
+    <button class="tab-btn" onclick="staffTab('mgmt',this)">Management</button>
+    <button class="tab-btn" onclick="staffTab('settings',this)">Settings</button>
   </div>
-
   <div class="content">
 
     <!-- DASHBOARD -->
-    <div id="st-dash" class="ani">
-      <div class="stats">
-        <div class="stat"><div class="stat-n" id="s-today">—</div><div class="stat-l">Today</div></div>
-        <div class="stat"><div class="stat-n" id="s-inside">—</div><div class="stat-l">Inside Now</div></div>
-        <div class="stat"><div class="stat-n" id="s-week">—</div><div class="stat-l">This Week</div></div>
-        <div class="stat"><div class="stat-n" id="s-month">—</div><div class="stat-l">This Month</div></div>
-        <div class="stat full"><div class="stat-n" id="s-total">—</div><div class="stat-l">All Time Total</div><div class="stat-sub" id="s-arch"></div></div>
+    <div id="staff-dashboard" class="tab-panel active">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="stat-in">–</div><div class="stat-lbl">Currently In</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-today">–</div><div class="stat-lbl">Today's Visitors</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-total">–</div><div class="stat-lbl">Total Active</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-arch" style="color:var(--orange)">–</div><div class="stat-lbl">Archived (30+ days)</div></div>
       </div>
-      <div class="card">
-        <div class="card-title">Currently Inside</div>
-        <div id="dash-now"></div>
+      <div class="quick-actions">
+        <button class="qa-btn" onclick="staffTab('current',document.querySelectorAll('.tab-btn')[1])">👥 View Current<span>Live visitor list</span></button>
+        <button class="qa-btn" onclick="loadDashboard()">🔄 Refresh Data<span>Reload from Google Sheets</span></button>
+        <button class="qa-btn" onclick="openEOD()">📊 End of Day<span>Check out remaining</span></button>
+        <button class="qa-btn" onclick="exportToday()">📥 Export Today<span>Download CSV</span></button>
       </div>
+      <div id="dash-notice" class="notice" style="display:none"></div>
     </div>
 
     <!-- CURRENT VISITORS -->
-    <div id="st-now" class="hidden ani">
-      <div class="sec-hd"><h2>Visitors Inside</h2><span class="sec-cnt" id="now-cnt">0</span></div>
-      <button class="btn btn-ghost mt8" style="margin-bottom:12px" onclick="loadNow()">🔄 Refresh</button>
-      <div id="now-list"></div>
+    <div id="staff-current" class="tab-panel">
+      <div class="section-title">Currently Checked In</div>
+      <div id="current-list"><div class="notice">Loading…</div></div>
     </div>
 
     <!-- HISTORY -->
-    <div id="st-history" class="hidden ani">
-      <div class="sec-hd"><h2>Visit History</h2><span class="sec-cnt" id="hist-cnt">0</span></div>
-      <div class="sb">
-        <span class="si">🔍</span>
-        <input type="text" id="histSearch" placeholder="Search name or host…" oninput="filterHist(this.value)">
-        <button class="sc" id="histClear" onclick="clearHistSearch()">✕</button>
+    <div id="staff-history" class="tab-panel">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="btn-secondary active-filter" id="f-today" onclick="filterHistory('today',this)">Today</button>
+        <button class="btn-secondary" id="f-week" onclick="filterHistory('week',this)">This Week</button>
+        <button class="btn-secondary" id="f-month" onclick="filterHistory('month',this)">This Month</button>
+        <button class="btn-secondary" id="f-all" onclick="filterHistory('all',this)">All Active</button>
+        <button class="btn-secondary" style="border-color:var(--orange);color:var(--orange)" id="f-arch" onclick="filterHistory('archived',this)">📦 Archived</button>
       </div>
-      <div id="hist-list"></div>
+      <div id="history-list"><div class="notice">Loading…</div></div>
     </div>
 
-    <!-- SCANNER -->
-    <div id="st-scan" class="hidden ani">
+    <!-- UNIVERSAL CHECKOUT -->
+    <div id="staff-uco" class="tab-panel">
       <div class="card">
-        <div class="card-title">Universal Checkout Scanner</div>
-        <p style="font-size:13px;color:var(--mid);margin-bottom:14px">Scan visitor QR badge to check out</p>
-        <div id="scan-vid-wrap" class="hidden">
-          <div class="qr-wrap"><video id="qrv2" playsinline muted></video><div class="qr-overlay"><div class="qr-frame"><div class="qr-line"></div></div></div></div>
-          <button class="btn btn-ghost" onclick="stopStaffScan()">Stop Scanner</button>
+        <div class="card-title">Universal QR Scanner</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Scan any visitor's badge to check them out instantly</p>
+        <div class="scanner-wrap" id="scanner-wrap2" style="display:none">
+          <video id="scanner-video2" playsinline></video>
+          <div class="scanner-overlay"><div class="scanner-box"></div></div>
+          <canvas id="scanner-canvas2" style="display:none"></canvas>
         </div>
-        <button class="btn btn-black" id="startScanBtn" onclick="startStaffScan()"><span>📷</span> Start Scanner</button>
-        <div id="scan-result" class="mt12"></div>
-      </div>
-      <div class="card mt12">
-        <div class="card-title">Manual Checkout Search</div>
-        <div class="sb">
-          <span class="si">🔍</span>
-          <input type="text" id="scanSearch" placeholder="Search visitor…" oninput="searchStaffCO(this.value)">
-          <button class="sc" id="scanClear" onclick="clearScanSearch()">✕</button>
-        </div>
-        <div id="scan-co-list"></div>
+        <button class="btn-primary" id="scan-btn2" onclick="toggleScanner2()">📷 Start Scanner</button>
+        <div id="uco-notice" class="notice" style="display:none;margin-top:12px"></div>
       </div>
     </div>
 
-    <!-- MANAGE -->
-    <div id="st-manage" class="hidden ani">
+    <!-- MANAGEMENT -->
+    <div id="staff-mgmt" class="tab-panel">
       <div class="card">
-        <div class="sec-hd" style="margin-bottom:8px">
-          <div class="card-title" style="margin:0">Staff / Hosts</div>
-          <button class="btn btn-sm btn-red" onclick="openModal('m-staff')">+ Add</button>
-        </div>
-        <div id="mg-staff"></div>
+        <div class="card-title">Staff Members</div>
+        <div id="staff-table-wrap"><div class="notice">Loading…</div></div>
+        <button class="btn-secondary" style="margin-top:12px;width:100%" onclick="addStaff()">➕ Add Staff</button>
       </div>
       <div class="card">
-        <div class="sec-hd" style="margin-bottom:8px">
-          <div class="card-title" style="margin:0">Visit Purposes</div>
-          <button class="btn btn-sm btn-red" onclick="openModal('m-purpose')">+ Add</button>
+        <div class="card-title">Visit Purposes</div>
+        <div id="purposes-chips"><div class="notice">Loading…</div></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <input type="text" id="new-purpose" class="form-input" placeholder="Add new purpose…" style="flex:1"/>
+          <button class="btn-secondary" onclick="addPurpose()">➕ Add</button>
         </div>
-        <div id="mg-purpose"></div>
-      </div>
-      <div class="card" style="border-color:var(--red-mid)">
-        <div class="card-title" style="color:var(--red)">⚠️ Data</div>
-        <button class="btn btn-ghost" onclick="exportCSV()">📤 Export All Data (CSV)</button>
-        <p style="font-size:11px;color:var(--light);margin-top:8px">Delete individual records in the History tab.</p>
+        <div id="purpose-notice" class="notice" style="display:none;margin-top:10px"></div>
       </div>
     </div>
 
-  </div><!-- /content -->
+    <!-- SETTINGS -->
+    <div id="staff-settings" class="tab-panel">
+      <div class="card">
+        <div class="card-title">Change Password</div>
+        <div class="form-group">
+          <label class="form-label">Current Password</label>
+          <input type="password" id="pw-current" class="form-input" placeholder="Current password"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <input type="password" id="pw-new" class="form-input" placeholder="At least 6 characters"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" id="pw-confirm" class="form-input" placeholder="Repeat new password"/>
+        </div>
+        <button class="btn-primary" onclick="changePassword()">Change Password</button>
+        <div id="pw-notice" class="notice" style="display:none;margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">System Information</div>
+        <table class="mgmt-table">
+          <tr><td style="color:var(--text3)">System</td><td>Unified PWA v5.0</td></tr>
+          <tr><td style="color:var(--text3)">Storage</td><td>Google Sheets</td></tr>
+          <tr><td style="color:var(--text3)">Archive</td><td>Auto (30+ days)</td></tr>
+          <tr><td style="color:var(--text3)">Hosting</td><td>GitHub Pages</td></tr>
+          <tr><td style="color:var(--text3)">Cost</td><td style="color:var(--green)">$0 / month</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<!-- ╔══════════════════════════════════════════════╗
-     ║  MODALS                                      ║
-     ╚══════════════════════════════════════════════╝ -->
-<div class="ov" id="m-staff">
-  <div class="modal">
-    <div class="modal-drag"></div>
-    <div class="modal-title">Add Staff Member</div>
-    <div class="modal-sub">This person will appear in the host dropdown</div>
-    <div class="fg"><label class="lbl">Full Name <span class="req">*</span></label><input type="text" class="inp" id="nStaffName" placeholder="e.g. Ahmed Al Mansoori"></div>
-    <div class="fg"><label class="lbl">Department / Role</label><input type="text" class="inp" id="nStaffDept" placeholder="e.g. Operations"></div>
-    <div class="row mt16">
-      <button class="btn btn-ghost" onclick="closeModal('m-staff')">Cancel</button>
-      <button class="btn btn-red" onclick="addStaff()">Add Staff</button>
+<!-- ═══════════════════════════════════════
+     BADGE MODAL
+════════════════════════════════════════ -->
+<div id="badge-modal">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <h3>🪪 Visitor Badge</h3>
+      <button class="modal-close" onclick="closeBadgeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="badge-print">
+        <div class="badge-header">Guest Card</div>
+        <div class="badge-datetime" id="b-datetime"></div>
+        <div class="badge-name" id="b-name"></div>
+        <div class="badge-company" id="b-company"></div>
+        <div class="badge-host" id="b-host"></div>
+        <div class="badge-divider"></div>
+        <div class="badge-footer-company">Plastic Powder Coating Company LLC</div>
+        <div class="badge-bottom">
+          <div>
+            <div class="badge-footer-text">Please return this ticket when you leave. Have a nice day and welcome back!</div>
+            <div class="badge-vid" id="b-vid"></div>
+          </div>
+          <div id="badge-qr"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="savePDF()">💾 Save PDF</button>
+      <button class="btn-secondary" onclick="printBadge()">🖨 Print</button>
+      <button class="btn-secondary" onclick="shareWhatsApp()">💬 WhatsApp Host</button>
+      <button class="btn-secondary" onclick="closeBadgeModal()">Close</button>
     </div>
   </div>
 </div>
 
-<div class="ov" id="m-purpose">
-  <div class="modal">
-    <div class="modal-drag"></div>
-    <div class="modal-title">Add Visit Purpose</div>
-    <div class="modal-sub">Add a reason visitors can select</div>
-    <div class="fg"><label class="lbl">Purpose Name <span class="req">*</span></label><input type="text" class="inp" id="nPurpose" placeholder="e.g. Client Meeting"></div>
-    <div class="row mt16">
-      <button class="btn btn-ghost" onclick="closeModal('m-purpose')">Cancel</button>
-      <button class="btn btn-red" onclick="addPurpose()">Add Purpose</button>
+<!-- ═══════════════════════════════════════
+     EOD MODAL
+════════════════════════════════════════ -->
+<div id="eod-modal">
+  <div class="eod-inner">
+    <div class="modal-header">
+      <h3>📊 End of Day Report</h3>
+      <button class="modal-close" onclick="closeEOD()">✕</button>
+    </div>
+    <div style="padding:18px 20px">
+      <div id="eod-warn" class="notice warn" style="margin-bottom:14px"></div>
+      <div id="eod-list"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+        <button class="btn-secondary" onclick="eodSelectAll()">Select All</button>
+        <button class="btn-secondary" onclick="eodDeselectAll()">Deselect All</button>
+        <button class="btn-primary" style="flex:1;margin-top:0" onclick="eodCheckoutSelected()">✓ Check Out Selected</button>
+        <button class="btn-danger" style="padding:9px 16px" onclick="eodCheckoutAll()">Check Out All</button>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="ov" id="m-del">
-  <div class="modal" style="text-align:center">
-    <div class="modal-drag"></div>
-    <div style="font-size:40px;margin-bottom:12px">🗑️</div>
-    <div class="modal-title">Delete Record?</div>
-    <div class="modal-sub" id="del-text">This cannot be undone.</div>
-    <div class="row mt16">
-      <button class="btn btn-ghost" onclick="closeModal('m-del')">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmDel()">Yes, Delete</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<!-- ╔══════════════════════════════════════════════╗
-     ║  JAVASCRIPT                                  ║
-     ╚══════════════════════════════════════════════╝ -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script>
-// ─── CONFIG ───────────────────────────────────────────────
-const API = 'https://script.google.com/macros/s/AKfycbwC4oUm3holztMyeFmPbfofAyLvZDg4bHrIsWgHHsfhpAwovC32eCOuva7fqEI-vKgo2Q/exec';
-const PW  = 'DXB@ppc2026';
+// ═══════════════════════════════════════════════════════
+//  CONFIG — REPLACE THESE WITH YOUR ACTUAL VALUES
+// ═══════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwOLop6xxH6y6Ct2U5X1_FfLnOzMRlB5SNEJe0Js8qDEODzpBsgBMQ9pTMOIvwXWap9aA/exec';
+const COMPANY_NAME = 'Plastic Powder Coating Company LLC';
+const TIMEZONE = 'Asia/Dubai';
 
-// ─── STATE ─────────────────────────────────────────────────
-let histAll = [], scanStreams = {}, delRowId = null;
+// ── State ──
+let allVisitors = [];
+let staffList = [];
+let purposeList = [];
+let storedPassword = 'DXB@ppc2026';
+let scannerStream = null;
+let scannerStream2 = null;
+let scannerActive = false;
+let scannerActive2 = false;
+let currentBadgeData = null;
+let submitting = false;
+let quickCheckinData = null;
 
-// ─── SCREEN NAV ────────────────────────────────────────────
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+// ── Dubai time ──
+function dubaiNow() {
+  return new Date(new Date().toLocaleString('en-US', {timeZone: TIMEZONE}));
 }
-function goReception(){
-  show('s-rec');
-  recTab('register');
-  loadConfig();
+function fmtDate(d) {
+  return d.toLocaleDateString('en-GB', {day:'2-digit',month:'2-digit',year:'numeric'}).split('/').join('/');
 }
-function goStaffLogin(){
-  show('s-pass');
-  document.getElementById('pwInput').value='';
-  document.getElementById('pwErr').style.display='none';
-  setTimeout(()=>document.getElementById('pwInput').focus(),300);
+function fmtTime(d) {
+  return d.toTimeString().slice(0,8);
 }
-function checkPw(){
-  if(document.getElementById('pwInput').value===PW){
-    show('s-staff');
-    staffTab('dash');
-    loadDash();
-  } else {
-    document.getElementById('pwErr').style.display='block';
-    document.getElementById('pwInput').value='';
-  }
+function fmtDisplay(d) {
+  return d.toLocaleString('en-GB', {timeZone: TIMEZONE, day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
 }
-function staffLogout(){ stopAllScan(); show('s-role'); }
 
-// ─── TAB SWITCHING ─────────────────────────────────────────
-function recTab(t){
-  ['register','checkin','checkout'].forEach(x=>{
-    document.getElementById('rt-'+x).classList.toggle('hidden',x!==t);
+// ── Screen routing ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function goReception() {
+  showScreen('reception');
+  loadDropdowns();
+}
+function goLogin() {
+  showScreen('login');
+  setTimeout(() => document.getElementById('login-pw').focus(), 100);
+}
+
+// ── API helper ──
+async function api(params) {
+  const url = APPS_SCRIPT_URL + '?' + new URLSearchParams(params);
+  const res = await fetch(url);
+  return res.json();
+}
+async function apiPost(body) {
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
   });
-  document.querySelectorAll('#rec-nav .nb').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
-  if(t==='checkout'){ clearCO(); stopScan('qrv1'); document.getElementById('co-scanner').classList.add('hidden'); document.getElementById('co-result').innerHTML=''; }
-  if(t!=='checkin'){ stopScan('qrv1'); }
-}
-function staffTab(t){
-  ['dash','now','history','scan','manage'].forEach(x=>{
-    const el=document.getElementById('st-'+x); if(el) el.classList.toggle('hidden',x!==t);
-  });
-  document.querySelectorAll('#staff-nav .nb').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
-  if(t==='dash')    loadDash();
-  if(t==='now')     loadNow();
-  if(t==='history') loadHist();
-  if(t==='manage')  loadManage();
-  if(t!=='scan')    stopStaffScan();
+  return res.json();
 }
 
-// ─── API HELPERS ───────────────────────────────────────────
-async function apiGet(p){
-  const r=await fetch(API+'?'+new URLSearchParams(p));
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  return r.json();
-}
-async function apiPost(body){
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  return r.json();
-}
-
-// ─── LOAD CONFIG (staff + purposes) ────────────────────────
-async function loadConfig(){
-  try{
-    const d=await apiGet({action:'getConfig'});
-    // Purposes
-    const ps=document.getElementById('rPurpose');
-    ps.innerHTML='<option value="">Select purpose…</option>';
-    (d.purposes||[]).forEach(p=>ps.innerHTML+=`<option value="${esc(p)}">${esc(p)}</option>`);
-    // Hosts
-    const hs=document.getElementById('rHost');
-    hs.innerHTML='<option value="">Select host…</option>';
-    (d.staff||[]).forEach(s=>hs.innerHTML+=`<option value="${esc(s.name)}">${esc(s.name)}${s.dept?' – '+s.dept:''}</option>`);
-  }catch(e){
-    // Fallback defaults
-    const ps=document.getElementById('rPurpose');
-    ps.innerHTML='<option value="">Select purpose…</option>';
-    ['Client Meeting','Interview','Delivery','Personal','Government','Maintenance','Other']
-      .forEach(p=>ps.innerHTML+=`<option value="${p}">${p}</option>`);
-    const hs=document.getElementById('rHost');
-    hs.innerHTML='<option value="">Select host…</option><option value="Management">Management</option>';
+// ── Load dropdowns ──
+async function loadDropdowns() {
+  try {
+    const [sRes, pRes] = await Promise.all([api({action:'getStaff'}), api({action:'getPurposes'})]);
+    staffList = sRes.staff || [];
+    purposeList = pRes.purposes || [];
+    const host = document.getElementById('v-host');
+    host.innerHTML = '<option value="">Select host…</option>' + staffList.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+    const pur = document.getElementById('v-purpose');
+    pur.innerHTML = '<option value="">Select purpose…</option>' + purposeList.map(p => `<option value="${p}">${p}</option>`).join('');
+  } catch(e) {
+    // Offline fallback with example data
+    staffList = [{name:'Jashni',phone:'8220513861',email:'jashni@ppc.com'}];
+    purposeList = ['Meeting','Delivery','Interview','Maintenance','Personal'];
+    const host = document.getElementById('v-host');
+    host.innerHTML = '<option value="">Select host…</option>' + staffList.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+    const pur = document.getElementById('v-purpose');
+    pur.innerHTML = '<option value="">Select purpose…</option>' + purposeList.map(p => `<option value="${p}">${p}</option>`).join('');
   }
 }
 
-// ─── REGISTER VISITOR ──────────────────────────────────────
-async function doRegister(){
-  const name=g('rName').trim(), phone=g('rPhone').trim(),
-        company=g('rCompany').trim(), purpose=gv('rPurpose'),
-        host=gv('rHost'), notes=g('rNotes').trim();
+// ── Tab switches ──
+function recTab(name, el) {
+  document.querySelectorAll('#screen-reception .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#screen-reception .tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('rec-'+name).classList.add('active');
+  if (name === 'checkout') {
+    document.getElementById('co-search').value = '';
+    document.getElementById('co-list').innerHTML = '<div class="notice">👆 Use QR scanner or search above — results appear here</div>';
+  }
+}
+function staffTab(name, el) {
+  document.querySelectorAll('#screen-staff .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#screen-staff .tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('staff-'+name).classList.add('active');
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'current') loadCurrent();
+  if (name === 'history') loadHistory('today');
+  if (name === 'mgmt') { loadStaffTable(); loadPurposes(); }
+}
 
-  if(!name){  toast('Please enter visitor name','err'); return; }
-  if(!purpose){toast('Please select a purpose','err'); return; }
-  if(!host){  toast('Please select a host','err'); return; }
+// ── Submit new visitor ──
+async function submitVisitor() {
+  if (submitting) return;
+  const name = document.getElementById('v-name').value.trim();
+  const company = document.getElementById('v-company').value.trim();
+  const phone = document.getElementById('v-phone').value.trim();
+  const email = document.getElementById('v-email').value.trim();
+  const host = document.getElementById('v-host').value;
+  const purpose = document.getElementById('v-purpose').value;
+  const vehicle = document.getElementById('v-vehicle').value.trim();
 
-  const btn=document.getElementById('regBtn');
-  btn.disabled=true;
-  btn.innerHTML='<span class="dots"><span></span><span></span><span></span></span> Registering…';
+  if (!name || !company || !phone || !host || !purpose) {
+    showNotice('submit-notice', 'err', '⚠️ Please fill in all required fields.');
+    return;
+  }
 
-  const token=mkToken(name);
+  submitting = true;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Processing…';
+  hideNotice('submit-notice');
 
-  try{
-    const res=await apiPost({
-      action:'register', name, phone, company, purpose, host, notes, token,
-      timestamp:new Date().toISOString()
-    });
-    if(res.success){
-      showPass({name,phone,company,purpose,host,token});
-      clearRegForm();
-    } else if(res.duplicate){
-      document.getElementById('reg-result').innerHTML=
-        `<div class="alert a-warn">⚠️ ${esc(res.message)} The badge is shown below anyway.</div>`;
-      showPass({name,phone,company,purpose,host,token});
-      clearRegForm();
+  const now = dubaiNow();
+  const visitorId = 'VIS-' + Date.now();
+  const payload = {
+    date: fmtDate(now),
+    checkInTime: fmtTime(now),
+    fullName: name,
+    visitorId,
+    phone,
+    email,
+    company,
+    hostName: host,
+    hostCompany: COMPANY_NAME,
+    purpose,
+    vehicle,
+    checkOutTime: '',
+    status: 'IN'
+  };
+
+  try {
+    const result = await apiPost(payload);
+    if (result && result.success === false && result.error && result.error.includes('Duplicate')) {
+      showNotice('submit-notice', 'err', '⚠️ Duplicate submission detected. Please wait a moment.');
     } else {
-      document.getElementById('reg-result').innerHTML=
-        `<div class="alert a-err">❌ ${esc(res.message||'Registration failed. Please try again.')}</div>`;
+      showNotice('submit-notice', 'success', '✅ Visitor checked in successfully!');
+      currentBadgeData = { ...payload, hostPhone: getHostPhone(host), hostEmail: getHostEmail(host) };
+      generateBadge(currentBadgeData);
+      openBadgeModal();
+      clearNewForm();
+      setTimeout(() => notifyHost(currentBadgeData), 500);
     }
-  }catch(e){
-    document.getElementById('reg-result').innerHTML=
-      `<div class="alert a-err">❌ Could not reach server. Check connection and try again.<br><small>${e.message}</small></div>`;
+  } catch(e) {
+    // Offline or network error — still generate badge
+    showNotice('submit-notice', 'warn', '⚠️ Could not reach server. Badge generated locally.');
+    currentBadgeData = { ...payload, hostPhone: getHostPhone(host), hostEmail: getHostEmail(host) };
+    generateBadge(currentBadgeData);
+    openBadgeModal();
+    clearNewForm();
   }
-  btn.disabled=false;
-  btn.innerHTML='<span>✓</span> Register &amp; Generate Pass';
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = 'Check In &amp; Generate Badge';
+    submitting = false;
+  }, 3000);
 }
 
-function showPass(v){
-  const now=new Date();
-  const time=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  const date=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  document.getElementById('reg-result').innerHTML=`
-    <div class="alert a-ok">✅ ${esc(v.name)} registered successfully!</div>
-    ${buildPass(v,time,date)}
-    <button class="btn btn-ghost" onclick="clearPass()">← Register Another Visitor</button>`;
-  document.getElementById('reg-result').scrollIntoView({behavior:'smooth',block:'start'});
+function getHostPhone(name) {
+  const s = staffList.find(x => x.name === name);
+  return s ? s.phone : '';
 }
-function buildPass(v,time,date){
-  return `<div class="pass-card">
-    <div class="pass-head">
-      <div class="pass-head-logo"><span>PPC</span></div>
-      <div class="pass-head-text"><h2>Visitor Pass</h2><p>Plastic Powder Coating Co. L.L.C</p></div>
-    </div>
-    <div class="pass-body">
-      <div class="pass-name">${esc(v.name)}</div>
-      <div class="pass-details">
-        ${v.company?`<strong>${esc(v.company)}</strong><br>`:''}
-        <strong>Meeting:</strong> ${esc(v.host)}<br>
-        <strong>Purpose:</strong> ${esc(v.purpose)}<br>
-        <strong>Time:</strong> ${time} · ${date}
-      </div>
-      <div class="pass-divider"></div>
-      <div class="pass-token-area">
-        <div class="pass-token-label">Visitor Token — Show on Exit</div>
-        <div class="pass-token">${esc(v.token)}</div>
-        <div class="pass-note">Present this token to reception when leaving</div>
-      </div>
-    </div>
-    <div class="pass-footer">PPC Dubai — Authorised Visitor</div>
-  </div>`;
+function getHostEmail(name) {
+  const s = staffList.find(x => x.name === name);
+  return s ? s.email : '';
 }
-function clearPass(){ document.getElementById('reg-result').innerHTML=''; }
-function clearRegForm(){
-  ['rName','rPhone','rCompany','rNotes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('rPurpose').value='';
-  document.getElementById('rHost').value='';
+function clearNewForm() {
+  ['v-name','v-company','v-phone','v-email','v-vehicle'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('v-host').selectedIndex = 0;
+  document.getElementById('v-purpose').selectedIndex = 0;
 }
 
-// ─── QUICK CHECK-IN ────────────────────────────────────────
-async function searchCI(q){
-  document.getElementById('ciClear').classList.toggle('show',q.length>0);
-  if(q.length<2){ document.getElementById('ci-list').innerHTML=''; return; }
-  document.getElementById('ci-list').innerHTML=loadingHTML();
-  try{
-    const d=await apiGet({action:'search',query:q.trim(),status:'checkedout'});
-    renderCI(d.visitors||[],q.trim());
-  }catch(e){
-    document.getElementById('ci-list').innerHTML=`<div class="alert a-err">Search failed. ${e.message}</div>`;
+// ── Quick Check-In ──
+async function quickSearch() {
+  const q = document.getElementById('quick-search').value.trim().toLowerCase();
+  if (!q) { showNotice('quick-notice','err','Please enter a name or phone number.'); return; }
+  hideNotice('quick-notice');
+  try {
+    const res = await api({action:'getVisitors'});
+    const visitors = res.visitors || [];
+    const match = visitors.find(v =>
+      (v.fullName||'').toLowerCase().startsWith(q) || (v.phone||'').includes(q)
+    );
+    if (!match) {
+      showNotice('quick-notice','err','❌ No previous visit found. Use the "New Visitor" tab to register.');
+      document.getElementById('quick-result').style.display = 'none';
+      return;
+    }
+    quickCheckinData = match;
+    document.getElementById('quick-result-content').innerHTML = `
+      <div class="vc-name">${match.fullName}</div>
+      <div class="vc-meta">${match.company} · Previous host: ${match.hostName}</div>
+      <div class="notice success" style="margin-top:10px">✅ Checked in successfully! Click below to generate badge.</div>
+    `;
+    document.getElementById('quick-result').style.display = 'block';
+    // Create new check-in in sheets
+    const now = dubaiNow();
+    const newId = 'VIS-' + Date.now();
+    const payload = {
+      date: fmtDate(now), checkInTime: fmtTime(now),
+      fullName: match.fullName, visitorId: newId,
+      phone: match.phone, email: match.email||'',
+      company: match.company, hostName: match.hostName,
+      hostCompany: COMPANY_NAME, purpose: match.purpose,
+      vehicle: match.vehicle||'', checkOutTime: '', status:'IN'
+    };
+    await apiPost(payload).catch(()=>{});
+    currentBadgeData = { ...payload, hostPhone: getHostPhone(match.hostName), hostEmail: getHostEmail(match.hostName) };
+    document.getElementById('quick-badge-btn').onclick = () => {
+      generateBadge(currentBadgeData);
+      openBadgeModal();
+    };
+  } catch(e) {
+    showNotice('quick-notice','err','Network error. Please try again.');
   }
 }
-function renderCI(visitors,q){
-  const f=visitors.filter(v=>v.name&&v.name.toLowerCase().startsWith(q.toLowerCase()));
-  if(!f.length){
-    document.getElementById('ci-list').innerHTML=`<div class="empty"><div class="empty-icon">👤</div><h3>No Match</h3><p>No previous visitor named "${esc(q)}".<br>Use Register tab for new visitors.</p></div>`;
+function resetQuickCheckin() {
+  document.getElementById('quick-search').value = '';
+  document.getElementById('quick-result').style.display = 'none';
+  hideNotice('quick-notice');
+  quickCheckinData = null;
+}
+
+// ── Check-out search ──
+async function coSearch() {
+  const q = document.getElementById('co-search').value.trim().toLowerCase();
+  if (!q) {
+    document.getElementById('co-list').innerHTML = '<div class="notice">👆 Use QR scanner or search above — results appear here</div>';
     return;
   }
-  document.getElementById('ci-list').innerHTML=f.map(v=>`
-    <div class="vc" style="cursor:pointer" onclick="doCI('${esc(v.id||v.row)}','${esc(v.name)}','${esc(v.host||'')}','${esc(v.purpose||'')}')">
-      <div class="av">${initials(v.name)}</div>
-      <div class="vi">
-        <div class="vn">${esc(v.name)}</div>
-        <div class="vd">${esc(v.company||'')} ${v.host?'· '+v.host:''}</div>
-        <div class="vt">Last visit: ${fdate(v.lastVisit||v.checkoutTime)}</div>
-      </div>
-      <span class="chip chip-red">TAP TO CHECK IN</span>
-    </div>`).join('');
-}
-async function doCI(id,name,host,purpose){
-  toast('Checking in '+name+'…');
-  try{
-    const res=await apiPost({action:'checkin',visitorId:id,name,host,purpose,timestamp:new Date().toISOString()});
-    if(res.success){
-      const token=res.token||mkToken(name);
-      const now=new Date();
-      document.getElementById('ciSearch').value='';
-      document.getElementById('ci-list').innerHTML='';
-      document.getElementById('ciClear').classList.remove('show');
-      document.getElementById('ci-pass-section').classList.remove('hidden');
-      document.getElementById('ci-pass').innerHTML=
-        buildPass({name,host,purpose,company:'',token},
-          now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
-          now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))+
-        `<div class="alert a-ok" style="margin-top:8px">✅ ${esc(name)} checked in successfully!</div>`;
-    } else { toast(res.message||'Check-in failed','err'); }
-  }catch(e){ toast('Network error. Try again.','err'); }
-}
-function ciAnother(){
-  document.getElementById('ci-pass-section').classList.add('hidden');
-  document.getElementById('ci-pass').innerHTML='';
-  document.getElementById('ciSearch').value='';
-  document.getElementById('ci-list').innerHTML='';
-  document.getElementById('ciClear').classList.remove('show');
-}
-function clearCI(){
-  document.getElementById('ciSearch').value='';
-  document.getElementById('ci-list').innerHTML='';
-  document.getElementById('ciClear').classList.remove('show');
-}
+  try {
+    const res = await api({action:'getVisitors'});
+    const visitors = (res.visitors||[]).filter(v => v.status === 'IN');
+    const matches = visitors.filter(v =>
+      (v.fullName||'').toLowerCase().includes(q) ||
+      (v.phone||'').includes(q) ||
+      (v.visitorId||'').toLowerCase().includes(q)
+    ).sort((a,b) => b.visitorId.localeCompare(a.visitorId));
 
-// ─── CHECKOUT ──────────────────────────────────────────────
-async function searchCO(q){
-  document.getElementById('coClear').classList.toggle('show',q.length>0);
-  if(q.length<2){ document.getElementById('co-list').innerHTML=''; return; }
-  document.getElementById('co-list').innerHTML=loadingHTML();
-  try{
-    const d=await apiGet({action:'search',query:q.trim(),status:'inside'});
-    renderCO(d.visitors||[],q.trim(),'co-list','recCO');
-  }catch(e){
-    document.getElementById('co-list').innerHTML=`<div class="alert a-err">Search failed. ${e.message}</div>`;
-  }
-}
-function renderCO(visitors,q,listId,fn){
-  const f=visitors.filter(v=>v.name&&v.name.toLowerCase().startsWith(q.toLowerCase()));
-  if(!f.length){
-    document.getElementById(listId).innerHTML=`<div class="empty"><div class="empty-icon">✅</div><h3>No Match</h3><p>No visitor named "${esc(q)}" currently inside.</p></div>`;
-    return;
-  }
-  document.getElementById(listId).innerHTML=f.map(v=>`
-    <div class="vc" style="cursor:pointer" onclick="${fn}('${esc(v.id||v.row)}','${esc(v.name)}')">
-      <div class="av in">${initials(v.name)}</div>
-      <div class="vi">
-        <div class="vn">${esc(v.name)}</div>
-        <div class="vd">Host: ${esc(v.host||'—')} · ${esc(v.purpose||'—')}</div>
-        <div class="vt">In: ${ftime(v.checkInTime)}</div>
-      </div>
-      <span class="chip chip-in">CHECK OUT</span>
-    </div>`).join('');
-}
-async function recCO(id,name){
-  if(!confirm('Check out '+name+'?')) return;
-  try{
-    const res=await apiPost({action:'checkout',visitorId:id,timestamp:new Date().toISOString()});
-    if(res.success){
-      toast(name+' checked out ✓','ok');
-      clearCO();
-      document.getElementById('co-result').innerHTML=
-        `<div class="alert a-ok">✅ ${esc(name)} checked out at ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}.</div>`;
-    } else { toast(res.message||'Checkout failed','err'); }
-  }catch(e){ toast('Network error.','err'); }
-}
-function clearCO(){
-  document.getElementById('coSearch').value='';
-  document.getElementById('co-list').innerHTML='';
-  document.getElementById('coClear').classList.remove('show');
-}
-function toggleCoScanner(){
-  const el=document.getElementById('co-scanner');
-  if(el.classList.contains('hidden')){
-    el.classList.remove('hidden');
-    startScan('qrv1',token=>handleQRCO(token,'co-result'));
-  } else { el.classList.add('hidden'); stopScan('qrv1'); }
-}
-async function handleQRCO(token,resultId){
-  stopScan('qrv1');
-  document.getElementById('co-scanner').classList.add('hidden');
-  document.getElementById(resultId).innerHTML=loadingHTML('Looking up token…');
-  try{
-    const d=await apiGet({action:'lookupToken',token});
-    if(d.visitor){
-      const v=d.visitor;
-      document.getElementById(resultId).innerHTML=`
-        <div class="vc">
-          <div class="av in">${initials(v.name)}</div>
-          <div class="vi"><div class="vn">${esc(v.name)}</div><div class="vd">Host: ${esc(v.host||'—')}</div><div class="vt">In: ${ftime(v.checkInTime)}</div></div>
-          <span class="chip chip-in">INSIDE</span>
+    if (!matches.length) {
+      document.getElementById('co-list').innerHTML = '<div class="notice">No checked-in visitors match your search.</div>';
+      return;
+    }
+    document.getElementById('co-list').innerHTML = matches.map(v => `
+      <div class="visitor-card" style="border-left-color:var(--green)">
+        <div class="vc-row">
+          <div>
+            <div class="vc-name">${v.fullName}</div>
+            <div class="vc-meta">${v.company} · ${v.phone}</div>
+            <div class="vc-meta">ID: ${v.visitorId} · In: ${v.date} ${v.checkInTime}</div>
+          </div>
+          <button class="btn-primary" style="width:auto;padding:8px 18px" onclick="doCheckout('${v.visitorId}','${v.fullName}')">Check Out</button>
         </div>
-        <button class="btn btn-red mt8" onclick="recCO('${esc(v.id||v.row)}','${esc(v.name)}')">🚪 Check Out ${esc(v.name)}</button>`;
-    } else {
-      document.getElementById(resultId).innerHTML=`<div class="alert a-err">❌ Token not found or visitor already checked out.</div>`;
-    }
-  }catch(e){ document.getElementById(resultId).innerHTML=`<div class="alert a-err">Network error.</div>`; }
-}
-
-// ─── DASHBOARD ─────────────────────────────────────────────
-async function loadDash(){
-  document.getElementById('s-today').innerHTML='<span class="dots"><span></span><span></span><span></span></span>';
-  try{
-    const d=await apiGet({action:'getStats'});
-    document.getElementById('s-today').textContent=d.today??'0';
-    document.getElementById('s-inside').textContent=d.inside??'0';
-    document.getElementById('s-week').textContent=d.week??'0';
-    document.getElementById('s-month').textContent=d.month??'0';
-    document.getElementById('s-total').textContent=d.total??'0';
-    if(d.archived) document.getElementById('s-arch').textContent=d.archived+' archived (30+ days)';
-    const cv=d.currentVisitors||[];
-    document.getElementById('dash-now').innerHTML=cv.length
-      ? cv.map(v=>`<div class="vc"><div class="av in">${initials(v.name)}</div><div class="vi"><div class="vn">${esc(v.name)}</div><div class="vd">${esc(v.host||'')} · ${esc(v.purpose||'')}</div><div class="vt">In: ${ftime(v.checkInTime)}</div></div><span class="chip chip-in">IN</span></div>`).join('')
-      : `<div class="empty"><div class="empty-icon">🏢</div><h3>No Visitors Inside</h3><p>All clear!</p></div>`;
-  }catch(e){
-    document.getElementById('s-today').textContent='—';
-    showAlert('dash-now','a-err','Could not load data. Check Apps Script deployment.');
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('co-list').innerHTML = '<div class="notice err">Network error. Please try again.</div>';
   }
 }
 
-// ─── CURRENT VISITORS ──────────────────────────────────────
-async function loadNow(){
-  document.getElementById('now-list').innerHTML=loadingHTML();
-  try{
-    const d=await apiGet({action:'getCurrentVisitors'});
-    const v=(d.visitors||[]).reverse();
-    document.getElementById('now-cnt').textContent=v.length;
-    document.getElementById('now-list').innerHTML=v.length
-      ? v.map(x=>`<div class="vc"><div class="av in">${initials(x.name)}</div><div class="vi"><div class="vn">${esc(x.name)}</div><div class="vd">Host: ${esc(x.host||'—')} · ${esc(x.purpose||'—')}</div><div class="vd">${esc(x.company||'')}</div><div class="vt">In: ${ftime(x.checkInTime)}</div></div><button class="btn btn-sm btn-ghost" onclick="staffCO('${esc(x.id||x.row)}','${esc(x.name)}')">Check Out</button></div>`).join('')
-      : `<div class="empty"><div class="empty-icon">✅</div><h3>No Visitors Inside</h3></div>`;
-  }catch(e){ document.getElementById('now-list').innerHTML=`<div class="alert a-err">Failed to load. ${e.message}</div>`; }
-}
-async function staffCO(id,name){
-  if(!confirm('Check out '+name+'?')) return;
-  try{
-    const r=await apiPost({action:'checkout',visitorId:id,timestamp:new Date().toISOString()});
-    r.success ? (toast(name+' checked out ✓','ok'), loadNow()) : toast(r.message||'Failed','err');
-  }catch(e){ toast('Network error','err'); }
+async function doCheckout(vid, name) {
+  if (!confirm(`Check out visitor:\n${name}?`)) return;
+  const now = dubaiNow();
+  try {
+    await api({action:'checkout', visitorId: vid, checkoutTime: fmtTime(now)});
+    coSearch();
+    showNotice('scan-notice','success',`✅ ${name} checked out at ${fmtTime(now)}`);
+  } catch(e) {
+    alert('Checkout failed. Please try again.');
+  }
 }
 
-// ─── HISTORY ───────────────────────────────────────────────
-async function loadHist(){
-  document.getElementById('hist-list').innerHTML=loadingHTML();
-  try{
-    const d=await apiGet({action:'getHistory'});
-    histAll=(d.visitors||[]).reverse();
-    document.getElementById('hist-cnt').textContent=histAll.length;
-    renderHist(histAll);
-  }catch(e){ document.getElementById('hist-list').innerHTML=`<div class="alert a-err">Failed to load.</div>`; }
+// ── QR SCANNER (Reception) ──
+async function toggleScanner() {
+  if (scannerActive) {
+    stopScanner(); return;
+  }
+  const wrap = document.getElementById('scanner-wrap');
+  const btn = document.getElementById('scan-btn');
+  wrap.style.display = 'block';
+  btn.textContent = '⏹ Stop Scanner';
+  scannerActive = true;
+  try {
+    scannerStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const video = document.getElementById('scanner-video');
+    video.srcObject = scannerStream;
+    video.play();
+    video.addEventListener('loadedmetadata', () => scanQR());
+  } catch(e) { showNotice('scan-notice','err','Camera access denied.'); stopScanner(); }
 }
-function renderHist(v){
-  document.getElementById('hist-list').innerHTML=v.length
-    ? v.map(x=>`<div class="vc"><div class="av">${initials(x.name)}</div><div class="vi"><div class="vn">${esc(x.name)}</div><div class="vd">${esc(x.host||'—')} · ${esc(x.purpose||'—')}</div><div class="vt">${fdate(x.checkInTime)} → ${ftime(x.checkoutTime)||'Still inside'}</div></div><button class="btn btn-sm btn-danger" onclick="openDel('${esc(x.id||x.row)}','${esc(x.name)}')">🗑️</button></div>`).join('')
-    : `<div class="empty"><div class="empty-icon">📋</div><h3>No History</h3></div>`;
+function stopScanner() {
+  scannerActive = false;
+  if (scannerStream) { scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; }
+  document.getElementById('scanner-wrap').style.display = 'none';
+  document.getElementById('scan-btn').textContent = '📷 Start QR Scanner';
 }
-function filterHist(q){
-  document.getElementById('histClear').classList.toggle('show',q.length>0);
-  if(!q){ document.getElementById('hist-cnt').textContent=histAll.length; renderHist(histAll); return; }
-  const f=histAll.filter(v=>(v.name&&v.name.toLowerCase().startsWith(q.toLowerCase()))||(v.host&&v.host.toLowerCase().startsWith(q.toLowerCase())));
-  document.getElementById('hist-cnt').textContent=f.length;
-  renderHist(f);
+function scanQR() {
+  if (!scannerActive) return;
+  const video = document.getElementById('scanner-video');
+  const canvas = document.getElementById('scanner-canvas');
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const img = canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height);
+    const code = jsQR(img.data, img.width, img.height);
+    if (code) { stopScanner(); handleQRCheckout(code.data, 'scan-notice'); return; }
+  }
+  requestAnimationFrame(scanQR);
 }
-function clearHistSearch(){
-  document.getElementById('histSearch').value='';
-  document.getElementById('histClear').classList.remove('show');
-  document.getElementById('hist-cnt').textContent=histAll.length;
-  renderHist(histAll);
-}
-
-// ─── STAFF SCANNER ─────────────────────────────────────────
-function startStaffScan(){
-  document.getElementById('scan-vid-wrap').classList.remove('hidden');
-  document.getElementById('startScanBtn').classList.add('hidden');
-  startScan('qrv2',token=>handleQRCO(token,'scan-result').then(()=>{ document.getElementById('scan-vid-wrap').classList.add('hidden'); document.getElementById('startScanBtn').classList.remove('hidden'); }));
-}
-function stopStaffScan(){
-  stopScan('qrv2');
-  document.getElementById('scan-vid-wrap').classList.add('hidden');
-  document.getElementById('startScanBtn').classList.remove('hidden');
-}
-async function searchStaffCO(q){
-  document.getElementById('scanClear').classList.toggle('show',q.length>0);
-  if(q.length<2){ document.getElementById('scan-co-list').innerHTML=''; return; }
-  document.getElementById('scan-co-list').innerHTML=loadingHTML();
-  try{
-    const d=await apiGet({action:'search',query:q.trim(),status:'inside'});
-    renderCO(d.visitors||[],q.trim(),'scan-co-list','staffCO');
-  }catch(e){ document.getElementById('scan-co-list').innerHTML=`<div class="alert a-err">Search failed.</div>`; }
-}
-function clearScanSearch(){
-  document.getElementById('scanSearch').value='';
-  document.getElementById('scan-co-list').innerHTML='';
-  document.getElementById('scanClear').classList.remove('show');
+async function handleQRCheckout(vid, noticeId) {
+  try {
+    const res = await api({action:'getVisitors'});
+    const v = (res.visitors||[]).find(x => x.visitorId === vid);
+    if (!v) { showNotice(noticeId,'err','❌ Visitor not found in system.'); return; }
+    if (v.status === 'OUT') { showNotice(noticeId,'warn','ℹ️ Visitor already checked out.'); return; }
+    if (confirm(`Check out: ${v.fullName} (${v.company})?`)) {
+      const now = dubaiNow();
+      await api({action:'checkout', visitorId: vid, checkoutTime: fmtTime(now)});
+      showNotice(noticeId,'success',`✅ ${v.fullName} checked out at ${fmtTime(now)}`);
+    }
+  } catch(e) { showNotice(noticeId,'err','Network error.'); }
 }
 
-// ─── MANAGEMENT ────────────────────────────────────────────
-async function loadManage(){
-  try{
-    const d=await apiGet({action:'getConfig'});
-    const sl=d.staff||[], pl=d.purposes||[];
-    document.getElementById('mg-staff').innerHTML=sl.length
-      ? sl.map((s,i)=>`<div class="mi"><div><div class="mi-name">${esc(s.name)}</div>${s.dept?`<div class="mi-sub">${esc(s.dept)}</div>`:''}</div><button class="btn btn-sm btn-danger" onclick="delStaff(${i})">Remove</button></div>`).join('')
-      : '<p style="font-size:13px;color:var(--light);padding:10px 0">No staff added yet</p>';
-    document.getElementById('mg-purpose').innerHTML=pl.length
-      ? pl.map((p,i)=>`<div class="mi"><div class="mi-name">${esc(p)}</div><button class="btn btn-sm btn-danger" onclick="delPurpose(${i})">Remove</button></div>`).join('')
-      : '<p style="font-size:13px;color:var(--light);padding:10px 0">No purposes added yet</p>';
-  }catch(e){ toast('Failed to load settings','err'); }
+// ── QR SCANNER (Staff) ──
+async function toggleScanner2() {
+  if (scannerActive2) { stopScanner2(); return; }
+  const wrap = document.getElementById('scanner-wrap2');
+  const btn = document.getElementById('scan-btn2');
+  wrap.style.display = 'block';
+  btn.textContent = '⏹ Stop Scanner';
+  scannerActive2 = true;
+  try {
+    scannerStream2 = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const video = document.getElementById('scanner-video2');
+    video.srcObject = scannerStream2;
+    video.play();
+    video.addEventListener('loadedmetadata', () => scanQR2());
+  } catch(e) { showNotice('uco-notice','err','Camera access denied.'); stopScanner2(); }
 }
-function openModal(id){ document.getElementById(id).classList.add('on'); }
-function closeModal(id){ document.getElementById(id).classList.remove('on'); }
-async function addStaff(){
-  const name=document.getElementById('nStaffName').value.trim();
-  const dept=document.getElementById('nStaffDept').value.trim();
-  if(!name){ toast('Enter a name','err'); return; }
-  try{
-    const r=await apiPost({action:'addStaff',name,dept});
-    if(r.success){ toast(name+' added ✓','ok'); closeModal('m-staff'); document.getElementById('nStaffName').value=''; document.getElementById('nStaffDept').value=''; loadManage(); }
-    else toast(r.message||'Failed','err');
-  }catch(e){ toast('Network error','err'); }
+function stopScanner2() {
+  scannerActive2 = false;
+  if (scannerStream2) { scannerStream2.getTracks().forEach(t => t.stop()); scannerStream2 = null; }
+  document.getElementById('scanner-wrap2').style.display = 'none';
+  document.getElementById('scan-btn2').textContent = '📷 Start Scanner';
 }
-async function addPurpose(){
-  const p=document.getElementById('nPurpose').value.trim();
-  if(!p){ toast('Enter a purpose','err'); return; }
-  try{
-    const r=await apiPost({action:'addPurpose',purpose:p});
-    if(r.success){ toast(p+' added ✓','ok'); closeModal('m-purpose'); document.getElementById('nPurpose').value=''; loadManage(); }
-    else toast(r.message||'Failed','err');
-  }catch(e){ toast('Network error','err'); }
-}
-async function delStaff(i){
-  if(!confirm('Remove this staff member?')) return;
-  try{
-    const r=await apiPost({action:'deleteStaff',index:i});
-    r.success ? (toast('Removed ✓','ok'), loadManage()) : toast(r.message||'Failed','err');
-  }catch(e){ toast('Network error','err'); }
-}
-async function delPurpose(i){
-  if(!confirm('Remove this purpose?')) return;
-  try{
-    const r=await apiPost({action:'deletePurpose',index:i});
-    r.success ? (toast('Removed ✓','ok'), loadManage()) : toast(r.message||'Failed','err');
-  }catch(e){ toast('Network error','err'); }
+function scanQR2() {
+  if (!scannerActive2) return;
+  const video = document.getElementById('scanner-video2');
+  const canvas = document.getElementById('scanner-canvas2');
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const img = canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height);
+    const code = jsQR(img.data, img.width, img.height);
+    if (code) { stopScanner2(); handleQRCheckout(code.data, 'uco-notice'); return; }
+  }
+  requestAnimationFrame(scanQR2);
 }
 
-// ─── DELETE RECORD ─────────────────────────────────────────
-function openDel(rowId,name){
-  delRowId=rowId;
-  document.getElementById('del-text').textContent=`Delete visit record for "${name}"? This cannot be undone.`;
-  openModal('m-del');
+// ── BADGE ──
+function generateBadge(d) {
+  const now = dubaiNow();
+  document.getElementById('b-datetime').textContent = fmtDisplay(now);
+  document.getElementById('b-name').textContent = d.fullName;
+  document.getElementById('b-company').textContent = d.company;
+  document.getElementById('b-host').textContent = '– ' + d.hostName;
+  document.getElementById('b-vid').textContent = 'Visitor ID: ' + d.visitorId;
+  const qrDiv = document.getElementById('badge-qr');
+  qrDiv.innerHTML = '';
+  new QRCode(qrDiv, { text: d.visitorId, width: 80, height: 80, colorDark:'#111', colorLight:'#fff' });
 }
-async function confirmDel(){
-  closeModal('m-del');
-  if(!delRowId) return;
-  try{
-    const r=await apiPost({action:'deleteVisit',rowId:delRowId});
-    r.success ? (toast('Deleted ✓','ok'), loadHist()) : toast(r.message||'Failed','err');
-  }catch(e){ toast('Network error','err'); }
-}
-
-// ─── EXPORT ────────────────────────────────────────────────
-async function exportCSV(){
-  toast('Preparing export…');
-  try{
-    const d=await apiGet({action:'getAll'});
-    const hdr=['Name','Company','Phone','Purpose','Host','Check In','Check Out','Token','Notes'];
-    const rows=(d.visitors||[]).map(v=>[v.name,v.company,v.phone,v.purpose,v.host,v.checkInTime,v.checkoutTime,v.token,v.notes].map(f=>`"${String(f||'').replace(/"/g,'""')}"`));
-    const csv=[hdr.join(','),...rows.map(r=>r.join(','))].join('\n');
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-    a.download='PPC_Visitors_'+new Date().toISOString().slice(0,10)+'.csv';
-    a.click();
-    toast('Export ready ✓','ok');
-  }catch(e){ toast('Export failed','err'); }
+function openBadgeModal() { document.getElementById('badge-modal').classList.add('open'); }
+function closeBadgeModal() {
+  document.getElementById('badge-modal').classList.remove('open');
+  if (quickCheckinData) resetQuickCheckin();
 }
 
-// ─── QR SCANNER ENGINE ─────────────────────────────────────
-async function startScan(videoId,cb){
-  const video=document.getElementById(videoId);
-  if(!video) return;
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    scanStreams[videoId]={stream};
-    video.srcObject=stream; video.play();
-    const canvas=document.createElement('canvas');
-    const ctx=canvas.getContext('2d');
-    const interval=setInterval(()=>{
-      if(video.readyState===video.HAVE_ENOUGH_DATA){
-        canvas.width=video.videoWidth; canvas.height=video.videoHeight;
-        ctx.drawImage(video,0,0);
-        const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-        const code=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
-        if(code&&code.data){ clearInterval(interval); scanStreams[videoId].interval=null; cb(code.data); }
-      }
-    },250);
-    scanStreams[videoId].interval=interval;
-  }catch(e){ toast('Camera access denied. Enable camera permission.','err'); }
+async function savePDF() {
+  const el = document.getElementById('badge-print');
+  const canvas = await html2canvas(el, {scale:2, useCORS:true});
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF({orientation:'landscape', unit:'mm', format:[100, 65]});
+  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 100, 65);
+  pdf.save('PPC-Badge-' + (currentBadgeData?.visitorId||'visitor') + '.pdf');
 }
-function stopScan(id){
-  if(!scanStreams[id]) return;
-  if(scanStreams[id].interval) clearInterval(scanStreams[id].interval);
-  if(scanStreams[id].stream) scanStreams[id].stream.getTracks().forEach(t=>t.stop());
-  const v=document.getElementById(id);
-  if(v) v.srcObject=null;
-  delete scanStreams[id];
-}
-function stopAllScan(){ ['qrv1','qrv2'].forEach(stopScan); }
+function printBadge() { savePDF(); window.print(); }
 
-// ─── TOAST ─────────────────────────────────────────────────
-let toastT;
-function toast(msg,type=''){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.className='toast show'+(type?' '+type:'');
-  clearTimeout(toastT);
-  toastT=setTimeout(()=>el.className='toast',3200);
+function notifyHost(d) {
+  if (!d.hostPhone) return;
+  const msg = encodeURIComponent(`🔔 Visitor Alert!\n\n${d.fullName} from ${d.company} is here to see you.\n\nPurpose: ${d.purpose}\nTime: ${fmtDisplay(dubaiNow())}\n\nPlease come to reception.\n\n– PPC Reception`);
+  const phone = d.hostPhone.replace(/\D/g,'');
+  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank', 'width=600,height=400');
+}
+function shareWhatsApp() { if (currentBadgeData) notifyHost(currentBadgeData); }
+
+// ── LOGIN ──
+async function doLogin() {
+  const pw = document.getElementById('login-pw').value;
+  try {
+    const res = await api({action:'getPassword'});
+    storedPassword = res.password || storedPassword;
+  } catch(e) {}
+  if (pw === storedPassword) {
+    document.getElementById('login-pw').value = '';
+    document.getElementById('login-err').style.display = 'none';
+    showScreen('staff');
+    loadDashboard();
+  } else {
+    const err = document.getElementById('login-err');
+    err.textContent = '❌ Incorrect password. Please try again.';
+    err.style.display = 'block';
+  }
 }
 
-// ─── HELPERS ───────────────────────────────────────────────
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-function g(id){ return document.getElementById(id).value; }
-function gv(id){ return document.getElementById(id).value; }
-function initials(n){ return String(n||'').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?'; }
-function mkToken(name){ const i=name.replace(/[^a-zA-Z ]/g,'').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,3); return i+(Math.floor(1000+Math.random()*9000)); }
-function ftime(ts){ if(!ts) return '—'; try{ return new Date(ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ts; } }
-function fdate(ts){ if(!ts) return '—'; try{ return new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){ return ts; } }
-function loadingHTML(msg=''){ return `<div class="empty" style="padding:28px"><div class="dots" style="color:var(--red)"><span></span><span></span><span></span></div>${msg?`<p style="margin-top:10px;color:var(--mid);font-size:13px">${msg}</p>`:''}</div>`; }
-function showAlert(id,cls,msg){ document.getElementById(id).innerHTML=`<div class="alert ${cls}">${msg}</div>`; }
+// ── DASHBOARD ──
+async function loadDashboard() {
+  try {
+    const res = await api({action:'getVisitors'});
+    allVisitors = res.visitors || [];
+    const now = dubaiNow();
+    const todayStr = fmtDate(now);
+    const thirtyAgo = new Date(now); thirtyAgo.setDate(thirtyAgo.getDate()-30);
+    const inNow = allVisitors.filter(v => v.status==='IN' && v.archived!=='YES');
+    const today = allVisitors.filter(v => v.date===todayStr);
+    const active = allVisitors.filter(v => v.archived!=='YES');
+    const archived = allVisitors.filter(v => {
+      const [d,m,y] = (v.date||'').split('/');
+      const vDate = new Date(+y,+m-1,+d);
+      return vDate < thirtyAgo;
+    });
+    document.getElementById('stat-in').textContent = inNow.length;
+    document.getElementById('stat-today').textContent = today.length;
+    document.getElementById('stat-total').textContent = active.length;
+    document.getElementById('stat-arch').textContent = archived.length;
+  } catch(e) {
+    showNotice('dash-notice','err','Could not load data. Check network connection.');
+  }
+}
 
-// ─── MODAL CLOSE ON BACKDROP ───────────────────────────────
-document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on')}));
+// ── CURRENT VISITORS ──
+async function loadCurrent() {
+  const el = document.getElementById('current-list');
+  el.innerHTML = '<div class="notice">Loading…</div>';
+  try {
+    const res = await api({action:'getVisitors'});
+    const current = (res.visitors||[]).filter(v => v.status==='IN' && v.archived!=='YES');
+    if (!current.length) { el.innerHTML = '<div class="notice">No visitors currently checked in.</div>'; return; }
+    el.innerHTML = current.map(v => `
+      <div class="visitor-card">
+        <div class="vc-name">${v.fullName}</div>
+        <div class="vc-meta">${v.company} · ${v.phone}</div>
+        <div class="vc-meta">Visiting: ${v.hostName} · ${v.date} ${v.checkInTime}</div>
+        <div style="margin-top:8px">
+          <button class="btn-secondary" onclick="staffCheckout('${v.visitorId}','${v.fullName}')">Check Out</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { el.innerHTML = '<div class="notice err">Network error.</div>'; }
+}
 
-// ─── SERVICE WORKER ────────────────────────────────────────
-if('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+async function staffCheckout(vid, name) {
+  if (!confirm(`Check out:\n${name}?`)) return;
+  const now = dubaiNow();
+  await api({action:'checkout', visitorId: vid, checkoutTime: fmtTime(now)}).catch(()=>{});
+  loadCurrent();
+}
+
+// ── HISTORY ──
+let currentFilter = 'today';
+async function loadHistory(filter) {
+  currentFilter = filter;
+  const el = document.getElementById('history-list');
+  el.innerHTML = '<div class="notice">Loading…</div>';
+  try {
+    const res = await api({action:'getVisitors'});
+    let visitors = res.visitors || [];
+    const now = dubaiNow();
+    const todayStr = fmtDate(now);
+    const thirtyAgo = new Date(now); thirtyAgo.setDate(thirtyAgo.getDate()-30);
+    const sevenAgo = new Date(now); sevenAgo.setDate(sevenAgo.getDate()-7);
+
+    if (filter==='today') visitors = visitors.filter(v => v.date===todayStr);
+    else if (filter==='week') visitors = visitors.filter(v => { const [d,m,y]=(v.date||'').split('/'); return new Date(+y,+m-1,+d)>=sevenAgo; });
+    else if (filter==='month') visitors = visitors.filter(v => v.archived!=='YES');
+    else if (filter==='all') visitors = visitors.filter(v => v.archived!=='YES');
+    else if (filter==='archived') visitors = visitors.filter(v => { const [d,m,y]=(v.date||'').split('/'); return new Date(+y,+m-1,+d)<thirtyAgo; });
+
+    visitors = visitors.sort((a,b) => b.visitorId.localeCompare(a.visitorId));
+
+    if (!visitors.length) { el.innerHTML = '<div class="notice">No visitors found for this filter.</div>'; return; }
+    const isArch = filter==='archived';
+    if (isArch) el.innerHTML = '<div class="notice warn" style="margin-bottom:12px">📦 Archived records (30+ days old)</div>';
+    else el.innerHTML = '';
+    el.innerHTML += visitors.map(v => {
+      const isIn = v.status==='IN';
+      return `<div class="visitor-card ${isIn?'':'out'} ${isArch?'archived':''}">
+        <div class="vc-row">
+          <div>
+            <div class="vc-name">${v.fullName} <span class="badge ${isIn?'badge-in':'badge-out'}">${v.status}</span></div>
+            <div class="vc-meta">${v.company} · Host: ${v.hostName}</div>
+            <div class="vc-meta">In: ${v.date} ${v.checkInTime}${v.checkOutTime?' · Out: '+v.checkOutTime:''}</div>
+            <div class="vc-meta" style="color:var(--text3)">${v.visitorId}</div>
+          </div>
+          <button class="btn-danger" onclick="deleteVisitor('${v.visitorId}','${v.fullName}')">🗑 Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div class="notice err">Network error.</div>'; }
+}
+
+function filterHistory(f, el) {
+  document.querySelectorAll('#staff-history .btn-secondary').forEach(b => b.style.borderColor='');
+  el.style.borderColor = 'var(--green)';
+  loadHistory(f);
+}
+
+async function deleteVisitor(vid, name) {
+  if (!confirm(`⚠️ PERMANENTLY DELETE this visitor?\n\nName: ${name}\n\nThis cannot be undone!`)) return;
+  try {
+    await api({action:'deleteVisitor', visitorId: vid});
+    loadHistory(currentFilter);
+  } catch(e) { alert('Delete failed. Please try again.'); }
+}
+
+// ── EOD ──
+async function openEOD() {
+  const res = await api({action:'getVisitors'}).catch(()=>({visitors:[]}));
+  const inList = (res.visitors||[]).filter(v => v.status==='IN' && v.archived!=='YES');
+  const modal = document.getElementById('eod-modal');
+  const warn = document.getElementById('eod-warn');
+  const list = document.getElementById('eod-list');
+  if (!inList.length) { alert('✅ All visitors have checked out!'); return; }
+  warn.textContent = `⚠️ ${inList.length} visitor(s) still checked in`;
+  list.innerHTML = inList.map(v => `
+    <div class="eod-visitor-row">
+      <input type="checkbox" class="eod-check" data-vid="${v.visitorId}" checked>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--text)">${v.fullName}</div>
+        <div style="font-size:12px;color:var(--text2)">${v.company} · in ${v.checkInTime}</div>
+      </div>
+    </div>
+  `).join('');
+  modal.classList.add('open');
+}
+function closeEOD() { document.getElementById('eod-modal').classList.remove('open'); }
+function eodSelectAll() { document.querySelectorAll('.eod-check').forEach(c => c.checked=true); }
+function eodDeselectAll() { document.querySelectorAll('.eod-check').forEach(c => c.checked=false); }
+async function eodCheckoutSelected() {
+  const now = dubaiNow();
+  const selected = [...document.querySelectorAll('.eod-check:checked')].map(c => c.dataset.vid);
+  for (const vid of selected) {
+    await api({action:'checkout', visitorId: vid, checkoutTime: fmtTime(now)}).catch(()=>{});
+  }
+  closeEOD(); loadDashboard();
+  alert(`✅ ${selected.length} visitor(s) checked out.`);
+}
+async function eodCheckoutAll() {
+  if (!confirm('⚠️ Check out ALL visitors?')) return;
+  eodSelectAll(); await eodCheckoutSelected();
+}
+
+// ── EXPORT ──
+async function exportToday() {
+  const res = await api({action:'getVisitors'}).catch(()=>({visitors:[]}));
+  const today = fmtDate(dubaiNow());
+  const rows = (res.visitors||[]).filter(v => v.date===today);
+  if (!rows.length) { alert('No visitors today.'); return; }
+  const headers = ['Date','Check-In Time','Full Name','Visitor ID','Phone','Email','Company','Host Name','Purpose','Status'];
+  const csv = [headers.join(','), ...rows.map(v =>
+    [v.date, v.checkInTime, v.fullName, v.visitorId, v.phone, v.email||'', v.company, v.hostName, v.purpose, v.status].map(x => `"${x||''}"`).join(',')
+  )].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `PPC-visitors-today-${today.replace(/\//g,'-')}.csv`;
+  a.click();
+}
+
+// ── STAFF MANAGEMENT ──
+async function loadStaffTable() {
+  const wrap = document.getElementById('staff-table-wrap');
+  wrap.innerHTML = '<div class="notice">Loading…</div>';
+  try {
+    const res = await api({action:'getStaff'});
+    staffList = res.staff || [];
+    if (!staffList.length) { wrap.innerHTML = '<div class="notice">No staff members yet.</div>'; return; }
+    wrap.innerHTML = `<table class="mgmt-table">
+      <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Actions</th></tr></thead>
+      <tbody>${staffList.map((s,i) => `<tr>
+        <td style="color:var(--text)">${s.name}</td>
+        <td>${s.phone||'–'}</td>
+        <td>${s.email||'–'}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="editStaff(${i})">Edit</button>
+          <button class="btn-danger" onclick="deleteStaff(${i},'${s.name}')">Delete</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } catch(e) { wrap.innerHTML = '<div class="notice err">Network error.</div>'; }
+}
+
+async function addStaff() {
+  const name = prompt('Staff name:'); if (!name) return;
+  const phone = prompt('Phone (optional):') || '';
+  const email = prompt('Email (optional):') || '';
+  staffList.push({name, phone, email});
+  await api({action:'updateStaff', data: JSON.stringify(staffList)}).catch(()=>{});
+  loadStaffTable();
+}
+async function editStaff(i) {
+  const s = staffList[i];
+  const phone = prompt('New phone:', s.phone||'');
+  const email = prompt('New email:', s.email||'');
+  staffList[i] = {...s, phone: phone||s.phone, email: email||s.email};
+  await api({action:'updateStaff', data: JSON.stringify(staffList)}).catch(()=>{});
+  loadStaffTable();
+}
+async function deleteStaff(i, name) {
+  if (!confirm(`Delete staff member: ${name}?`)) return;
+  staffList.splice(i,1);
+  await api({action:'updateStaff', data: JSON.stringify(staffList)}).catch(()=>{});
+  loadStaffTable();
+}
+
+// ── PURPOSES ──
+async function loadPurposes() {
+  const wrap = document.getElementById('purposes-chips');
+  wrap.innerHTML = '<div class="notice">Loading…</div>';
+  try {
+    const res = await api({action:'getPurposes'});
+    purposeList = res.purposes || [];
+    renderPurposes();
+  } catch(e) { wrap.innerHTML = '<div class="notice err">Network error.</div>'; }
+}
+function renderPurposes() {
+  const wrap = document.getElementById('purposes-chips');
+  if (!purposeList.length) { wrap.innerHTML = '<div class="notice">No purposes yet.</div>'; return; }
+  wrap.innerHTML = '<div class="chips">' + purposeList.map((p,i) =>
+    `<div class="chip">${p}<button class="chip-x" onclick="deletePurpose(${i},'${p}')">×</button></div>`
+  ).join('') + '</div>';
+}
+async function addPurpose() {
+  const val = document.getElementById('new-purpose').value.trim();
+  if (!val) return;
+  if (purposeList.includes(val)) { showNotice('purpose-notice','warn','Purpose already exists.'); return; }
+  purposeList.push(val);
+  await api({action:'updatePurposes', data: JSON.stringify(purposeList)}).catch(()=>{});
+  document.getElementById('new-purpose').value = '';
+  renderPurposes();
+  showNotice('purpose-notice','success','Purpose added!');
+}
+async function deletePurpose(i, name) {
+  if (!confirm(`Delete purpose: ${name}?`)) return;
+  purposeList.splice(i,1);
+  await api({action:'updatePurposes', data: JSON.stringify(purposeList)}).catch(()=>{});
+  renderPurposes();
+}
+
+// ── SETTINGS ──
+async function changePassword() {
+  const curr = document.getElementById('pw-current').value;
+  const newpw = document.getElementById('pw-new').value;
+  const conf = document.getElementById('pw-confirm').value;
+  if (curr !== storedPassword) { showNotice('pw-notice','err','❌ Current password is incorrect.'); return; }
+  if (newpw.length < 6) { showNotice('pw-notice','err','New password must be at least 6 characters.'); return; }
+  if (newpw !== conf) { showNotice('pw-notice','err','Passwords do not match.'); return; }
+  try {
+    await api({action:'updatePassword', password: newpw});
+    storedPassword = newpw;
+    ['pw-current','pw-new','pw-confirm'].forEach(id => document.getElementById(id).value='');
+    showNotice('pw-notice','success','✅ Password changed successfully!');
+  } catch(e) { showNotice('pw-notice','err','Network error. Password not changed.'); }
+}
+
+// ── HELPERS ──
+function showNotice(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'notice ' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideNotice(id) { document.getElementById(id).style.display = 'none'; }
+
+// ── INIT ──
+document.getElementById('login-pw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 </script>
 </body>
 </html>
